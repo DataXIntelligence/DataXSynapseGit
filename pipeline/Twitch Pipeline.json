@@ -20,11 +20,17 @@
 						"type": "NotebookReference"
 					},
 					"snapshot": true,
+					"sparkPool": {
+						"referenceName": "SparkPool01",
+						"type": "BigDataPoolReference"
+					},
+					"executorSize": "Small",
 					"conf": {
 						"spark.dynamicAllocation.enabled": null,
 						"spark.dynamicAllocation.minExecutors": null,
 						"spark.dynamicAllocation.maxExecutors": null
 					},
+					"driverSize": "Small",
 					"numExecutors": null
 				}
 			},
@@ -78,11 +84,17 @@
 						"type": "NotebookReference"
 					},
 					"snapshot": true,
+					"sparkPool": {
+						"referenceName": "SparkPool01",
+						"type": "BigDataPoolReference"
+					},
+					"executorSize": "Small",
 					"conf": {
 						"spark.dynamicAllocation.enabled": null,
 						"spark.dynamicAllocation.minExecutors": null,
 						"spark.dynamicAllocation.maxExecutors": null
 					},
+					"driverSize": "Small",
 					"numExecutors": null
 				}
 			},
