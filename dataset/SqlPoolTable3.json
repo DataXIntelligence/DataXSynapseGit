@@ -1,0 +1,16 @@
+{
+	"name": "SqlPoolTable3",
+	"properties": {
+		"annotations": [],
+		"type": "SqlPoolTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "Twitch",
+			"table": "TopGames"
+		},
+		"sqlPool": {
+			"referenceName": "DataXDW",
+			"type": "SqlPoolReference"
+		}
+	}
+}
