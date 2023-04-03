@@ -5,7 +5,14 @@
 			{
 				"name": "LoadVideoData",
 				"type": "SynapseNotebook",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "Copy Streams Data",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -37,14 +44,7 @@
 			{
 				"name": "LoadStreamsData",
 				"type": "SynapseNotebook",
-				"dependsOn": [
-					{
-						"activity": "LoadVideoData",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -78,7 +78,7 @@
 				"type": "SynapseNotebook",
 				"dependsOn": [
 					{
-						"activity": "Copy Streams Data",
+						"activity": "Copy Data Videos",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -207,7 +207,7 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "SqlPoolTable4",
+						"referenceName": "StreamsTable",
 						"type": "DatasetReference"
 					}
 				]
