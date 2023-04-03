@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "1",
 				"spark.dynamicAllocation.maxExecutors": "1",
-				"spark.autotune.trackingId": "1dcabaa0-ec8d-4423-94e1-066a27228eeb"
+				"spark.autotune.trackingId": "1347d170-e64e-4dbc-9a1d-d3f19ff314b9"
 			}
 		},
 		"metadata": {
@@ -360,6 +360,50 @@
 					"print(refresh_df.shape)"
 				],
 				"execution_count": 120
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Imports"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"imports_df = pd.DataFrame()\r\n",
+					"for group in groups_df[\"id\"]:\r\n",
+					"    group = str(group)\r\n",
+					"    url = \"https://api.powerbi.com/v1.0/myorg/groups/\"\r\n",
+					"    url += group + \"/\" + \"imports\"\r\n",
+					"    resp = requests.get(url, headers=headers)\r\n",
+					"    obj = resp.json()\r\n",
+					"    if \"value\" in obj.keys():\r\n",
+					"        new_df = pd.DataFrame.from_records(obj[\"value\"])\r\n",
+					"        new_df[\"group_id\"] = group\r\n",
+					"        imports_df = pd.concat([imports_df,new_df],ignore_index=True)\r\n",
+					"\r\n",
+					"print(imports_df)\r\n",
+					"mssparkutils.fs.put(\"/PBIMetadata/Imports.csv\", imports_df.to_csv(index=False), True)"
+				],
+				"execution_count": 124
 			},
 			{
 				"cell_type": "code",
