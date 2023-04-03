@@ -19,7 +19,13 @@
 						"referenceName": "LoadVideoData",
 						"type": "NotebookReference"
 					},
-					"snapshot": true
+					"snapshot": true,
+					"conf": {
+						"spark.dynamicAllocation.enabled": null,
+						"spark.dynamicAllocation.minExecutors": null,
+						"spark.dynamicAllocation.maxExecutors": null
+					},
+					"numExecutors": null
 				}
 			},
 			{
@@ -39,7 +45,13 @@
 						"referenceName": "LoadStreamsData",
 						"type": "NotebookReference"
 					},
-					"snapshot": true
+					"snapshot": true,
+					"conf": {
+						"spark.dynamicAllocation.enabled": null,
+						"spark.dynamicAllocation.minExecutors": null,
+						"spark.dynamicAllocation.maxExecutors": null
+					},
+					"numExecutors": null
 				}
 			},
 			{
@@ -59,7 +71,13 @@
 						"referenceName": "LoadStreamersData",
 						"type": "NotebookReference"
 					},
-					"snapshot": true
+					"snapshot": true,
+					"conf": {
+						"spark.dynamicAllocation.enabled": null,
+						"spark.dynamicAllocation.minExecutors": null,
+						"spark.dynamicAllocation.maxExecutors": null
+					},
+					"numExecutors": null
 				}
 			},
 			{
@@ -246,7 +264,7 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "DelimitedText3",
+						"referenceName": "VideoDataCSV",
 						"type": "DatasetReference"
 					}
 				],
