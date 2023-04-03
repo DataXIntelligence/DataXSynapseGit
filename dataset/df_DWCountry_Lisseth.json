@@ -1,0 +1,17 @@
+{
+	"name": "df_DWCountry_Lisseth",
+	"properties": {
+		"annotations": [],
+		"type": "SqlPoolTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "Lisseth",
+			"table": "Country"
+		},
+		"sqlPool": {
+			"referenceName": "DataXDW",
+			"type": "SqlPoolReference"
+		}
+	},
+	"type": "Microsoft.Synapse/workspaces/datasets"
+}

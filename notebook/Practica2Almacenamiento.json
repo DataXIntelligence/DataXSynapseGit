@@ -1,0 +1,359 @@
+{
+	"name": "Practica2Almacenamiento",
+	"properties": {
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "SparkPool01",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2,
+			"runAsWorkspaceSystemIdentity": false,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "67b3f963-b2f1-42a0-992d-4c59873e6bf7"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"synapse_widget": {
+				"version": "0.1"
+			},
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/b2c447f4-0f0b-471d-a130-0c72330f08f2/resourceGroups/DataX-ResGroup/providers/Microsoft.Synapse/workspaces/dataxsynapsedev/bigDataPools/SparkPool01",
+				"name": "SparkPool01",
+				"type": "Spark",
+				"endpoint": "https://dataxsynapsedev.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/SparkPool01",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net",
+					"authHeader": null
+				},
+				"sparkVersion": "3.1",
+				"nodeCount": 10,
+				"cores": 4,
+				"memory": 28,
+				"extraHeader": null
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"from pyspark.sql.functions import col, asc,desc\r\n",
+					"from pyspark.sql.types import *"
+				],
+				"execution_count": 96
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"En primer lugar cargamos el CSV a un dataframe. Dado que hay muchas columnas con diferentes tipos, podemos usar la opcion _inferSchema_ para que los tipos se deduzcan. En estos casos siempre es conveniente revisar que los tipos inferidos sean los correctos con el método _printSchema_."
+				]
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"path= 'spotify_2022.csv'\r\n",
+					"print(path)\r\n",
+					"#df = spark.read.load(path, format='csv', inferSchema=True, header=True)"
+				],
+				"execution_count": 2
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"Como se puede observar, al estar el dataset bien formado los tipos inferidos son los correctos (incluso para el campo _explicit_, en el que detecta el tipo _boolean_)."
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"df.printSchema()"
+				],
+				"execution_count": 104
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"Para obtener el número de registros podemos simplemente usar la función count"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"df.count()"
+				],
+				"execution_count": 105
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"Para estas primeras consultas más sencillas se usarán métodos en vez de directamente código SQL para probar ambas opciones. Nótese que la mayoría de métodos tienen dos nombres, el propio de spark y un apodo para asimilarse a la sintaxis SQL. En este caso se usará la sintaxis similar a SQL.\r\n",
+					"\r\n",
+					"Para este primer ejemplo simplemente se ha realizado un select para quedarnos sólo con la columna interesada y un distinct, que elimina duplicados atendiendo a todas las columnas (que tras el select, es sólo _track_genre_). Al igual que ene el resto de futuras celdas, se usa show para forzar el cálculo y mostrar el resultado, pasando un número alto  como máximo para que se vean los resultados completos."
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"df.select('track_genre').distinct().show(1000)"
+				],
+				"execution_count": 99
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"Para el siguiente código se usa una query filtrando por el artista Queen con where y ordenando de forma descendente por popularidad. Como se puede ver, es muy similar a escribir directamente SQL.\r\n",
+					"\r\n",
+					"En este caso además se pueden ver las tres formas de referirse a una columna. Si no se requiere hacer nada salvo pasarlo como argumento, se puede usar directamente el nombre. Si no, es necesario o bien acceder desde el dataframe (_df.artist_) o bien con la función col pasándole el nombre (_col('popularity')_)."
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					""
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"df.select('artist', 'track_name', 'popularity'\r\n",
+					"    ).where(df.artist == 'Queen'\r\n",
+					"    ).orderBy(col('popularity').desc(), \r\n",
+					"    ).show(truncate=False)"
+				],
+				"execution_count": 116
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"Dado que los siguientes ejemplos son algo más complejos, se ha optado por usar directamente SQL. Para ello es necesario en primer lugar crear una vista temporar, en este caso llamada _spotify_."
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"df.createOrReplaceTempView('spotify')"
+				],
+				"execution_count": 101
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"Para esta consulta es necesario en primer lugar filtrar para quedarnos sólo con el género 'edm'. Al agrupar por artista se puede obtener la popularidad media por artista para establecer el orden descendente. Por último con _LIMIT_ podemos restringir el número de registros, aunque si sólo quisiéramos limitar a 5 a la hora de mostrar se le podría pasar el 5 a la función _show_."
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"spark.sql(\"\"\"SELECT artist, AVG(popularity) popularity\r\n",
+					"FROM spotify\r\n",
+					"WHERE track_genre='edm'\r\n",
+					"GROUP BY artist\r\n",
+					"ORDER BY AVG(popularity) DESC\r\n",
+					"LIMIT 5\"\"\").show()"
+				],
+				"execution_count": 109
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"En este caso, para hacerlo en SQL es necesario hacer una consulta algo compleja. En primer lugar, hay que hacer una agrupación para obtener la popularidad media por artista y género. Tras esto, la forma más consistente para obtener el primer elemento de cada grupo (tras agrupar por género) es usar el método ROW_NUMBER() ordenado por popularidad (que es la popularidad media de la anterior query) y agrupada por género.\r\n",
+					"\r\n",
+					"Por último, basta con quedarse con las filas con _ROW_NUMBER==1_ (es decir, las primeras de cada género). Para este paso final se han usado de nuevo métodos en vez de código por comodidad (esto se puede hacer ya que el método SQL devuelve un dataframe con el resultado, por lo que se puede encadenar)."
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"spark.sql(\"\"\"\r\n",
+					"    SELECT *,\r\n",
+					"        ROW_NUMBER() OVER(PARTITION BY track_genre\r\n",
+					"                        ORDER BY popularity DESC) AS rank\r\n",
+					"    FROM (\r\n",
+					"        SELECT artist,\r\n",
+					"            track_genre,\r\n",
+					"            AVG(popularity) popularity\r\n",
+					"        FROM spotify\r\n",
+					"        GROUP BY artist, track_genre\r\n",
+					"        ORDER BY AVG(popularity) DESC\r\n",
+					"    )\r\n",
+					"\"\"\").select('artist', 'track_genre').where(col('rank') ==1).show(10000)"
+				],
+				"execution_count": 115
+			}
+		]
+	}
+}

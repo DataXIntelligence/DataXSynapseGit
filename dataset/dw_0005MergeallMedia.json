@@ -1,0 +1,17 @@
+{
+	"name": "dw_0005MergeallMedia",
+	"properties": {
+		"annotations": [],
+		"type": "SqlPoolTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "0005",
+			"table": "MergeallMedia"
+		},
+		"sqlPool": {
+			"referenceName": "DataXDW",
+			"type": "SqlPoolReference"
+		}
+	},
+	"type": "Microsoft.Synapse/workspaces/datasets"
+}

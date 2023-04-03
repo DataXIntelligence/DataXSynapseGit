@@ -1,0 +1,17 @@
+{
+	"name": "Update_Columns_Values",
+	"properties": {
+		"content": {
+			"query": "UPDATE lgads\nSET \n    lgads.CountryID = lc.CountryName,\n    lgads.BrandID = lb.BrandName\nFROM [Lisseth].[GoogleAds] lgads\nLEFT JOIN [Lisseth].[Country]  lc ON lgads.CountryID = lc.CountryID\nLEFT JOIN [Lisseth].[Brand]  lb ON lgads.BrandID = lb.BrandID",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "DataXDW",
+				"poolName": "DataXDW"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

@@ -1,0 +1,98 @@
+{
+	"name": "pl_PauseDW_Daily_18UTC",
+	"properties": {
+		"activities": [
+			{
+				"name": "Pause DW",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_Pause_or_Resume_Pool",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "Wait 15 Minutes",
+				"type": "Wait",
+				"dependsOn": [
+					{
+						"activity": "Pause DW",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"waitTimeInSeconds": 900
+				}
+			},
+			{
+				"name": "Pause DW II",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Wait 15 Minutes",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_Pause_or_Resume_Pool",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "Wait 15 Minutes II",
+				"type": "Wait",
+				"dependsOn": [
+					{
+						"activity": "Pause DW II",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"waitTimeInSeconds": 900
+				}
+			},
+			{
+				"name": "Pause DW III",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Wait 15 Minutes II",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_Pause_or_Resume_Pool",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			}
+		],
+		"folder": {
+			"name": "Other"
+		},
+		"annotations": [],
+		"lastPublishTime": "2022-06-10T13:20:48Z"
+	},
+	"type": "Microsoft.Synapse/workspaces/pipelines"
+}

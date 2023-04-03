@@ -1,0 +1,174 @@
+{
+	"name": "Channel Map - Data Generation",
+	"properties": {
+		"description": "Test dataset generation for Manpower channel calc column measure refactoring",
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "SparkPool01",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2,
+			"runAsWorkspaceSystemIdentity": false,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "03ba073e-1096-43f2-b7da-eca34b959f08"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"synapse_widget": {
+				"version": "0.1"
+			},
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/b2c447f4-0f0b-471d-a130-0c72330f08f2/resourceGroups/DataX-ResGroup/providers/Microsoft.Synapse/workspaces/dataxsynapsedev/bigDataPools/SparkPool01",
+				"name": "SparkPool01",
+				"type": "Spark",
+				"endpoint": "https://dataxsynapsedev.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/SparkPool01",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net",
+					"authHeader": null
+				},
+				"sparkVersion": "3.1",
+				"nodeCount": 10,
+				"cores": 4,
+				"memory": 28,
+				"extraHeader": null
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"source": [
+					"# Imports\r\n",
+					"import pandas as pd\r\n",
+					"import random"
+				],
+				"execution_count": 1
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"excel_file = pd.ExcelFile('abfss://dataxsynapsefs@adlsdatax01.dfs.core.windows.net/General Dataset Transformations/SourcesMediumExtract.xlsx')\r\n",
+					"print(excel_file.sheet_names)"
+				],
+				"execution_count": 3
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"source_df = pd.read_excel(excel_file, 0)\r\n",
+					"medium_df = pd.read_excel(excel_file, 1)"
+				],
+				"execution_count": 4
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"result = {\r\n",
+					"    'source': [],\r\n",
+					"    'medium': []\r\n",
+					"}\r\n",
+					"\r\n",
+					"for i in range(2000):\r\n",
+					"    random_source_index = random.randint(0, len(source_df.index) - 1)\r\n",
+					"    val = source_df.at[random_source_index, 'Source']\r\n",
+					"    result['source'].append(val)\r\n",
+					"\r\n",
+					"    random_medium_index = random.randint(0, len(medium_df.index) - 1)\r\n",
+					"    val = medium_df.at[random_medium_index, 'Medium']\r\n",
+					"    result['medium'].append(val)\r\n",
+					"\r\n",
+					"    "
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"result_df = pd.DataFrame.from_dict(result)\r\n",
+					"result_df.head()"
+				],
+				"execution_count": 12
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"result_df.to_excel('abfss://dataxsynapsefs@adlsdatax01.dfs.core.windows.net/General Dataset Transformations/GeneratedFactTable.xlsx', sheet_name = 'FactTable', index = False)"
+				],
+				"execution_count": 13
+			}
+		]
+	}
+}

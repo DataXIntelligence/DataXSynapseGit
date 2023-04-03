@@ -1,0 +1,1638 @@
+{
+	"name": "DelimitedText3",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "dataxsynapsedev-WorkspaceDefaultStorage",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "TopGames.json",
+				"folderPath": "Training/Cristian",
+				"fileSystem": "dataxsynapsefs"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "{\"data\":[{\"id\":\"509658\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Just Chatting\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/509658-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"\"}3",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"322503446\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Resident Evil 4\"5",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/322503446_IGDB-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"132181\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"21779\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"League of Legends\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/21779-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"115\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"32399\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Counter-Strike: Global Offensive\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/32399_IGDB-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"1372\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"516575\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"VALORANT\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/516575-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"126459\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"32982\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Grand Theft Auto V\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/32982_IGDB-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"1020\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"27471\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Minecraft\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/27471_IGDB-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"121\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"29595\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Dota 2\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/29595-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"2963\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"511224\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Apex Legends\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/511224-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"114795\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"515024\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Diablo IV\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/515024-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"125165\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"33214\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Fortnite\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/33214-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"1905\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"513143\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Teamfight Tactics\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/513143-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"120176\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"18122\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"World of Warcraft\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/18122-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"123\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"1890315333\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Counter-Strike 2\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/1890315333_IGDB-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"242408\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"509672\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Travel \\u0026 Outdoors\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/509672-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"\"}59",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"515025\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Overwatch 2\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/515025-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"125174\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"509667\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Food \\u0026 Drink\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/509667-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"\"}67",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"491931\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Escape from Tarkov\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/491931_IGDB-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"15536\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"512710\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Call of Duty: Warzone\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/512710-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"131800\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"27546\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"World of Tanks\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/27546-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"1184\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"490100\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Lost Ark\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/490100-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"26128\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"498566\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Slots\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/498566-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"\"}87",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"26936\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Music\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/26936-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"\"}91",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"1745202732\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"FIFA 23\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/1745202732_IGDB-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"205780\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"29452\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Virtual Casino\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/29452_IGDB-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"45517\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"417528\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Albion Online\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/417528_IGDB-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"19698\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"138585\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Hearthstone\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/138585_IGDB-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"1279\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"491487\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Dead by Daylight\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/491487-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"18866\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"504798\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"FIFA Online 4\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/504798_IGDB-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"93902\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"497057\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Destiny 2\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/497057-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"25657\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"493057\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"PUBG: BATTLEGROUNDS\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/493057-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"27789\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"518203\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Sports\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/518203-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"\"}127",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"509660\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Art\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/509660-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"\"}131",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"1678052513\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Call of Duty: Modern Warfare II\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/1678052513-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"200165\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"513181\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Genshin Impact\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/513181_IGDB-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"119277\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"1016442748\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"MLB The Show 23\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/1016442748_IGDB-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"230593\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"512953\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"ELDEN RING\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/512953_IGDB-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"119133\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"263490\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Rust\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/263490_IGDB-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"3277\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"459931\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Old School RuneScape\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/459931_IGDB-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"79824\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"509659\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"ASMR\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/509659-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"\"}159",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"65632\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"DayZ\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/65632_IGDB-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"2117\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"1468\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Resident Evil 4\"165",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/1468_IGDB-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"974\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"375960865\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Have a Nice Death\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/375960865_IGDB-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"185241\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"19976\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"MapleStory\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/19976_IGDB-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"9804\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"743\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Chess\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/743-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"\"}179",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"2748\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Magic: The Gathering\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/2748-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"\"}183",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"417752\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Talk Shows \\u0026 Podcasts\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/417752-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"\"}187",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"511399\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Super Mario Maker 2\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/511399_IGDB-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"115276\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"490377\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Sea of Thieves\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/490377-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"11137\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"510202\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Contraband Police\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/510202_IGDB-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"76263\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"1095275650\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Hogwarts Legacy\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/1095275650_IGDB-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"136625\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"717087827\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Hoosegow\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/717087827_IGDB-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"207213\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"30921\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Rocket League\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/30921-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"11198\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"508509\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Codenames\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/508509_IGDB-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"105254\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"71375\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Star Citizen\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/71375_IGDB-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"1595\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"24241\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"FINAL FANTASY XIV ONLINE\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/24241_IGDB-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"386\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"490422\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"StarCraft II\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/490422-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"\"}227",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"460630\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Tom Clancy's Rainbow Six Siege\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/460630_IGDB-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"7360\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"515467\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Watch Parties\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/515467-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"\"}235",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"27284\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Retro\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/27284-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"\"}239",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"386821\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Black Desert\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/386821_IGDB-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"6292\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"1158884259\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Splatoon 3\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/1158884259_IGDB-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"143613\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"499003\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"VRChat\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/499003_IGDB-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"33615\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"498592\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"I'm Only Sleeping\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/498592_IGDB-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"71001\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"19619\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Tibia\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/19619_IGDB-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"9596\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"32502\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"World of Warships\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/32502_IGDB-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"5587\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"1119642287\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Yu-Gi-Oh! Master Duel\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/1119642287_IGDB-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"159298\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"488190\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Poker\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/488190-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"\"}271",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"32507\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"SMITE\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/32507-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"5607\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"1743359147\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"MARVEL SNAP\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/1743359147_IGDB-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"202279\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"499634\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Crypto\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/499634-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"76760\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"66082\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Games + Demos\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/66082-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"\"}287",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"13389\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Age of Empires II\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/13389-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"\"}291",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"500188\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Hunt: Showdown\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/500188_IGDB-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"7291\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"670867987\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Pok�mon Scarlet/Violet\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/670867987-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"\"}299",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"1885922279\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Summoners War: Chronicles\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/1885922279_IGDB-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"194702\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"272263131\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Animals",
+				"type": "String"
+			},
+			{
+				"name": " Aquariums",
+				"type": "String"
+			},
+			{
+				"name": " and Zoos\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/272263131-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"\"}309",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"515349\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Lineage II\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/515349_IGDB-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"2971\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"515479\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Sons of the Forest\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/515479_IGDB-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"127346\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"1913410799\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Total War: WARHAMMER III\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/1913410799_IGDB-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"143114\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"12839\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Heroes of Might and Magic III: The Restoration of Erathia\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/12839_IGDB-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"364\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"517159\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Guilty Gear: Strive\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/517159_IGDB-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"125764\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"461067\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Tekken 7\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/461067_IGDB-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"7498\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"19357\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Guild Wars 2\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/19357_IGDB-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"1183\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"509670\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Science \\u0026 Technology\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/509670-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"\"}341",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"508455\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Valheim\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/508455_IGDB-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"104967\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"65654\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"The Elder Scrolls Online\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/65654_IGDB-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"1081\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"772421245\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"NBA 2K23\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/772421245_IGDB-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"207393\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"493959\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Red Dead Redemption 2\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/493959_IGDB-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"25076\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"1202244044\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Atelier Ryza 3: Alchemist of the End \\u0026 the Secret Key\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/1202244044_IGDB-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"217558\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"514858\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"League of Legends: Wild Rift\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/514858-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"124700\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"509482\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Judgment\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/509482_IGDB-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"109274\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"29307\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Path of Exile\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/29307_IGDB-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"1911\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"5492\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Diablo\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/5492_IGDB-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"125\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"508402\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Live\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/508402_IGDB-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"85682\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"504461\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Super Smash Bros. Ultimate\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/504461_IGDB-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"90101\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"1040463021\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"WWE 2K23\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/1040463021_IGDB-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"233028\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"489635\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"ARK: Survival Evolved\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/489635-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"10239\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"23020\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"ROBLOX\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/23020_IGDB-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"17269\"}",
+				"type": "String"
+			},
+			{
+				"name": "{\"id\":\"512980\"",
+				"type": "String"
+			},
+			{
+				"name": "\"name\":\"Fall Guys\"",
+				"type": "String"
+			},
+			{
+				"name": "\"box_art_url\":\"https://static-cdn.jtvnw.net/ttv-boxart/512980-{width}x{height}.jpg\"",
+				"type": "String"
+			},
+			{
+				"name": "\"igdb_id\":\"119313\"}]",
+				"type": "String"
+			},
+			{
+				"name": "\"pagination\":{\"cursor\":\"eyJzIjoxMDAsImQiOmZhbHNlLCJ0Ijp0cnVlfQ==\"}}",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.Synapse/workspaces/datasets"
+}

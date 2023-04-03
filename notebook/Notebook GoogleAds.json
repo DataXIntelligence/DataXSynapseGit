@@ -1,0 +1,645 @@
+{
+	"name": "Notebook GoogleAds",
+	"properties": {
+		"folder": {
+			"name": "Training"
+		},
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "SparkPool01",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2,
+			"runAsWorkspaceSystemIdentity": false,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "e4df6878-4eab-4fdb-aa03-1300c952218e"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"synapse_widget": {
+				"version": "0.1"
+			},
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/b2c447f4-0f0b-471d-a130-0c72330f08f2/resourceGroups/DataX-ResGroup/providers/Microsoft.Synapse/workspaces/dataxsynapsedev/bigDataPools/SparkPool01",
+				"name": "SparkPool01",
+				"type": "Spark",
+				"endpoint": "https://dataxsynapsedev.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/SparkPool01",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net",
+					"authHeader": null
+				},
+				"sparkVersion": "3.1",
+				"nodeCount": 10,
+				"cores": 4,
+				"memory": 28,
+				"extraHeader": null
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"source": [
+					"import io\r\n",
+					"import os\r\n",
+					"import sys\r\n",
+					"import glob\r\n",
+					"import json\r\n",
+					"import datetime\r\n",
+					"import requests\r\n",
+					"from tqdm import tqdm\r\n",
+					"import numpy as np\r\n",
+					"import pandas as pd\r\n",
+					"import google_auth_httplib2\r\n",
+					"from rauth import OAuth2Service\r\n",
+					"import google.oauth2.credentials\r\n",
+					"from datetime import datetime, timedelta\r\n",
+					"from googleapiclient.discovery import build as google_build\r\n",
+					"from azure.storage.filedatalake import DataLakeServiceClient\r\n",
+					"from google.ads.googleads.client import GoogleAdsClient\r\n",
+					"from google.ads.googleads.errors import GoogleAdsException"
+				],
+				"execution_count": 1
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"from notebookutils import mssparkutils\r\n",
+					"\r\n",
+					"credentials = mssparkutils.credentials.getSecretWithLS('ls_Keyvault', 'GoogleAdsAlejandroTest')\r\n",
+					"credentials = json.loads(credentials)"
+				],
+				"execution_count": 2
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"print(credentials)"
+				],
+				"execution_count": 3
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"CLIENT_ID = credentials['CLIENT_ID']\r\n",
+					"CLIENT_SECRET = credentials['CLIENT_SECRET']\r\n",
+					"REFRESH_TOKEN = credentials['REFRESH_TOKEN']\r\n",
+					"DEVELOPER_TOKEN = credentials['DEVELOPER_TOKEN']"
+				],
+				"execution_count": 4
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"def get_access_token():\r\n",
+					"    access_token = None\r\n",
+					"    service = OAuth2Service(\r\n",
+					"                                name=\"Get Access Token - GA OAuth2\",\r\n",
+					"                                client_id= CLIENT_ID,\r\n",
+					"                                client_secret=CLIENT_SECRET,\r\n",
+					"                                access_token_url=\"https://oauth2.googleapis.com/token\",\r\n",
+					"                                base_url=\"https://oauth2.googleapis.com/\",\r\n",
+					"                            )\r\n",
+					"    data = {'refresh_token': REFRESH_TOKEN,\r\n",
+					"            'grant_type': 'refresh_token'}\r\n",
+					"    session = service.get_auth_session(data=data, decoder=json.loads)\r\n",
+					"    return session.access_token"
+				],
+				"execution_count": 5
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"def getAccounts(ACCESS_TOKEN, manager_id, token):\r\n",
+					"    manager_customer_id = manager_id\r\n",
+					"    developer_token = token\r\n",
+					"    account_sql = \"\"\"\r\n",
+					"                    SELECT\r\n",
+					"                      customer_client.client_customer,\r\n",
+					"                      customer_client.level,\r\n",
+					"                      customer_client.manager,\r\n",
+					"                      customer_client.descriptive_name,\r\n",
+					"                      customer_client.currency_code,\r\n",
+					"                      customer_client.time_zone,\r\n",
+					"                      customer_client.id\r\n",
+					"                    FROM customer_client\r\n",
+					"                    WHERE customer_client.level > 0\r\n",
+					"                \"\"\"\r\n",
+					"    response = requests.post(\"https://googleads.googleapis.com/v7/customers/\" + str(manager_customer_id) + \"/googleAds:searchStream\"\r\n",
+					"                                            ,headers={\"Authorization\":\"Bearer \" + str(ACCESS_TOKEN),\r\n",
+					"                                                      \"login-customer-id\":manager_customer_id,\r\n",
+					"                                                      \"developer-token\":developer_token}\r\n",
+					"                                            ,data={\"query\":account_sql}\r\n",
+					"                                            ).json()\r\n",
+					"    #List Comprehension used to pull all the accounts that are not manager accounts\r\n",
+					"    Ad_acc = [x[\"customerClient\"][\"id\"] for x in response[0][\"results\"] if x[\"customerClient\"][\"manager\"] == False]\r\n",
+					"    return Ad_acc"
+				],
+				"execution_count": 7
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"ACCESS_TOKEN = get_access_token()\r\n",
+					"token_expiry = datetime.now() - timedelta(days=1)"
+				],
+				"execution_count": 8
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"Ad_acc = getAccounts(ACCESS_TOKEN,\"9497681898\",\"74YhRrrXRugQwS-rtEar9w\")"
+				],
+				"execution_count": 9
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"print(json.dumps(Ad_acc, indent=4))"
+				],
+				"execution_count": 10
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"start   = (datetime.now() + timedelta(days=-30)).date().strftime('%Y-%m-%d')\r\n",
+					"\r\n",
+					"end     = (datetime.now() + timedelta(days=-1)).date().strftime('%Y-%m-%d')"
+				],
+				"execution_count": 12
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"credentialsAds = google.oauth2.credentials.Credentials(\r\n",
+					"    ACCESS_TOKEN,\r\n",
+					"    refresh_token=REFRESH_TOKEN,\r\n",
+					"    token_uri='https://accounts.google.com/o/oauth2/token',\r\n",
+					"    client_id=CLIENT_ID,\r\n",
+					"    client_secret=CLIENT_SECRET\r\n",
+					")\r\n",
+					"authorized = google_auth_httplib2.AuthorizedHttp(credentials=credentialsAds)\r\n",
+					"\r\n",
+					"start_date = pd.to_datetime(start).date().isoformat().replace(\"-\",\"\")\r\n",
+					"end_date = pd.to_datetime(end).date().isoformat().replace(\"-\",\"\")"
+				],
+				"execution_count": 13
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"df_all = pd.DataFrame()\r\n",
+					"#print(\"Google Ads:\",\"Fetching account ids..\")"
+				],
+				"execution_count": 15
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"client = GoogleAdsClient.load_from_string(f\"\"\"# Developer token\r\n",
+					"##########################################################################################\r\n",
+					"# A developer token is required when making requests to the Google Ads API regardless of #\r\n",
+					"# whether you're using the OAuth2 or Service Account configurations. To obtain a         #\r\n",
+					"# developer token see:                                                                   #\r\n",
+					"# https://developers.google.com/google-ads/api/docs/first-call/dev-token                 #\r\n",
+					"##########################################################################################\r\n",
+					"developer_token: {DEVELOPER_TOKEN}\r\n",
+					"\r\n",
+					"# Use proto plus\r\n",
+					"##########################################################################################\r\n",
+					"# This parameter specifies whether the client library should return proto-plus messages  #\r\n",
+					"# or protobuf messages. This value should be explicitly set to either \"True\" or \"False\", #\r\n",
+					"# For more information on the differences between these two types, see our Protobuf      #\r\n",
+					"# Messages guide:                                                                        #\r\n",
+					"# https://developers.google.com/google-ads/api/docs/client-libs/python/protobuf-messages #\r\n",
+					"##########################################################################################\r\n",
+					"use_proto_plus: True\r\n",
+					"\r\n",
+					"# OAuth2 configuration\r\n",
+					"##########################################################################################\r\n",
+					"# The below configuration parameters are used to authenticate using the recommended      #\r\n",
+					"# OAuth2 flow. For more information on authenticating with OAuth2 see:                   #\r\n",
+					"# https://developers.google.com/google-ads/api/docs/oauth/overview                       #\r\n",
+					"##########################################################################################\r\n",
+					"client_id: {CLIENT_ID}\r\n",
+					"client_secret: {CLIENT_SECRET}\r\n",
+					"refresh_token: {REFRESH_TOKEN}\r\n",
+					"\r\n",
+					"# Login customer ID configuration\r\n",
+					"##########################################################################################\r\n",
+					"# Required for manager accounts only: Specify the login customer ID used to authenticate #\r\n",
+					"# API calls. This will be the customer ID of the authenticated manager account. It       #\r\n",
+					"# should be set without dashes, for example: 1234567890 instead of 123-456-7890. You can #\r\n",
+					"# also specify this later in code if your application uses multiple manager account +    #\r\n",
+					"# OAuth pairs.                                                                           #\r\n",
+					"##########################################################################################\r\n",
+					"login_customer_id: 9497681898\r\n",
+					"\"\"\")"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"def get_campaigns(client, customer_id):\r\n",
+					"    ga_service = client.get_service(\"GoogleAdsService\")\r\n",
+					"    query = \"\"\"\r\n",
+					"    SELECT\r\n",
+					"        campaign.id,\r\n",
+					"        campaign.name,\r\n",
+					"        ad_group.id,\r\n",
+					"        ad_group.name,\r\n",
+					"        ad_group_criterion.criterion_id,\r\n",
+					"        ad_group_criterion.keyword.text,\r\n",
+					"        ad_group_criterion.keyword.match_type,\r\n",
+					"        metrics.impressions,\r\n",
+					"        metrics.clicks,\r\n",
+					"        metrics.cost_micros\r\n",
+					"    FROM keyword_view WHERE segments.date DURING LAST_7_DAYS\r\n",
+					"    AND ad_group.status = 'ENABLED'\r\n",
+					"    AND ad_group_criterion.status IN ('ENABLED', 'PAUSED')\r\n",
+					"    ORDER BY metrics.impressions DESC\"\"\"\r\n",
+					" \r\n",
+					"    # Issues a search request using streaming.\r\n",
+					"    search_request = client.get_type(\"SearchGoogleAdsStreamRequest\")\r\n",
+					"    search_request.customer_id = customer_id\r\n",
+					"    search_request.query = query\r\n",
+					"    stream = ga_service.search_stream(search_request)\r\n",
+					"    final = pd.DataFrame()\r\n",
+					"    for batch in stream:\r\n",
+					"        for row in batch.results:\r\n",
+					"            campaign = row.campaign\r\n",
+					"            ad_group = row.ad_group\r\n",
+					"            criterion = row.ad_group_criterion\r\n",
+					"            metrics = row.metrics\r\n",
+					"            df = pd.DataFrame({\"Campaign\": campaign.name,\r\n",
+					"                          \"CampaignID\": campaign.id,\r\n",
+					"                          \"AdGroup\": ad_group.name,\r\n",
+					"                          \"AdGroupID\": ad_group.id,\r\n",
+					"                          \"Keyword\": criterion.keyword.text,\r\n",
+					"                          \"MatchType\": criterion.keyword.match_type,\r\n",
+					"                          \"Clicks\": metrics.clicks,\r\n",
+					"                          \"Conversions\": metrics.conversions,\r\n",
+					"                          \"Costs\": metrics.cost_micros ,\r\n",
+					"                          \"Impressions\": metrics.impressions},index=[0])\r\n",
+					" \r\n",
+					"            final = pd.concat([final, df])\r\n",
+					"            \"\"\"print(\r\n",
+					"                f'Keyword text \"{criterion.keyword.text}\" with '\r\n",
+					"                f'match type \"{criterion.keyword.match_type.name}\" '\r\n",
+					"                f\"and ID {criterion.criterion_id} in \"\r\n",
+					"                f'ad group \"{ad_group.name}\" '\r\n",
+					"                f'with ID \"{ad_group.id}\" '\r\n",
+					"                f'in campaign \"{campaign.name}\" '\r\n",
+					"                f\"with ID {campaign.id} \"\r\n",
+					"                f\"had {metrics.impressions} impression(s), \"\r\n",
+					"                f\"{metrics.clicks} click(s), and \"\r\n",
+					"                f\"{metrics.cost_micros} cost (in micros) during \"\r\n",
+					"                \"the last 7 days.\"\r\n",
+					"            )\"\"\"\r\n",
+					"    return final"
+				],
+				"execution_count": 16
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"df = pd.DataFrame()\r\n",
+					"\r\n",
+					"for acc in Ad_acc:\r\n",
+					"    df_tmp = get_campaigns(client, acc)\r\n",
+					"    df = pd.concat([df, df_tmp])\r\n",
+					"#df = df.drop_duplicates()"
+				],
+				"execution_count": 17
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"df.head(5)"
+				],
+				"execution_count": 20
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"import random\r\n",
+					"def fillFakeData(df):\r\n",
+					"    df['Impressions'] = [random.uniform(0.0, 1100.5) for k in df.index]\r\n",
+					"    df['Clicks'] = [random.triangular(-100, 80, 1100) for k in df.index]\r\n",
+					"    df['Clicks'] = df['Clicks']+df['Impressions']\r\n",
+					"    df['Costs'] = [random.uniform(20, 5000) for k in df.index]\r\n",
+					"    return df"
+				],
+				"execution_count": 24
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"df=fillFakeData(df)"
+				],
+				"execution_count": 25
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"df.head(20)\r\n",
+					""
+				],
+				"execution_count": 26
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"\r\n",
+					"df_campaigns = df['Campaign'].drop_duplicates()\r\n",
+					"df_campaigns\r\n",
+					""
+				],
+				"execution_count": 29
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"cols = ['CountryID', 'BrandID']\r\n",
+					"df[cols] = df.apply(lambda x: pd.Series(x['Campaign'].split('_')), axis=1)"
+				],
+				"execution_count": 30
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"df.head(20)"
+				],
+				"execution_count": 31
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"mssparkutils.fs.put('/Training/Lisseth/GoogleAds.csv', df.to_csv(index=False), True)"
+				],
+				"execution_count": 32
+			}
+		]
+	}
+}

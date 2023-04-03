@@ -1,0 +1,309 @@
+{
+	"name": "df_Anonymization_pl_Source",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "dataxsynapsedev-WorkspaceDefaultStorage",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"file_system": {
+				"type": "string",
+				"defaultValue": "dataxsynapsefs"
+			},
+			"folder_path": {
+				"type": "string",
+				"defaultValue": "<path>/<directory_name>"
+			},
+			"file_name": {
+				"type": "string",
+				"defaultValue": "<file_name>"
+			}
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@dataset().file_name",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@dataset().folder_path",
+					"type": "Expression"
+				},
+				"fileSystem": {
+					"value": "@dataset().file_system",
+					"type": "Expression"
+				}
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "invoiceId",
+				"type": "String"
+			},
+			{
+				"name": "previousInvoiceId",
+				"type": "String"
+			},
+			{
+				"name": "billingAccountId",
+				"type": "String"
+			},
+			{
+				"name": "billingAccountName",
+				"type": "String"
+			},
+			{
+				"name": "billingProfileId",
+				"type": "String"
+			},
+			{
+				"name": "billingProfileName",
+				"type": "String"
+			},
+			{
+				"name": "invoiceSectionId",
+				"type": "String"
+			},
+			{
+				"name": "invoiceSectionName",
+				"type": "String"
+			},
+			{
+				"name": "resellerName",
+				"type": "String"
+			},
+			{
+				"name": "resellerMpnId",
+				"type": "String"
+			},
+			{
+				"name": "costCenter",
+				"type": "String"
+			},
+			{
+				"name": "billingPeriodEndDate",
+				"type": "String"
+			},
+			{
+				"name": "billingPeriodStartDate",
+				"type": "String"
+			},
+			{
+				"name": "servicePeriodEndDate",
+				"type": "String"
+			},
+			{
+				"name": "servicePeriodStartDate",
+				"type": "String"
+			},
+			{
+				"name": "date",
+				"type": "String"
+			},
+			{
+				"name": "serviceFamily",
+				"type": "String"
+			},
+			{
+				"name": "productOrderId",
+				"type": "String"
+			},
+			{
+				"name": "productOrderName",
+				"type": "String"
+			},
+			{
+				"name": "consumedService",
+				"type": "String"
+			},
+			{
+				"name": "meterId",
+				"type": "String"
+			},
+			{
+				"name": "meterName",
+				"type": "String"
+			},
+			{
+				"name": "meterCategory",
+				"type": "String"
+			},
+			{
+				"name": "meterSubCategory",
+				"type": "String"
+			},
+			{
+				"name": "meterRegion",
+				"type": "String"
+			},
+			{
+				"name": "ProductId",
+				"type": "String"
+			},
+			{
+				"name": "ProductName",
+				"type": "String"
+			},
+			{
+				"name": "SubscriptionId",
+				"type": "String"
+			},
+			{
+				"name": "subscriptionName",
+				"type": "String"
+			},
+			{
+				"name": "publisherType",
+				"type": "String"
+			},
+			{
+				"name": "publisherId",
+				"type": "String"
+			},
+			{
+				"name": "publisherName",
+				"type": "String"
+			},
+			{
+				"name": "resourceGroupName",
+				"type": "String"
+			},
+			{
+				"name": "ResourceId",
+				"type": "String"
+			},
+			{
+				"name": "resourceLocation",
+				"type": "String"
+			},
+			{
+				"name": "location",
+				"type": "String"
+			},
+			{
+				"name": "effectivePrice",
+				"type": "String"
+			},
+			{
+				"name": "quantity",
+				"type": "String"
+			},
+			{
+				"name": "unitOfMeasure",
+				"type": "String"
+			},
+			{
+				"name": "chargeType",
+				"type": "String"
+			},
+			{
+				"name": "billingCurrency",
+				"type": "String"
+			},
+			{
+				"name": "pricingCurrency",
+				"type": "String"
+			},
+			{
+				"name": "costInBillingCurrency",
+				"type": "String"
+			},
+			{
+				"name": "costInPricingCurrency",
+				"type": "String"
+			},
+			{
+				"name": "costInUsd",
+				"type": "String"
+			},
+			{
+				"name": "paygCostInBillingCurrency",
+				"type": "String"
+			},
+			{
+				"name": "paygCostInUsd",
+				"type": "String"
+			},
+			{
+				"name": "exchangeRatePricingToBilling",
+				"type": "String"
+			},
+			{
+				"name": "exchangeRateDate",
+				"type": "String"
+			},
+			{
+				"name": "isAzureCreditEligible",
+				"type": "String"
+			},
+			{
+				"name": "serviceInfo1",
+				"type": "String"
+			},
+			{
+				"name": "serviceInfo2",
+				"type": "String"
+			},
+			{
+				"name": "additionalInfo",
+				"type": "String"
+			},
+			{
+				"name": "tags",
+				"type": "String"
+			},
+			{
+				"name": "PayGPrice",
+				"type": "String"
+			},
+			{
+				"name": "frequency",
+				"type": "String"
+			},
+			{
+				"name": "term",
+				"type": "String"
+			},
+			{
+				"name": "reservationId",
+				"type": "String"
+			},
+			{
+				"name": "reservationName",
+				"type": "String"
+			},
+			{
+				"name": "pricingModel",
+				"type": "String"
+			},
+			{
+				"name": "unitPrice",
+				"type": "String"
+			},
+			{
+				"name": "costAllocationRuleName",
+				"type": "String"
+			},
+			{
+				"name": "benefitId",
+				"type": "String"
+			},
+			{
+				"name": "benefitName",
+				"type": "String"
+			},
+			{
+				"name": "provider",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.Synapse/workspaces/datasets"
+}

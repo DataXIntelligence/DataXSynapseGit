@@ -1,0 +1,30 @@
+{
+	"name": "df_0005MergeallMedia",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "dataxsynapsedev-WorkspaceDefaultStorage",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "0005.MergeallMedia.csv",
+				"folderPath": "0005",
+				"fileSystem": "dataxsynapsefs"
+			},
+			"columnDelimiter": ";",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "Date;Clicks;Impressions;Spend_EUR;PSCID;PlatformID;Platform_PSCID;Spend_Country_Currency",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.Synapse/workspaces/datasets"
+}

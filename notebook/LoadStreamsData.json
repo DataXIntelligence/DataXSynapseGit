@@ -1,0 +1,160 @@
+{
+	"name": "LoadStreamsData",
+	"properties": {
+		"description": "This script load all the data asociated with the current streams\nIt requieres to update frecuently, due to show existing currently data\nEstimate run time =  seconds",
+		"folder": {
+			"name": "Training/Twitch Dashboard"
+		},
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "SparkPool01",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2,
+			"runAsWorkspaceSystemIdentity": false,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "9c5fae65-9e88-4ca5-9ff3-abdbd22c2afb"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"synapse_widget": {
+				"version": "0.1"
+			},
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/b2c447f4-0f0b-471d-a130-0c72330f08f2/resourceGroups/DataX-ResGroup/providers/Microsoft.Synapse/workspaces/dataxsynapsedev/bigDataPools/SparkPool01",
+				"name": "SparkPool01",
+				"type": "Spark",
+				"endpoint": "https://dataxsynapsedev.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/SparkPool01",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net",
+					"authHeader": null
+				},
+				"sparkVersion": "3.1",
+				"nodeCount": 10,
+				"cores": 4,
+				"memory": 28
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"This script load all the data asociated with the **current streams**.\r\n",
+					"It requieres to **update frecuently**, due to show existing currently data.\r\n",
+					"\r\n",
+					"Estimate run time = **3 seconds**"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"import requests\r\n",
+					"import json\r\n",
+					"import time\r\n",
+					"import pandas as pd\r\n",
+					"from requests.structures import CaseInsensitiveDict\r\n",
+					"from notebookutils import mssparkutils\r\n",
+					"\r\n",
+					"STREAMERS_FILENAME = \"abfss://dataxsynapsefs@adlsdatax01.dfs.core.windows.net/Training/Cristian/Streamers.csv\"\r\n",
+					"STREAMS_FILENAME = \"abfss://dataxsynapsefs@adlsdatax01.dfs.core.windows.net/Training/Cristian/Streams.csv\"\r\n",
+					"\r\n",
+					"start_time = time.time()\r\n",
+					"#streamersCSV = mssparkutils.fs.head(STREAMERS_FILENAME)\r\n",
+					"streamersCSV = spark.read.csv(STREAMERS_FILENAME, header=True, inferSchema=True)\r\n",
+					"tuples = set([tuple(x) for x in streamersCSV.collect()])\r\n",
+					"\r\n",
+					"headers = CaseInsensitiveDict()\r\n",
+					"secret = mssparkutils.credentials.getSecretWithLS('ls_keyvault', 'TwitchSecret')\r\n",
+					"headers[\"Authorization\"] = \"Bearer \" + secret\r\n",
+					"headers[\"Client-Id\"] = \"euj1dlm3po5d9e0xi03am76u5jhyz9\"\r\n",
+					"\r\n",
+					"languages = [\"en\", \"es\", \"fr\", \"pt\", \"de\", \"zh\", \"ja\", \"ar\", \"it\", \"ru\"]"
+				],
+				"execution_count": 37
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"Load Top Streams data. Returns a **json** with the current 100 streams wich have **more viewers**. This data **changes a lot** in a short period of time so outdated data may be displayed"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"aux_df = pd.DataFrame()\r\n",
+					"for language in languages:\r\n",
+					"    url = \"https://api.twitch.tv/helix/streams?first=100&language=\" + language\r\n",
+					"    resp = requests.get(url, headers=headers)\r\n",
+					"    streams_obj = json.loads(resp.text)\r\n",
+					"    streams_df = pd.DataFrame.from_records(streams_obj[\"data\"])\r\n",
+					"    for stream in streams_df.index:\r\n",
+					"        tuples.add(tuple([int(streams_df['user_id'][stream]),streams_df['user_name'][stream],streams_df['language'][stream]]))\r\n",
+					"    aux_df = pd.concat([aux_df,streams_df], axis=0)\r\n",
+					"    \r\n",
+					"mssparkutils.fs.put(STREAMS_FILENAME, aux_df.to_csv(index=False), True)\r\n",
+					"streamers_df = pd.DataFrame(set(tuples),columns=['user_id', 'user_name', 'language'])\r\n",
+					"mssparkutils.fs.put(STREAMERS_FILENAME, streamers_df.to_csv(index=False), True)\r\n",
+					"\r\n",
+					"print(\"--- %s seconds ---\" % (time.time() - start_time))"
+				],
+				"execution_count": 38
+			}
+		]
+	}
+}

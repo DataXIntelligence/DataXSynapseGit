@@ -1,0 +1,17 @@
+{
+	"name": "df_DW_GoogleAds",
+	"properties": {
+		"annotations": [],
+		"type": "SqlPoolTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "Lisseth",
+			"table": "GoogleAds"
+		},
+		"sqlPool": {
+			"referenceName": "DataXDW",
+			"type": "SqlPoolReference"
+		}
+	},
+	"type": "Microsoft.Synapse/workspaces/datasets"
+}

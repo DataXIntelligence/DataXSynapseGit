@@ -1,0 +1,394 @@
+{
+	"name": "Dataset Anonymization Tool",
+	"properties": {
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "SparkPool01",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 1,
+			"runAsWorkspaceSystemIdentity": false,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "1",
+				"spark.dynamicAllocation.maxExecutors": "1",
+				"spark.autotune.trackingId": "7d544680-0fd5-44d4-b6d8-d47f29a1987e"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"synapse_widget": {
+				"version": "0.1"
+			},
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/b2c447f4-0f0b-471d-a130-0c72330f08f2/resourceGroups/DataX-ResGroup/providers/Microsoft.Synapse/workspaces/dataxsynapsedev/bigDataPools/SparkPool01",
+				"name": "SparkPool01",
+				"type": "Spark",
+				"endpoint": "https://dataxsynapsedev.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/SparkPool01",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net",
+					"authHeader": null
+				},
+				"sparkVersion": "3.1",
+				"nodeCount": 10,
+				"cores": 4,
+				"memory": 28,
+				"extraHeader": null
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"tags": [
+						"parameters"
+					]
+				},
+				"source": [
+					"# Default parameters\r\n",
+					"input_file_path = '/Anonymization Tool Tests/sales-campaigns-formatted.xlsx'\r\n",
+					"output_file_path = '/Anonymization Tool Tests/sales-campaigns-anonymized.xlsx'"
+				],
+				"execution_count": 17
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"tags": []
+				},
+				"source": [
+					"# Imports\r\n",
+					"import pandas as pd\r\n",
+					"import random"
+				],
+				"execution_count": 3
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Read input excel file from data lake"
+				]
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"try:\r\n",
+					"    excel_file = pd.ExcelFile('abfss://dataxsynapsefs@adlsdatax01.dfs.core.windows.net' + input_file_path)\r\n",
+					"    print(excel_file.sheet_names)\r\n",
+					"\r\n",
+					"except Exception as e:\r\n",
+					"    raise Exception('Input excel file reading failed - ' + repr(e))"
+				],
+				"execution_count": 4
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"try:\r\n",
+					"    fact_df = pd.read_excel(excel_file, 0)\r\n",
+					"    values_df = pd.read_excel(excel_file, 1)\r\n",
+					"\r\n",
+					"    dim_dfs = []\r\n",
+					"    for dim_index in range(2, len(excel_file.sheet_names)):\r\n",
+					"        dim_dfs.append(pd.read_excel(excel_file, dim_index))\r\n",
+					"\r\n",
+					"    fact_df.head()\r\n",
+					"\r\n",
+					"except Exception as e:\r\n",
+					"    raise Exception('Input excel sheets reading failed - ' + repr(e))"
+				],
+				"execution_count": 5
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Methods to detect errors in the input file structure"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Column names from values & dims have to match with a fact table column.\r\n",
+					"fact_column_names = list(fact_df)\r\n",
+					"def check_column_names(column_names):\r\n",
+					"    for name in column_names:\r\n",
+					"        if name not in fact_column_names: \r\n",
+					"            raise Exception(f'Value/Dimensional column \\'{name}\\' does not match any from fact table.')\r\n",
+					"\r\n",
+					"# Dimensional sheets must contain valid data.\r\n",
+					"def check_dim_columns_size(dim_df):\r\n",
+					"    column_names = list(dim_df)\r\n",
+					"    # Dimensional sheets must have at least 2 columns.\r\n",
+					"    if len(column_names) < 2: \r\n",
+					"        raise Exception(f'Dimensional sheets must contain at least two columns.')\r\n",
+					"    first_size = dim_df[column_names[0]].count()\r\n",
+					"    for name in column_names:\r\n",
+					"        # All columns have to share size.\r\n",
+					"        if dim_df[name].count() != first_size:\r\n",
+					"            raise Exception(f'Column {name} has to share size with the other columns from the same dimensional sheet.')\r\n",
+					"        # Empty columns are not allowed.\r\n",
+					"        if dim_df[name].count() == 0:\r\n",
+					"            raise Exception(f'Column {name} from dimensional sheet can not be empty.')\r\n",
+					"    return first_size\r\n",
+					"\r\n",
+					"# Values from dimensional sheet columns can not be null or empty.\r\n",
+					"def check_dim_values_null(values):\r\n",
+					"    index = 0\r\n",
+					"    for value in values:\r\n",
+					"        if pd.isnull(value) or str(value).isspace():\r\n",
+					"            raise Exception(f'Invalid null value in column: {column_name}, index: {index}')\r\n",
+					"        index += 1"
+				],
+				"execution_count": 8
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Extract clean data from values & dimensional dataframes"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": true
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Values data (Sheet 2) processing\r\n",
+					"try: \r\n",
+					"    values_columns = list(values_df)\r\n",
+					"    check_column_names(values_columns) \r\n",
+					"    clean_values = []\r\n",
+					"    for column_name in values_columns:\r\n",
+					"        temp_value = {}\r\n",
+					"        temp_value['name'] = column_name\r\n",
+					"        temp_value['size'] = values_df[column_name].nunique()\r\n",
+					"        values_with_null = list(values_df[column_name].unique())\r\n",
+					"        temp_value['values'] = [x for x in values_with_null if not pd.isnull(x)]\r\n",
+					"        clean_values.append(temp_value)\r\n",
+					"\r\n",
+					"    print(clean_values)\r\n",
+					"\r\n",
+					"except Exception as e:\r\n",
+					"    raise Exception('Values sheet (2) processing failed - ' + repr(e))"
+				],
+				"execution_count": 9
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": true
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Dimensional data (Sheet 3+) processing\r\n",
+					"try:\r\n",
+					"    clean_dims = []  # [dim1={size: n, cols: [{name: x, values: [x1, x2]}, {name: y, values: [y1, y2]}]}, dim2={...}]   \r\n",
+					"    for dim_df in dim_dfs:\r\n",
+					"        column_names = list(dim_df)\r\n",
+					"        check_column_names(column_names)\r\n",
+					"        dim_size = check_dim_columns_size(dim_df)\r\n",
+					"\r\n",
+					"        dim_columns = []\r\n",
+					"        for column_name in column_names:\r\n",
+					"            raw_values = list(dim_df[column_name])\r\n",
+					"            check_dim_values_null(raw_values)\r\n",
+					"            dim_columns.append({\r\n",
+					"                'name': column_name,\r\n",
+					"                'values': raw_values\r\n",
+					"            })\r\n",
+					"\r\n",
+					"        clean_dims.append({\r\n",
+					"            'size': dim_size,\r\n",
+					"            'cols': dim_columns\r\n",
+					"        })\r\n",
+					"    \r\n",
+					"    print(clean_dims)\r\n",
+					"\r\n",
+					"except Exception as e:\r\n",
+					"    raise Exception('Dimensional sheet (3+) processing failed - ' + repr(e))"
+				],
+				"execution_count": 11
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Incorporate clean data into the fact dataframe"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"try:\r\n",
+					"    fact_rows = len(fact_df.index)\r\n",
+					"    for i in range(fact_rows):\r\n",
+					"        # Values data incorporation\r\n",
+					"        for col in clean_values:\r\n",
+					"            random_index = random.randint(0, col['size'] - 1)\r\n",
+					"            fact_df.at[i, col['name']] = col['values'][random_index]\r\n",
+					"\r\n",
+					"        # Dimensional data incorporation\r\n",
+					"        for dim in clean_dims:\r\n",
+					"            random_index = random.randint(0, dim['size'] - 1) \r\n",
+					"            for col in dim['cols']:\r\n",
+					"                fact_df.at[i, col['name']] = col['values'][random_index]\r\n",
+					"\r\n",
+					"    fact_df.head()\r\n",
+					"\r\n",
+					"except Exception as e:\r\n",
+					"    raise Exception('FactTable sheet (1) data incorporation failed - ' + repr(e))"
+				],
+				"execution_count": 15
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Export result to output"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"try:\r\n",
+					"    output_file_format = output_file_path.split('.')[-1]\r\n",
+					"    if output_file_format == 'xlsx':\r\n",
+					"        fact_df.to_excel('abfss://dataxsynapsefs@adlsdatax01.dfs.core.windows.net' + output_file_path, sheet_name = 'FactTable', index = False)\r\n",
+					"    elif output_file_format == 'csv':\r\n",
+					"        fact_df.to_csv('abfss://dataxsynapsefs@adlsdatax01.dfs.core.windows.net' + output_file_path, index = False)\r\n",
+					"    else:\r\n",
+					"        raise Exception(f'Invalid output format <{output_file_format}>')\r\n",
+					"except Exception as e:\r\n",
+					"    raise Exception('Output excel file writing failed - ' + repr(e))"
+				],
+				"execution_count": 18
+			}
+		]
+	}
+}

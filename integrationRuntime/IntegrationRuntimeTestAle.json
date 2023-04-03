@@ -1,0 +1,6 @@
+{
+	"name": "IntegrationRuntimeTestAle",
+	"properties": {
+		"type": "SelfHosted"
+	}
+}

@@ -1,0 +1,94 @@
+{
+	"name": "df_0005DateTable",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "dataxsynapsedev-WorkspaceDefaultStorage",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "0005.DateTable.csv",
+				"folderPath": "0005",
+				"fileSystem": "dataxsynapsefs"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "Date",
+				"type": "String"
+			},
+			{
+				"name": "yyyymmdd",
+				"type": "String"
+			},
+			{
+				"name": "Year",
+				"type": "String"
+			},
+			{
+				"name": "Month",
+				"type": "String"
+			},
+			{
+				"name": "Day",
+				"type": "String"
+			},
+			{
+				"name": "MonthName",
+				"type": "String"
+			},
+			{
+				"name": "YearMonth",
+				"type": "String"
+			},
+			{
+				"name": "YearMonthName",
+				"type": "String"
+			},
+			{
+				"name": "MonthCommencing",
+				"type": "String"
+			},
+			{
+				"name": "MonthEnding",
+				"type": "String"
+			},
+			{
+				"name": "WeekCommencing",
+				"type": "String"
+			},
+			{
+				"name": "WeekEnding",
+				"type": "String"
+			},
+			{
+				"name": "WeekOfYear",
+				"type": "String"
+			},
+			{
+				"name": "DayOfWeek",
+				"type": "String"
+			},
+			{
+				"name": "DayOfWeekName",
+				"type": "String"
+			},
+			{
+				"name": "Quarter",
+				"type": "String"
+			},
+			{
+				"name": "YearQuarter",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.Synapse/workspaces/datasets"
+}

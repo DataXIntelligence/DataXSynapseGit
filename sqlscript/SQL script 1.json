@@ -1,0 +1,17 @@
+{
+	"name": "SQL script 1",
+	"properties": {
+		"content": {
+			"query": "IF NOT EXISTS (SELECT * FROM sys.objects O JOIN sys.schemas S ON O.schema_id = S.schema_id WHERE O.NAME = '[GoogleAdsCampaign]' AND O.TYPE = 'U' AND S.NAME = '[0002]')\nCREATE TABLE [0002].[GoogleAdsCampaign]\n\t(\n\t [Date] date,\n\t [Campaign State] nvarchar(4000),\n\t [Campaign Type] nvarchar(4000),\n\t [Impressions] bigint,\n\t [Clicks] bigint,\n\t [Campaign Name] nvarchar(4000),\n\t [Taxonomy Check] nvarchar(4000),\n\t [Business Unit] nvarchar(4000),\n\t [Spend EUR] bigint,\n\t [Platform Name] bigint,\n\t [Unique ID] bigint,\n\t [PSCID] bigint,\n\t [Platform PSCID] nvarchar(4000)\n\t)\nWITH\n\t(\n\tDISTRIBUTION = ROUND_ROBIN,\n\t HEAP\n\t -- CLUSTERED COLUMNSTORE INDEX\n\t)\nGO\n\n--Uncomment the 4 lines below to create a stored procedure for data pipeline orchestration​\n--CREATE PROC bulk_load_[GoogleAdsCampaign]\n--AS\n--BEGIN\nCOPY INTO [0002].[GoogleAdsCampaign]\n(Date 1, [Campaign State] 2, [Campaign Type] 3, Impressions 4, Clicks 5, [Campaign Name] 6, [Taxonomy Check] 7, [Business Unit] 8, [Spend EUR] 9, [Platform Name] 10, [Unique ID] 11, PSCID 12, [Platform PSCID] 13)\nFROM 'https://adlsdatax01.dfs.core.windows.net/dataxsynapsefs/0002/0002.GoogleAdsCampaign.csv'\nWITH\n(\n\tFILE_TYPE = 'CSV'\n\t,MAXERRORS = 0\n\t,DATEFORMAT = 'dmy'\n\t,FIRSTROW = 2\n\t,ERRORFILE = 'https://adlsdatax01.dfs.core.windows.net/dataxsynapsefs/0002/'\n)\n--END\nGO\n\nSELECT TOP 100 * FROM [0002].[GoogleAdsCampaign]\nGO",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "DataXDW",
+				"poolName": "DataXDW"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

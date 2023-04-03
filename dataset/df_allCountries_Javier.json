@@ -1,0 +1,70 @@
+{
+	"name": "df_allCountries_Javier",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "dataxsynapsedev-WorkspaceDefaultStorage",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "allCountries.csv",
+				"folderPath": "Training/Javier",
+				"fileSystem": "dataxsynapsefs"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "name",
+				"type": "String"
+			},
+			{
+				"name": "alpha-2",
+				"type": "String"
+			},
+			{
+				"name": "alpha-3",
+				"type": "String"
+			},
+			{
+				"name": "country-code",
+				"type": "String"
+			},
+			{
+				"name": "iso_3166-2",
+				"type": "String"
+			},
+			{
+				"name": "region",
+				"type": "String"
+			},
+			{
+				"name": "sub-region",
+				"type": "String"
+			},
+			{
+				"name": "intermediate-region",
+				"type": "String"
+			},
+			{
+				"name": "region-code",
+				"type": "String"
+			},
+			{
+				"name": "sub-region-code",
+				"type": "String"
+			},
+			{
+				"name": "intermediate-region-code",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.Synapse/workspaces/datasets"
+}

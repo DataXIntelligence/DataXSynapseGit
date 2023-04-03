@@ -1,0 +1,171 @@
+{
+	"name": "LoadVideoData",
+	"properties": {
+		"description": "# This script load all the data asociated with the top games and its videos\n# Estimate run time = 40 seconds",
+		"folder": {
+			"name": "Training/Twitch Dashboard"
+		},
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "SparkPool01",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 1,
+			"runAsWorkspaceSystemIdentity": false,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "1",
+				"spark.dynamicAllocation.maxExecutors": "1",
+				"spark.autotune.trackingId": "f5f52acd-6366-4bd1-9b5c-416db760d917"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"synapse_widget": {
+				"version": "0.1"
+			},
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/b2c447f4-0f0b-471d-a130-0c72330f08f2/resourceGroups/DataX-ResGroup/providers/Microsoft.Synapse/workspaces/dataxsynapsedev/bigDataPools/SparkPool01",
+				"name": "SparkPool01",
+				"type": "Spark",
+				"endpoint": "https://dataxsynapsedev.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/SparkPool01",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net",
+					"authHeader": null
+				},
+				"sparkVersion": "3.1",
+				"nodeCount": 10,
+				"cores": 4,
+				"memory": 28,
+				"extraHeader": null
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"source": [
+					"import requests\r\n",
+					"import json\r\n",
+					"import time\r\n",
+					"import pandas as pd\r\n",
+					"from requests.structures import CaseInsensitiveDict\r\n",
+					"from notebookutils import mssparkutils\r\n",
+					"\r\n",
+					"STREAMERS_FILENAME = \"abfss://dataxsynapsefs@adlsdatax01.dfs.core.windows.net/Training/Cristian/Streamers.csv\"\r\n",
+					"TOP_GAMES_FILENAME = \"abfss://dataxsynapsefs@adlsdatax01.dfs.core.windows.net/Training/Cristian/TopGames.csv\"\r\n",
+					"ALL_TOP_VIDEOS_FILENAME = \"abfss://dataxsynapsefs@adlsdatax01.dfs.core.windows.net/Training/Cristian/AllTopGames.csv\"\r\n",
+					"\r\n",
+					"start_time = time.time()\r\n",
+					"streamersCSV = spark.read.csv(STREAMERS_FILENAME, header=True, inferSchema=True)\r\n",
+					"tuples = set([tuple(x) for x in streamersCSV.collect()])\r\n",
+					"\r\n",
+					"headers = CaseInsensitiveDict()\r\n",
+					"secret = mssparkutils.credentials.getSecretWithLS('ls_keyvault', 'TwitchSecret')\r\n",
+					"headers[\"Authorization\"] = \"Bearer \" + secret\r\n",
+					"headers[\"Client-Id\"] = \"euj1dlm3po5d9e0xi03am76u5jhyz9\"\r\n",
+					"\r\n",
+					"languages = [\"en\", \"es\", \"fr\", \"pt\", \"de\", \"zh\", \"ja\", \"ar\", \"it\", \"ru\"]"
+				],
+				"execution_count": 10
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"Load TopGames data. Returns a **json** with 100 **most viewed** categories of Twitch"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"url = \"https://api.twitch.tv/helix/games/top?first=100\"\r\n",
+					"resp = requests.get(url, headers=headers)\r\n",
+					"topGames = json.loads(resp.text)\r\n",
+					"TopGames_df = pd.DataFrame.from_records(topGames[\"data\"])\r\n",
+					"mssparkutils.fs.put(TOP_GAMES_FILENAME, TopGames_df.to_csv(index=False), True)"
+				],
+				"execution_count": 11
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"Load Top Videos data. Returns a **json** with 100 **most viewed** videos of each top Category of Twitch"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"aux_df = pd.DataFrame()\r\n",
+					"for game in TopGames_df.index:\r\n",
+					"    currentGameID = TopGames_df['id'][game]\r\n",
+					"    string = \"https://api.twitch.tv/helix/videos?first=100&game_id=\" + currentGameID + \"&sort=views\"\r\n",
+					"    resp = requests.get(string, headers=headers)\r\n",
+					"    topVideosObj = json.loads(resp.text)\r\n",
+					"    TopVideos_df = pd.DataFrame.from_records(topVideosObj[\"data\"])\r\n",
+					"    for video in TopVideos_df.index:\r\n",
+					"        tuples.add(tuple([int(TopVideos_df['user_id'][video]),TopVideos_df['user_name'][video],TopVideos_df['language'][video]]))\r\n",
+					"    TopVideos_df[\"game_id\"] = int(currentGameID)\r\n",
+					"    aux_df = pd.concat([aux_df,TopVideos_df], axis=0)\r\n",
+					"\r\n",
+					"mssparkutils.fs.put(ALL_TOP_VIDEOS_FILENAME, aux_df.to_csv(index=False), True)\r\n",
+					"streamers_df = pd.DataFrame(set(tuples),columns=['user_id', 'user_name', 'language'])\r\n",
+					"mssparkutils.fs.put(STREAMERS_FILENAME, streamers_df.to_csv(index=False), True)\r\n",
+					"\r\n",
+					"print(\"--- %s seconds ---\" % (time.time() - start_time))"
+				],
+				"execution_count": 12
+			}
+		]
+	}
+}

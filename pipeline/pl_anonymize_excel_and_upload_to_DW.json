@@ -1,0 +1,131 @@
+{
+	"name": "pl_anonymize_excel_and_upload_to_DW",
+	"properties": {
+		"activities": [
+			{
+				"name": "Dataset Anonymization Tool",
+				"type": "SynapseNotebook",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebook": {
+						"referenceName": "Dataset Anonymization Tool",
+						"type": "NotebookReference"
+					},
+					"parameters": {
+						"input_file_path": {
+							"value": {
+								"value": "@concat('/', pipeline().parameters.input_folder_path, '/', pipeline().parameters.input_file_name)",
+								"type": "Expression"
+							},
+							"type": "string"
+						},
+						"output_file_path": {
+							"value": {
+								"value": "@concat('/', pipeline().parameters.output_folder_path, '/', pipeline().parameters.output_file_name)",
+								"type": "Expression"
+							},
+							"type": "string"
+						}
+					},
+					"snapshot": true,
+					"sparkPool": {
+						"referenceName": "SparkPool01",
+						"type": "BigDataPoolReference"
+					},
+					"conf": {
+						"spark.dynamicAllocation.enabled": null,
+						"spark.dynamicAllocation.minExecutors": null,
+						"spark.dynamicAllocation.maxExecutors": null
+					},
+					"numExecutors": null
+				}
+			},
+			{
+				"name": "Upload anonymized file to DW",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Dataset Anonymization Tool",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_Overwrite_CSV_to_DW",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"input_folder_path": {
+							"value": "@pipeline().parameters.output_folder_path",
+							"type": "Expression"
+						},
+						"input_file_name": {
+							"value": "@pipeline().parameters.output_file_name",
+							"type": "Expression"
+						},
+						"table_schema": {
+							"value": "@pipeline().parameters.table_schema",
+							"type": "Expression"
+						},
+						"table_name": {
+							"value": "@pipeline().parameters.table_name",
+							"type": "Expression"
+						},
+						"table_already_exists": {
+							"value": "@pipeline().parameters.table_already_exists",
+							"type": "Expression"
+						}
+					}
+				}
+			}
+		],
+		"parameters": {
+			"input_folder_path": {
+				"type": "string",
+				"defaultValue": "Anonymization Tool Tests"
+			},
+			"input_file_name": {
+				"type": "string",
+				"defaultValue": "sales-campaigns-formatted.xlsx"
+			},
+			"output_folder_path": {
+				"type": "string",
+				"defaultValue": "Anonymization Tool Tests"
+			},
+			"output_file_name": {
+				"type": "string",
+				"defaultValue": "sales-campaigns-anonymized.csv"
+			},
+			"table_schema": {
+				"type": "string",
+				"defaultValue": "test"
+			},
+			"table_name": {
+				"type": "string",
+				"defaultValue": "pl_upload_test"
+			},
+			"table_already_exists": {
+				"type": "bool",
+				"defaultValue": true
+			}
+		},
+		"folder": {
+			"name": "Other"
+		},
+		"annotations": [],
+		"lastPublishTime": "2022-04-29T11:43:59Z"
+	},
+	"type": "Microsoft.Synapse/workspaces/pipelines"
+}

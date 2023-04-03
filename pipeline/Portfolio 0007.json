@@ -1,0 +1,626 @@
+{
+	"name": "Portfolio 0007",
+	"properties": {
+		"activities": [
+			{
+				"name": "Upload Agency to DW",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Split Excel sheets into CSV files",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_Overwrite_CSV_to_DW",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"input_folder_path": "0007/Splitted files",
+						"input_file_name": "Agency.csv",
+						"table_schema": "0007",
+						"table_name": "Agency",
+						"table_already_exists": {
+							"value": "@pipeline().parameters.tables_already_exists",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "Upload Candidate to DW",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Upload Agency to DW",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_Overwrite_CSV_to_DW",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"input_folder_path": "0007/Splitted files",
+						"input_file_name": "Candidate.csv",
+						"table_schema": "0007",
+						"table_name": "Candidate",
+						"table_already_exists": {
+							"value": "@pipeline().parameters.tables_already_exists",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "Upload Client to DW",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Upload Candidate to DW",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_Overwrite_CSV_to_DW",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"input_folder_path": "0007/Splitted files",
+						"input_file_name": "Client.csv",
+						"table_schema": "0007",
+						"table_name": "Client",
+						"table_already_exists": {
+							"value": "@pipeline().parameters.tables_already_exists",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "Upload ClientType to DW",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Upload Client to DW",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_Overwrite_CSV_to_DW",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"input_folder_path": "0007/Splitted files",
+						"input_file_name": "ClientType.csv",
+						"table_schema": "0007",
+						"table_name": "ClientType",
+						"table_already_exists": {
+							"value": "@pipeline().parameters.tables_already_exists",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "Upload ClientTypeGroup to DW",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Upload ClientType to DW",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_Overwrite_CSV_to_DW",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"input_folder_path": "0007/Splitted files",
+						"input_file_name": "ClientTypeGroup.csv",
+						"table_schema": "0007",
+						"table_name": "ClientTypeGroup",
+						"table_already_exists": {
+							"value": "@pipeline().parameters.tables_already_exists",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "Upload ContractType to DW",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Upload ClientTypeGroup to DW",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_Overwrite_CSV_to_DW",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"input_folder_path": "0007/Splitted files",
+						"input_file_name": "ContractType.csv",
+						"table_schema": "0007",
+						"table_name": "ContractType",
+						"table_already_exists": {
+							"value": "@pipeline().parameters.tables_already_exists",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "Upload Date to DW",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Upload ContractType to DW",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_Overwrite_CSV_to_DW",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"input_folder_path": "0007/Splitted files",
+						"input_file_name": "Date.csv",
+						"table_schema": "0007",
+						"table_name": "Date",
+						"table_already_exists": {
+							"value": "@pipeline().parameters.tables_already_exists",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "Upload Department to DW",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Upload Date to DW",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_Overwrite_CSV_to_DW",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"input_folder_path": "0007/Splitted files",
+						"input_file_name": "Department.csv",
+						"table_schema": "0007",
+						"table_name": "Department",
+						"table_already_exists": {
+							"value": "@pipeline().parameters.tables_already_exists",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "Upload DR to DW",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Upload Department to DW",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_Overwrite_CSV_to_DW",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"input_folder_path": "0007/Splitted files",
+						"input_file_name": "DR.csv",
+						"table_schema": "0007",
+						"table_name": "DR",
+						"table_already_exists": {
+							"value": "@pipeline().parameters.tables_already_exists",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "Upload Industry to DW",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Upload DR to DW",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_Overwrite_CSV_to_DW",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"input_folder_path": "0007/Splitted files",
+						"input_file_name": "Industry.csv",
+						"table_schema": "0007",
+						"table_name": "Industry",
+						"table_already_exists": {
+							"value": "@pipeline().parameters.tables_already_exists",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "Upload Media to DW",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Upload Industry to DW",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_Overwrite_CSV_to_DW",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"input_folder_path": "0007/Splitted files",
+						"input_file_name": "Media.csv",
+						"table_schema": "0007",
+						"table_name": "Media",
+						"table_already_exists": {
+							"value": "@pipeline().parameters.tables_already_exists",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "Upload Occupation to DW",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Upload Media to DW",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_Overwrite_CSV_to_DW",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"input_folder_path": "0007/Splitted files",
+						"input_file_name": "Occupation.csv",
+						"table_schema": "0007",
+						"table_name": "Occupation",
+						"table_already_exists": {
+							"value": "@pipeline().parameters.tables_already_exists",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "Upload OfferType to DW",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Upload Occupation to DW",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_Overwrite_CSV_to_DW",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"input_folder_path": "0007/Splitted files",
+						"input_file_name": "OfferType.csv",
+						"table_schema": "0007",
+						"table_name": "OfferType",
+						"table_already_exists": {
+							"value": "@pipeline().parameters.tables_already_exists",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "Upload Region to DW",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Upload OfferType to DW",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_Overwrite_CSV_to_DW",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"input_folder_path": "0007/Splitted files",
+						"input_file_name": "Region.csv",
+						"table_schema": "0007",
+						"table_name": "Region",
+						"table_already_exists": {
+							"value": "@pipeline().parameters.tables_already_exists",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "Upload TargetProfile to DW",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Upload Region to DW",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_Overwrite_CSV_to_DW",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"input_folder_path": "0007/Splitted files",
+						"input_file_name": "TargetProfile.csv",
+						"table_schema": "0007",
+						"table_name": "TargetProfile",
+						"table_already_exists": {
+							"value": "@pipeline().parameters.tables_already_exists",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "Split Excel sheets into CSV files",
+				"type": "SynapseNotebook",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebook": {
+						"referenceName": "Split Excel sheets as CSV files",
+						"type": "NotebookReference"
+					},
+					"parameters": {
+						"input_file_path": {
+							"value": "/0007/CandidateDatabaseV1.xlsx",
+							"type": "string"
+						},
+						"output_directory_path": {
+							"value": "/0007/Splitted files/",
+							"type": "string"
+						}
+					},
+					"snapshot": true,
+					"sparkPool": {
+						"referenceName": "SparkPool01",
+						"type": "BigDataPoolReference"
+					},
+					"conf": {
+						"spark.dynamicAllocation.enabled": null,
+						"spark.dynamicAllocation.minExecutors": null,
+						"spark.dynamicAllocation.maxExecutors": null
+					},
+					"numExecutors": null
+				}
+			},
+			{
+				"name": "Upload Channel to DW",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Upload TargetProfile to DW",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_Overwrite_CSV_to_DW",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"input_folder_path": "0007/Splitted files",
+						"input_file_name": "Channel.csv",
+						"table_schema": "0007",
+						"table_name": "Channel",
+						"table_already_exists": {
+							"value": "@pipeline().parameters.tables_already_exists",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "Upload Publication to DW",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Upload Channel to DW",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_Overwrite_CSV_to_DW",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"input_folder_path": "0007/Splitted files",
+						"input_file_name": "Publication.csv",
+						"table_schema": "0007",
+						"table_name": "Publication",
+						"table_already_exists": {
+							"value": "@pipeline().parameters.tables_already_exists",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "Upload Application to DW",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Upload Publication to DW",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_Overwrite_CSV_to_DW",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"input_folder_path": "0007/Splitted files",
+						"input_file_name": "Application.csv",
+						"table_schema": "0007",
+						"table_name": "Application",
+						"table_already_exists": {
+							"value": "@pipeline().parameters.tables_already_exists",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "Upload JobOffer to DW",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Upload Application to DW",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_Overwrite_CSV_to_DW",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"input_folder_path": "0007/Splitted files",
+						"input_file_name": "JobOffer.csv",
+						"table_schema": "0007",
+						"table_name": "JobOffer",
+						"table_already_exists": {
+							"value": "@pipeline().parameters.tables_already_exists",
+							"type": "Expression"
+						}
+					}
+				}
+			}
+		],
+		"parameters": {
+			"tables_already_exists": {
+				"type": "bool",
+				"defaultValue": true
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2022-05-03T12:35:48Z"
+	},
+	"type": "Microsoft.Synapse/workspaces/pipelines"
+}

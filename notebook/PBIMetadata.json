@@ -1,0 +1,353 @@
+{
+	"name": "PBIMetadata",
+	"properties": {
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "SparkPool01",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 1,
+			"runAsWorkspaceSystemIdentity": false,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "1",
+				"spark.dynamicAllocation.maxExecutors": "1",
+				"spark.autotune.trackingId": "f0e6a8f7-a615-4131-80c8-b7ac5a5f0956"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"synapse_widget": {
+				"version": "0.1"
+			},
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/b2c447f4-0f0b-471d-a130-0c72330f08f2/resourceGroups/DataX-ResGroup/providers/Microsoft.Synapse/workspaces/dataxsynapsedev/bigDataPools/SparkPool01",
+				"name": "SparkPool01",
+				"type": "Spark",
+				"endpoint": "https://dataxsynapsedev.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/SparkPool01",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net",
+					"authHeader": null
+				},
+				"sparkVersion": "3.1",
+				"nodeCount": 10,
+				"cores": 4,
+				"memory": 28,
+				"extraHeader": null
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"source": [
+					"from notebookutils import mssparkutils\r\n",
+					"import requests \r\n",
+					"from requests.structures import CaseInsensitiveDict\r\n",
+					"import json\r\n",
+					"import pandas as pd"
+				],
+				"execution_count": 37
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"def safe_print(response):\r\n",
+					"    print(response)\r\n",
+					"    try:\r\n",
+					"        print(json.dumps(response.json(), indent=4, sort_keys=False))\r\n",
+					"    except:\r\n",
+					"        pass"
+				],
+				"execution_count": 38
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"client_id = '0ab236de-0088-4311-bd50-11fa6b38c323'\r\n",
+					"tenant_id = '89248974-515e-4d65-9469-ab424abfd2d2'\r\n",
+					"client_secret = mssparkutils.credentials.getSecretWithLS('ls_keyvault', 'PBIMetadataClientSecret')\r\n",
+					"account_password = mssparkutils.credentials.getSecretWithLS('ls_keyvault', 'PBIMetadataClientUserAndPassword')"
+				],
+				"execution_count": 39
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"body = f'client_id={client_id}&grant_type=password&resource=https%3A%2F%2Fanalysis.windows.net%2Fpowerbi%2Fapi&{account_password}'\r\n",
+					"r = requests.post(f'https://login.microsoftonline.com/{tenant_id}/oauth2/token', data=body)\r\n",
+					"access_token = r.json()['access_token']\r\n",
+					"\r\n",
+					"headers = CaseInsensitiveDict()\r\n",
+					"headers[\"Authorization\"] = \"Bearer \" + access_token"
+				],
+				"execution_count": 40
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Workspaces(Groups)"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": true
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"url = \"https://api.powerbi.com/v1.0/myorg/groups\"\r\n",
+					"\r\n",
+					"resp = requests.get(url, headers=headers)\r\n",
+					"safe_print(resp)\r\n",
+					"obj = resp.json()\r\n",
+					"\r\n",
+					"groups_df = pd.DataFrame.from_records(obj[\"value\"])\r\n",
+					"mssparkutils.fs.put(\"/PBIMetadata/Groups.csv\", groups_df.to_csv(index=False), True)\r\n",
+					"print(groups_df.head())"
+				],
+				"execution_count": 41
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Metadata (Datasets, Dataflows and Reports)"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"data_df = pd.DataFrame()\r\n",
+					"types = [\"datasets\", \"dataflows\", \"reports\"]\r\n",
+					"for group in groups_df[\"id\"]:\r\n",
+					"    group = str(group)\r\n",
+					"    for _type in types:\r\n",
+					"        url = \"https://api.powerbi.com/v1.0/myorg/groups/\"\r\n",
+					"        url += group + \"/\" + _type\r\n",
+					"        resp = requests.get(url, headers=headers)\r\n",
+					"        obj = resp.json()\r\n",
+					"        new_df = pd.DataFrame.from_records(obj[\"value\"])\r\n",
+					"        new_df[\"group_id\"] = group\r\n",
+					"        new_df[\"type\"] = _type[:-1]\r\n",
+					"        if _type == \"dataflows\":\r\n",
+					"            if 'objectId' in new_df.columns:\r\n",
+					"                new_df[\"id\"] = new_df[\"objectId\"]\r\n",
+					"        data_df = pd.concat([data_df,new_df],ignore_index=True)\r\n",
+					"\r\n",
+					"print(data_df.shape)\r\n",
+					"mssparkutils.fs.put(\"/PBIMetadata/Metadata.csv\", data_df.to_csv(index=False), True)"
+				],
+				"execution_count": 42
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Report pages"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"report_df = data_df[data_df[\"type\"] == \"report\"]\r\n",
+					"pages_df = pd.DataFrame()\r\n",
+					"for id_ in report_df[\"id\"]:\r\n",
+					"    group = report_df[report_df[\"id\"] == id_][\"group_id\"].iloc[0]\r\n",
+					"    url = \"https://api.powerbi.com/v1.0/myorg/groups/\"\r\n",
+					"    url += group + \"/reports/\" + id_ + \"/pages\"\r\n",
+					"    resp = requests.get(url, headers=headers)\r\n",
+					"    obj = resp.json()\r\n",
+					"    new_df = pd.DataFrame.from_records(obj[\"value\"])\r\n",
+					"    new_df[\"report_id\"] = id_\r\n",
+					"    new_df[\"group_id\"] = group\r\n",
+					"    pages_df = pd.concat([pages_df,new_df],ignore_index=True)\r\n",
+					"mssparkutils.fs.put(\"/PBIMetadata/ReportPages.csv\", pages_df.to_csv(index=False), True)"
+				],
+				"execution_count": 43
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Datasources\r\n",
+					"\r\n",
+					"API only allows getDatasource calls on datasets, dataflows and RDL(paginated reports). Standard reports don't support getDatasource calls."
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"datasources_df = pd.DataFrame()\r\n",
+					"resources = [\"datasets\", \"dataflows\", \"reports\"]\r\n",
+					"for id_ in data_df[\"id\"]:\r\n",
+					"    group = data_df[data_df[\"id\"] == id_][\"group_id\"].iloc[0]\r\n",
+					"    resource = data_df[data_df[\"id\"] == id_][\"type\"].iloc[0] + \"s\"\r\n",
+					"    url = \"https://api.powerbi.com/v1.0/myorg/groups/\"\r\n",
+					"    url += group + \"/\" + resource + \"/\" + id_ + \"/\" + \"datasources\"\r\n",
+					"    resp = requests.get(url, headers=headers)\r\n",
+					"    obj = resp.json()\r\n",
+					"    new_df = pd.DataFrame()\r\n",
+					"    if \"value\" in obj.keys():\r\n",
+					"        if len(obj[\"value\"]) > 0:\r\n",
+					"            new_df = pd.DataFrame.from_records(obj[\"value\"])\r\n",
+					"            new_df[\"resource_id\"] = id_\r\n",
+					"            new_df[\"group_id\"] = group\r\n",
+					"            new_df[\"resource_type\"] = resource[:-1]\r\n",
+					"            new_df[\"id\"] = new_df[\"datasourceId\"]\r\n",
+					"    datasources_df = pd.concat([datasources_df,new_df],ignore_index=True)\r\n",
+					"mssparkutils.fs.put(\"/PBIMetadata/Datasources.csv\", datasources_df.to_csv(index=False), True)\r\n",
+					"#print(datasources_df.shape)"
+				],
+				"execution_count": 85
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					""
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					""
+				]
+			}
+		]
+	}
+}

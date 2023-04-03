@@ -1,0 +1,106 @@
+{
+	"name": "Portfolio 0003 - DimTabLineItems",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy LineItems from Main to DimTab",
+				"description": "It copies DV360Main[LineItem] & DV360Main[LineItemID] unique values to [0003].[DimTabDV360LineItem].\nIt will also add a new column LineItemName2 by performing a search in [0003].[LineItemName2Map].\nThe search consist on finding the first Map[value] that has Map[Key] as substring of DimTabDV360LineItem[LineItem], and assign it to DimTabDV360LineItem[LineItemName2].",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlPoolSource",
+						"sqlReaderQuery": "SELECT DISTINCT [LineItemID], [LineItem],\n(\n    SELECT TOP(1) [Value]\n    FROM [0003].[LineItemName2Map] linm\n    WHERE CHARINDEX(linm.[Key], main.LineItem ) > 0\n) AS [LineItemName2]\n\nFROM [0003].[DV360Main] main",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "SqlPoolSink",
+						"preCopyScript": {
+							"value": "@{\n    if(\n        pipeline().parameters.table_already_exists,\n        'TRUNCATE TABLE [0003].[DimTabDV360LineItem]',\n        ''\n    )\n}",
+							"type": "Expression"
+						},
+						"writeBehavior": "Insert",
+						"sqlWriterUseTableLock": false,
+						"tableOption": "autoCreate"
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "LineItemID",
+									"type": "String",
+									"physicalType": "nvarchar"
+								},
+								"sink": {
+									"name": "LineItemID",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "LineItem",
+									"type": "String",
+									"physicalType": "nvarchar"
+								},
+								"sink": {
+									"name": "LineItem",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "LineItemName2",
+									"type": "Int32",
+									"physicalType": "int"
+								},
+								"sink": {
+									"name": "LineItemName2",
+									"type": "Int32",
+									"physicalType": "Int32"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "dw_DV360Main",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "dw_DimTabDV360LineItem",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		],
+		"parameters": {
+			"table_already_exists": {
+				"type": "bool",
+				"defaultValue": true
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2022-05-04T11:26:20Z"
+	},
+	"type": "Microsoft.Synapse/workspaces/pipelines"
+}

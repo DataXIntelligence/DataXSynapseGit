@@ -1,0 +1,18 @@
+{
+	"name": "TestShifts",
+	"type": "Microsoft.Synapse/workspaces/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "OData",
+		"typeProperties": {
+			"url": "https://graph.microsoft.com/beta/teams/776c5cf3-1af9-4542-b845-ff6825d85492/schedule",
+			"authenticationType": "Basic",
+			"userName": "alexander.gonzalez@datax.world",
+			"encryptedCredential": "ew0KICAiVmVyc2lvbiI6ICIyMDE3LTExLTMwIiwNCiAgIlByb3RlY3Rpb25Nb2RlIjogIktleSIsDQogICJTZWNyZXRDb250ZW50VHlwZSI6ICJQbGFpbnRleHQiLA0KICAiQ3JlZGVudGlhbElkIjogIlNZTkFQU0VARDk1N0RBMTUtNUFDOC00QzIwLThBMkYtQTA3MTU3QjZEQjZBXzFjMDAxYTI4LTMzNzktNDRjYi1hYWEzLWY4Mjk4YTA2NzQ1NiINCn0="
+		},
+		"connectVia": {
+			"referenceName": "AutoResolveIntegrationRuntime",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

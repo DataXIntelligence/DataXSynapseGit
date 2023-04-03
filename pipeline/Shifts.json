@@ -1,0 +1,39 @@
+{
+	"name": "Shifts",
+	"properties": {
+		"activities": [
+			{
+				"name": "Web1",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": "https://graph.microsoft.com/beta/teams/776c5cf3-1af9-4542-b845-ff6825d85492/schedule",
+					"connectVia": {
+						"referenceName": "AutoResolveIntegrationRuntime",
+						"type": "IntegrationRuntimeReference"
+					},
+					"method": "GET",
+					"authentication": {
+						"type": "ServicePrincipal",
+						"userTenant": "89248974-515e-4d65-9469-ab424abfd2d2",
+						"password": {
+							"type": "SecureString",
+							"value": "**********"
+						}
+					}
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2022-11-22T17:30:01Z"
+	},
+	"type": "Microsoft.Synapse/workspaces/pipelines"
+}

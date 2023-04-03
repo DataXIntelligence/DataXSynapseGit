@@ -1,0 +1,341 @@
+{
+	"name": "PortfolioDashboardsAPI",
+	"properties": {
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "SparkPool01",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2,
+			"runAsWorkspaceSystemIdentity": false,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "486e2baf-a909-46d7-b261-1b33e340afbe"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"synapse_widget": {
+				"version": "0.1"
+			},
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/b2c447f4-0f0b-471d-a130-0c72330f08f2/resourceGroups/DataX-ResGroup/providers/Microsoft.Synapse/workspaces/dataxsynapsedev/bigDataPools/SparkPool01",
+				"name": "SparkPool01",
+				"type": "Spark",
+				"endpoint": "https://dataxsynapsedev.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/SparkPool01",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net",
+					"authHeader": null
+				},
+				"sparkVersion": "3.1",
+				"nodeCount": 10,
+				"cores": 4,
+				"memory": 28,
+				"extraHeader": null
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"from notebookutils import mssparkutils\r\n",
+					"import requests\r\n",
+					"import json\r\n",
+					"import pandas as pd"
+				],
+				"execution_count": 56
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Request access token"
+				]
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"client_secret = mssparkutils.credentials.getSecretWithLS('ls_keyvault', 'PBIServPrincipalAPISecret')\r\n",
+					"client_id = '95e2c30e-8533-4c18-b3c7-4718847e9f28'\r\n",
+					"tenant_id = '89248974-515e-4d65-9469-ab424abfd2d2'\r\n",
+					"workspace_id = 'ac1176e8-1b38-40d3-91e4-3b8f5983aa5f'"
+				],
+				"execution_count": 57
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"body = f'grant_type=client_credentials&resource=https://analysis.windows.net/powerbi/api&client_id={client_id}&client_secret={client_secret}'\r\n",
+					"r = requests.post(f'https://login.microsoftonline.com/{tenant_id}/oauth2/token', data=body)"
+				],
+				"execution_count": 58
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"access_token = r.json()['access_token']"
+				],
+				"execution_count": 59
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Request reports and pages information"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Helper for input date processing.\r\n",
+					"def process_date(datetime):\r\n",
+					"    date = datetime.split('T')[0]\r\n",
+					"    date_items = date.split('-')\r\n",
+					"    return date_items[1] + '/' + date_items[2] + '/' + date_items[0]"
+				],
+				"execution_count": 60
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"clean_reports = []\r\n",
+					"clean_pages = []\r\n",
+					"\r\n",
+					"url=f'https://api.powerbi.com/v1.0/myorg/admin/groups/{workspace_id}/reports'\r\n",
+					"res = requests.get(url, headers={\"Authorization\":\"Bearer \" + access_token})\r\n",
+					"reports = res.json()['value']\r\n",
+					"        \r\n",
+					"for report in reports:\r\n",
+					"    # Info from each report\r\n",
+					"    clean_reports.append({\r\n",
+					"        'ReportId': report['id'],\r\n",
+					"        'ReportName': report['name'],\r\n",
+					"        'ReportUrl': report['webUrl'],\r\n",
+					"        'ReportCreationDate': process_date(report['createdDateTime']),\r\n",
+					"        'ReportLastModificationDate': process_date(report['modifiedDateTime']),\r\n",
+					"        'ReportCreator': report['createdBy'],\r\n",
+					"        'ReportLastModifier': report['modifiedBy']\r\n",
+					"    })\r\n",
+					"    # Pages from each report\r\n",
+					"    try:\r\n",
+					"        reportId = report['id']\r\n",
+					"        url=f'https://api.powerbi.com/v1.0/myorg/groups/{workspace_id}/reports/{reportId}/pages'\r\n",
+					"        res = requests.get(url, headers={\"Authorization\":\"Bearer \" + access_token})\r\n",
+					"        pages = res.json()['value']\r\n",
+					"\r\n",
+					"    except Exception as e:\r\n",
+					"        clean_reports.pop(-1)\r\n",
+					"        continue\r\n",
+					"\r\n",
+					"    for page in pages:\r\n",
+					"        clean_pages.append({\r\n",
+					"            'ReportSectionId': page['Name'],\r\n",
+					"            'ReportSectionName': page['displayName'],\r\n",
+					"            'ReportSectionOrder': page['order'],\r\n",
+					"            'ReportId': reportId\r\n",
+					"        })\r\n",
+					"\r\n",
+					"reports_df = pd.DataFrame(clean_reports)\r\n",
+					"pages_df = pd.DataFrame(clean_pages)"
+				],
+				"execution_count": 50
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": true
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"print(json.dumps(reports, indent=4, sort_keys=False))"
+				],
+				"execution_count": 51
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": true
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"print(json.dumps(pages, indent=4, sort_keys=False))"
+				],
+				"execution_count": 52
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Store the results as csv files in the Data Warehouse"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"tags": [
+						"parameters"
+					]
+				},
+				"source": [
+					"reports_output_file_path = '/0000 Portfolio API/Reports.csv'\r\n",
+					"sections_output_file_path = '/0000 Portfolio API/ReportSections.csv'"
+				],
+				"execution_count": 53
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"reports_df.to_csv('abfss://dataxsynapsefs@adlsdatax01.dfs.core.windows.net' + reports_output_file_path, index = False)\r\n",
+					"pages_df.to_csv('abfss://dataxsynapsefs@adlsdatax01.dfs.core.windows.net' + sections_output_file_path, index = False)"
+				],
+				"execution_count": 54
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"proposal_output_file_path = '/0000 Portfolio API/Proposal.xlsx'\r\n",
+					"with pd.ExcelWriter('abfss://dataxsynapsefs@adlsdatax01.dfs.core.windows.net' + proposal_output_file_path) as writer:\r\n",
+					"    reports_df.to_excel(writer, sheet_name=\"Reports\", index=False)\r\n",
+					"    pages_df.to_excel(writer, sheet_name=\"ReportSections\", index=False)"
+				],
+				"execution_count": 55
+			}
+		]
+	}
+}

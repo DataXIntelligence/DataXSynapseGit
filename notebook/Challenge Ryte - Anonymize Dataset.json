@@ -1,0 +1,237 @@
+{
+	"name": "Challenge Ryte - Anonymize Dataset",
+	"properties": {
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "SparkPool01",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2,
+			"runAsWorkspaceSystemIdentity": false,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "8881b5b4-bef7-4683-afed-5cd7434c4f4d"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"synapse_widget": {
+				"version": "0.1"
+			},
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/b2c447f4-0f0b-471d-a130-0c72330f08f2/resourceGroups/DataX-ResGroup/providers/Microsoft.Synapse/workspaces/dataxsynapsedev/bigDataPools/SparkPool01",
+				"name": "SparkPool01",
+				"type": "Spark",
+				"endpoint": "https://dataxsynapsedev.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/SparkPool01",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net",
+					"authHeader": null
+				},
+				"sparkVersion": "3.1",
+				"nodeCount": 10,
+				"cores": 4,
+				"memory": 28,
+				"extraHeader": null
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"from notebookutils import mssparkutils\r\n",
+					"import pandas as pd\r\n",
+					"import random"
+				],
+				"execution_count": 1
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Import initial data from input file"
+				]
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"data_df = pd.read_excel('abfss://dataxsynapsefs@adlsdatax01.dfs.core.windows.net/Ryte challenge/Data to sanitize.xlsx', sheet_name='Data')\r\n",
+					"country_df = pd.read_excel('abfss://dataxsynapsefs@adlsdatax01.dfs.core.windows.net/Ryte challenge/Data to sanitize.xlsx', sheet_name='Country')"
+				],
+				"execution_count": 2
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Remove non needed columns"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"data_df = data_df[['Last Updated', 'Country Code', 'Market', 'Region', 'Critical Error','Critical Error Count', 'What is Indexible', 'What is Indexible Count','Indexability Status Codes', 'Indexability Status Codes Count', 'Redirect to Header Status Codes', 'Redirect to Header Status Codes Count','Links Status Code Count', 'Server Load Time', 'Server Load Time Count','Meta Title Pixel Length', 'Meta Title Pixel Length Count', 'Meta Title Duplicates', 'Meta Title Duplicates Count', 'Outgoing Links', 'Outgoing Links Count', 'Word Count', 'Word Count Count', 'Description Length', 'Description Length Count', 'Description Duplicates', 'Description Duplicates Count', 'OPS', 'OPS Count', 'Links Status Code', 'File Size Aggregate', 'File Size Aggregate Count']]\r\n",
+					"data_df.head()"
+				],
+				"execution_count": 3
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Change some column types"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"data_df = data_df.astype({\"Market\": object, \"Region\": object})\r\n",
+					"print(data_df.dtypes)\r\n",
+					"print('-------------')\r\n",
+					"print(country_df.dtypes)"
+				],
+				"execution_count": 4
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Merge Dataframes "
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"dataRowsCount = len(data_df.index) # 2338\r\n",
+					"countryRowsCount = len(country_df.index) # 152\r\n",
+					"\r\n",
+					"for i in range(dataRowsCount):\r\n",
+					"  randomIndex = random.randint(0, 21) # Only 22 countries\r\n",
+					"  data_df.at[i, 'Country Code'] = country_df.at[randomIndex, 'country_code']\r\n",
+					"  data_df.at[i, 'Market'] = country_df.at[randomIndex, 'market_name']\r\n",
+					"  data_df.at[i, 'Region'] = country_df.at[randomIndex, 'region_name']\r\n",
+					"\r\n",
+					"data_df.head()"
+				],
+				"execution_count": 5
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Export to output file"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# mssparkutils.fs.put('/Ryte challenge/clean_data_sa.csv', data_df.to_csv(index=False), True)\r\n",
+					"data_df.to_excel('abfss://dataxsynapsefs@adlsdatax01.dfs.core.windows.net/Ryte challenge/clean_data_from_notebook.xlsx')"
+				],
+				"execution_count": 11
+			}
+		]
+	}
+}

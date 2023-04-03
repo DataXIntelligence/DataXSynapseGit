@@ -1,0 +1,173 @@
+{
+	"name": "pl_Pause_or_Resume_Pool",
+	"properties": {
+		"activities": [
+			{
+				"name": "Until pool is Paused or Online",
+				"type": "Until",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@or(bool(startswith(activity('Check for changed SQLPool Status').Output.Properties.status,'Paused')),Bool(startswith(activity('Check for changed SQLPool Status').Output.Properties.status,'Online')))",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Check for changed SQLPool Status",
+							"type": "WebActivity",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"url": {
+									"value": "https://management.azure.com/subscriptions/@{pipeline().parameters.PLParSubscriptionID}/resourceGroups/@{pipeline().parameters.PLParSynapse_ResourceGroupName}/providers/Microsoft.Synapse/workspaces/@{pipeline().parameters.PLParSynapseWorkspace}/sqlPools/@{pipeline().parameters.PLParSynapseDedicatedSQLPool}/?api-version=2019-06-01-preview",
+									"type": "Expression"
+								},
+								"connectVia": {
+									"referenceName": "AutoResolveIntegrationRuntime",
+									"type": "IntegrationRuntimeReference"
+								},
+								"method": "GET",
+								"authentication": {
+									"type": "MSI",
+									"resource": "https://management.azure.com/"
+								}
+							}
+						},
+						{
+							"name": "Wait before checking again",
+							"type": "Wait",
+							"dependsOn": [
+								{
+									"activity": "Check for changed SQLPool Status",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"waitTimeInSeconds": {
+									"value": "@pipeline().parameters.PLParWaitTimeUntil",
+									"type": "Expression"
+								}
+							}
+						}
+					],
+					"timeout": "0.00:20:00"
+				}
+			},
+			{
+				"name": "Check if SQL Pool is Paused or Online",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "Until pool is Paused or Online",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@bool(\n    equals(activity('Check for changed SQLPool Status').Output.Properties.status, \n        if(equals(pipeline().parameters.PLParAction, 'Resume'), \n            'Online',\n            'Paused'\n        )\n    )\n)",
+						"type": "Expression"
+					},
+					"ifFalseActivities": [
+						{
+							"name": "Pause or Resume SQL",
+							"type": "WebActivity",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"url": {
+									"value": "https://management.azure.com/subscriptions/@{pipeline().parameters.PLParSubscriptionID}/resourceGroups/@{pipeline().parameters.PLParSynapse_ResourceGroupName}/providers/Microsoft.Synapse/workspaces/@{pipeline().parameters.PLParSynapseWorkspace}/sqlPools/@{pipeline().parameters.PLParSynapseDedicatedSQLPool}/@{pipeline().parameters.PLParAction}/?api-version=2019-06-01-preview",
+									"type": "Expression"
+								},
+								"connectVia": {
+									"referenceName": "AutoResolveIntegrationRuntime",
+									"type": "IntegrationRuntimeReference"
+								},
+								"method": "POST",
+								"authentication": {
+									"type": "MSI",
+									"resource": "https://management.azure.com/"
+								}
+							}
+						},
+						{
+							"name": "Wait before Continue",
+							"type": "Wait",
+							"dependsOn": [
+								{
+									"activity": "Pause or Resume SQL",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"waitTimeInSeconds": {
+									"value": "@pipeline().parameters.PLParWaitTime",
+									"type": "Expression"
+								}
+							}
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"PLParAction": {
+				"type": "string",
+				"defaultValue": "Pause"
+			},
+			"PLParWaitTime": {
+				"type": "int",
+				"defaultValue": 10
+			},
+			"PLParWaitTimeUntil": {
+				"type": "int",
+				"defaultValue": 30
+			},
+			"PLParSynapse_ResourceGroupName": {
+				"type": "string",
+				"defaultValue": "DataX-ResGroup"
+			},
+			"PLParSynapseWorkspace": {
+				"type": "string",
+				"defaultValue": "dataxsynapsedev"
+			},
+			"PLParSynapseDedicatedSQLPool": {
+				"type": "string",
+				"defaultValue": "DataXDW"
+			},
+			"PLParSubscriptionId": {
+				"type": "string",
+				"defaultValue": "b2c447f4-0f0b-471d-a130-0c72330f08f2"
+			}
+		},
+		"folder": {
+			"name": "Other"
+		},
+		"annotations": [],
+		"lastPublishTime": "2022-04-22T14:28:55Z"
+	},
+	"type": "Microsoft.Synapse/workspaces/pipelines"
+}

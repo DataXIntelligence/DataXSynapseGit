@@ -1,0 +1,137 @@
+{
+	"name": "pl_Overwrite_CSV_to_DW",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy output to DW",
+				"description": "",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "Resume DW",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "SqlPoolSink",
+						"preCopyScript": {
+							"value": "@{if(\r\n    pipeline().parameters.table_already_exists,\r\n    concat(\r\n        'TRUNCATE TABLE [', \r\n        pipeline().parameters.table_schema, \r\n        '].[', \r\n        pipeline().parameters.table_name, \r\n        ']'\r\n    ),\r\n    ''\r\n)\r\n}",
+							"type": "Expression"
+						},
+						"writeBehavior": "Insert",
+						"sqlWriterUseTableLock": false,
+						"tableOption": "autoCreate"
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "df_Anonymization_pl_Source",
+						"type": "DatasetReference",
+						"parameters": {
+							"file_system": "dataxsynapsefs",
+							"folder_path": {
+								"value": "@pipeline().parameters.input_folder_path",
+								"type": "Expression"
+							},
+							"file_name": {
+								"value": "@pipeline().parameters.input_file_name",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "dw_Anonymization_pl_Sink",
+						"type": "DatasetReference",
+						"parameters": {
+							"table_schema": {
+								"value": "@pipeline().parameters.table_schema",
+								"type": "Expression"
+							},
+							"table_name": {
+								"value": "@pipeline().parameters.table_name",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			},
+			{
+				"name": "Resume DW",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_Pause_or_Resume_Pool",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"PLParAction": "Resume"
+					}
+				}
+			}
+		],
+		"parameters": {
+			"input_folder_path": {
+				"type": "string",
+				"defaultValue": "Anonymization Tool Tests"
+			},
+			"input_file_name": {
+				"type": "string",
+				"defaultValue": "sales-campaigns-anonymized.csv"
+			},
+			"table_schema": {
+				"type": "string",
+				"defaultValue": "test"
+			},
+			"table_name": {
+				"type": "string",
+				"defaultValue": "pl_upload_test"
+			},
+			"table_already_exists": {
+				"type": "bool",
+				"defaultValue": true
+			}
+		},
+		"folder": {
+			"name": "Other"
+		},
+		"annotations": [],
+		"lastPublishTime": "2022-04-29T11:43:56Z"
+	},
+	"type": "Microsoft.Synapse/workspaces/pipelines"
+}

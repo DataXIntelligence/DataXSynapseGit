@@ -1,0 +1,170 @@
+{
+	"name": "Portfolio 0000",
+	"properties": {
+		"activities": [
+			{
+				"name": "API request info and store in Datalake",
+				"type": "SynapseNotebook",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebook": {
+						"referenceName": "PortfolioDashboardsAPI",
+						"type": "NotebookReference"
+					},
+					"parameters": {
+						"reports_output_file_path": {
+							"value": {
+								"value": "@concat('/', pipeline().parameters.inputs_folder_path, '/', pipeline().parameters.reports_file_name)",
+								"type": "Expression"
+							},
+							"type": "string"
+						},
+						"sections_output_file_path": {
+							"value": {
+								"value": "@concat('/', pipeline().parameters.inputs_folder_path, '/', pipeline().parameters.sections_file_name)",
+								"type": "Expression"
+							},
+							"type": "string"
+						}
+					},
+					"snapshot": true,
+					"sparkPool": {
+						"referenceName": "SparkPool01",
+						"type": "BigDataPoolReference"
+					},
+					"conf": {
+						"spark.dynamicAllocation.enabled": null,
+						"spark.dynamicAllocation.minExecutors": null,
+						"spark.dynamicAllocation.maxExecutors": null
+					},
+					"numExecutors": null
+				}
+			},
+			{
+				"name": "Update Reports table in Data Warehouse",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "API request info and store in Datalake",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_Overwrite_CSV_to_DW",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"input_folder_path": {
+							"value": "@pipeline().parameters.inputs_folder_path",
+							"type": "Expression"
+						},
+						"input_file_name": {
+							"value": "@pipeline().parameters.reports_file_name",
+							"type": "Expression"
+						},
+						"table_schema": {
+							"value": "@pipeline().parameters.tables_schema",
+							"type": "Expression"
+						},
+						"table_name": {
+							"value": "@pipeline().parameters.reports_table_name",
+							"type": "Expression"
+						},
+						"table_already_exists": {
+							"value": "@pipeline().parameters.tables_already_exists",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "Update ReportSections table in Data Warehouse",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Update Reports table in Data Warehouse",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_Overwrite_CSV_to_DW",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"input_folder_path": {
+							"value": "@pipeline().parameters.inputs_folder_path",
+							"type": "Expression"
+						},
+						"input_file_name": {
+							"value": "@pipeline().parameters.sections_file_name",
+							"type": "Expression"
+						},
+						"table_schema": {
+							"value": "@pipeline().parameters.tables_schema",
+							"type": "Expression"
+						},
+						"table_name": {
+							"value": "@pipeline().parameters.sections_table_name",
+							"type": "Expression"
+						},
+						"table_already_exists": {
+							"value": "@pipeline().parameters.tables_already_exists",
+							"type": "Expression"
+						}
+					}
+				}
+			}
+		],
+		"parameters": {
+			"inputs_folder_path": {
+				"type": "string",
+				"defaultValue": "0000 Portfolio API"
+			},
+			"reports_file_name": {
+				"type": "string",
+				"defaultValue": "Reports.csv"
+			},
+			"sections_file_name": {
+				"type": "string",
+				"defaultValue": "ReportSections.csv"
+			},
+			"tables_schema": {
+				"type": "string",
+				"defaultValue": "0000"
+			},
+			"reports_table_name": {
+				"type": "string",
+				"defaultValue": "Reports"
+			},
+			"sections_table_name": {
+				"type": "string",
+				"defaultValue": "ReportSections"
+			},
+			"tables_already_exists": {
+				"type": "bool",
+				"defaultValue": true
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2022-04-29T11:44:03Z"
+	},
+	"type": "Microsoft.Synapse/workspaces/pipelines"
+}

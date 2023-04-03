@@ -1,0 +1,132 @@
+{
+	"name": "Get Shifts",
+	"properties": {
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "SparkPool01",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2,
+			"runAsWorkspaceSystemIdentity": false,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "9ac751d2-79ac-4183-ab82-b8232654cdc1"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"synapse_widget": {
+				"version": "0.1"
+			},
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/b2c447f4-0f0b-471d-a130-0c72330f08f2/resourceGroups/DataX-ResGroup/providers/Microsoft.Synapse/workspaces/dataxsynapsedev/bigDataPools/SparkPool01",
+				"name": "SparkPool01",
+				"type": "Spark",
+				"endpoint": "https://dataxsynapsedev.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/SparkPool01",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net",
+					"authHeader": null
+				},
+				"sparkVersion": "3.1",
+				"nodeCount": 10,
+				"cores": 4,
+				"memory": 28,
+				"extraHeader": null
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"import requests\r\n",
+					"import pandas as pd"
+				],
+				"execution_count": 1
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"def GetAccessToken():\r\n",
+					"    url = 'https://login.microsoftonline.com/89248974-515e-4d65-9469-ab424abfd2d2/oauth2/token'\r\n",
+					"    data = {\r\n",
+					"        'grant_type': 'client_credentials',\r\n",
+					"        'client_id': '7370627a-b1c3-4d83-baf1-5a7c35910337',\r\n",
+					"        'client_secret': 'UjZ8Q~isPKVTRMSriUTJH~x7hLA.ok53AAx44df1',\r\n",
+					"        'resource': 'https://graph.microsoft.com'\r\n",
+					"    }\r\n",
+					"\r\n",
+					"    res = requests.post(url=url, data=data)\r\n",
+					"    return res.json()\r\n",
+					"\r\n",
+					"GetAccessToken()\r\n",
+					"    "
+				],
+				"execution_count": 2
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"# https://learn.microsoft.com/en-us/graph/api/resources/schedule?view=graph-rest-1.0\r\n",
+					"\r\n",
+					"token = GetAccessToken()['access_token']\r\n",
+					"\r\n",
+					"url = 'https://graph.microsoft.com/beta/teams/776c5cf3-1af9-4542-b845-ff6825d85492/schedule/shifts'\r\n",
+					"headers = {\r\n",
+					"    'Authorization': f'Bearer {token}',\r\n",
+					"    'Content-Type': 'application/json',\r\n",
+					"    'MS-APP-ACTS-AS': 'c9736d79-3914-4372-a68c-501f06dbfa11' ## User ID to Inspect\r\n",
+					"}\r\n",
+					"\r\n",
+					"res = requests.get(url=url, headers=headers)\r\n",
+					"data_shifts = res.json()['value']\r\n",
+					"\r\n",
+					"dataframe = pd.DataFrame(data_shifts)\r\n",
+					"dataframe.head(5)\r\n",
+					"\r\n",
+					""
+				],
+				"execution_count": 6
+			}
+		]
+	}
+}

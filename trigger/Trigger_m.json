@@ -1,0 +1,32 @@
+{
+	"name": "Trigger_m",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "Pipeline_Mario",
+					"type": "PipelineReference"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Day",
+				"interval": 2,
+				"startTime": "2023-03-29T12:19:00Z",
+				"timeZone": "UTC",
+				"schedule": {
+					"minutes": [
+						20
+					],
+					"hours": [
+						2
+					]
+				}
+			}
+		}
+	}
+}

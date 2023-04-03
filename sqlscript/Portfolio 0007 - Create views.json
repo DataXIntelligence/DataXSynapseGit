@@ -1,0 +1,17 @@
+{
+	"name": "Portfolio 0007 - Create views",
+	"properties": {
+		"content": {
+			"query": "-- CREATE VIEW [0007].[V_Client] AS\n--     SELECT c.*, ct.[ClientTypeName], ct.[ClientTypeGroupID], ctg.[ClientTypeGroupName]\n--     FROM [0007].[Client] c\n--     LEFT JOIN [0007].[ClientType] ct\n--     ON c.[ClientTypeID] = ct.[ClientTypeID]\n--     LEFT JOIN [0007].[ClientTypeGroup] ctg\n--     ON ct.[ClientTypeGroupID] = ctg.[ClientTypeGroupID]\n\n-- CREATE VIEW [0007].[V_Agency] AS\n--     SELECT a.*, d.[DepartmentName], d.[RegionID], r.[RegionName], r.[DRID], dr.[DRName]\n--     FROM [0007].[Agency] a\n--     LEFT JOIN [0007].[Department] d\n--     ON a.[DepartmentID] = d.[DepartmentID]\n--     LEFT JOIN [0007].[Region] r\n--     ON d.[RegionID] = r.[RegionID]\n--     LEFT JOIN [0007].[DR] dr\n--     ON r.[DRID] = dr.[DRID]\n\n-- CREATE VIEW [0007].[V_Publication] AS\n--     SELECT p.*, m.[MediaName], m.[PriorityID]\n--     FROM [0007].[Publication] p\n--     LEFT JOIN [0007].[Media] m\n--     ON CAST(p.[MediaID] AS NUMERIC) = CAST(m.[MediaID] AS NUMERIC)\n\n-- CREATE VIEW [0007].[V_Application] AS\n--     SELECT a.*, c.[CandidateName]\n--     FROM [0007].[Application] a\n--     LEFT JOIN [0007].[Candidate] c\n--     ON CAST(a.[CandidateID] AS NUMERIC) = CAST(c.[CandidateID] AS NUMERIC)",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "DataXDW",
+				"poolName": "DataXDW"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

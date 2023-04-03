@@ -1,0 +1,110 @@
+{
+	"name": "Pipeline 1",
+	"properties": {
+		"activities": [
+			{
+				"name": "Execute Pipeline1",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_Overwrite_CSV_to_DW",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"input_folder_path": "0006",
+						"input_file_name": "0006.Status.csv",
+						"table_schema": "0006",
+						"table_name": "Status",
+						"table_already_exists": false
+					}
+				}
+			},
+			{
+				"name": "Execute Pipeline1_copy1",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_Overwrite_CSV_to_DW",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"input_folder_path": "0006",
+						"input_file_name": "0006.DateTable.csv",
+						"table_schema": "0006",
+						"table_name": "DateTable",
+						"table_already_exists": false
+					}
+				}
+			},
+			{
+				"name": "Execute Pipeline1_copy2",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_Overwrite_CSV_to_DW",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"input_folder_path": "0006",
+						"input_file_name": "0006.Main.csv",
+						"table_schema": "0006",
+						"table_name": "Main",
+						"table_already_exists": false
+					}
+				}
+			},
+			{
+				"name": "Execute Pipeline1_copy3",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_Overwrite_CSV_to_DW",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"input_folder_path": "0006",
+						"input_file_name": "0006.Account.csv",
+						"table_schema": "0006",
+						"table_name": "Account",
+						"table_already_exists": false
+					}
+				}
+			},
+			{
+				"name": "Execute Pipeline1_copy4",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_Overwrite_CSV_to_DW",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"input_folder_path": "0006",
+						"input_file_name": "0006.Campaign.csv",
+						"table_schema": "0006",
+						"table_name": "Campaign",
+						"table_already_exists": false
+					}
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2022-05-10T14:03:28Z"
+	},
+	"type": "Microsoft.Synapse/workspaces/pipelines"
+}

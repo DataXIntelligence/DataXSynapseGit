@@ -1,0 +1,17 @@
+{
+	"name": "SQL script 6",
+	"properties": {
+		"content": {
+			"query": "CREATE USER Mario FOR LOGIN Mario\n\nGRANT SELECT ON Mario.v_topgames TO Mario\n\nEXECUTE AS USER='Mario'\n\nSELECT * FROM Mario.topgames",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "DataXDW",
+				"poolName": "DataXDW"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

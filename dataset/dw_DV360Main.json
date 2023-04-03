@@ -1,0 +1,82 @@
+{
+	"name": "dw_DV360Main",
+	"properties": {
+		"annotations": [],
+		"type": "SqlPoolTable",
+		"schema": [
+			{
+				"name": "Date",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Ad_Type",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Creative_Type",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Impressions",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Clicks",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Total_Conversions",
+				"type": "nvarchar"
+			},
+			{
+				"name": "First_Quartile_Views_Video",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Midpoint_Views_Video",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Third_Quartile_Views_Video",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Complete_Views_Video",
+				"type": "nvarchar"
+			},
+			{
+				"name": "YouTube__Views",
+				"type": "nvarchar"
+			},
+			{
+				"name": "spend_EUR",
+				"type": "nvarchar"
+			},
+			{
+				"name": "PSCID",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Platform_PSCID",
+				"type": "nvarchar"
+			},
+			{
+				"name": "LineItem",
+				"type": "nvarchar"
+			},
+			{
+				"name": "LineItemID",
+				"type": "nvarchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "0003",
+			"table": "DV360Main"
+		},
+		"sqlPool": {
+			"referenceName": "DataXDW",
+			"type": "SqlPoolReference"
+		}
+	},
+	"type": "Microsoft.Synapse/workspaces/datasets"
+}
