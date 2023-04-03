@@ -78,7 +78,7 @@
 				"type": "SynapseNotebook",
 				"dependsOn": [
 					{
-						"activity": "Copy Data Videos",
+						"activity": "Copy Videos Data",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -195,9 +195,17 @@
 					},
 					"sink": {
 						"type": "SqlPoolSink",
-						"allowCopyCommand": true
+						"writeBehavior": "Insert"
 					},
-					"enableStaging": false
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
 				},
 				"inputs": [
 					{
@@ -259,19 +267,19 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "VideoDataCSV",
+						"referenceName": "GamesDataCSV",
 						"type": "DatasetReference"
 					}
 				],
 				"outputs": [
 					{
-						"referenceName": "SqlPoolTable3",
+						"referenceName": "GamesTable",
 						"type": "DatasetReference"
 					}
 				]
 			},
 			{
-				"name": "Copy Data Videos",
+				"name": "Copy Videos Data",
 				"type": "Copy",
 				"dependsOn": [
 					{
@@ -301,11 +309,30 @@
 							"type": "DelimitedTextReadSettings"
 						}
 					},
-					"enableStaging": false
+					"sink": {
+						"type": "SqlPoolSink",
+						"writeBehavior": "Insert",
+						"sqlWriterUseTableLock": false
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
 				},
 				"inputs": [
 					{
 						"referenceName": "VideoDataCSV",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "VideosTable",
 						"type": "DatasetReference"
 					}
 				]
