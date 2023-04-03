@@ -6,7 +6,7 @@
 		"schema": [],
 		"typeProperties": {
 			"schema": "Twitch",
-			"table": "TopGamesTable"
+			"table": "TopGames"
 		},
 		"sqlPool": {
 			"referenceName": "DataXDW",
