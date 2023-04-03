@@ -146,7 +146,7 @@
 				]
 			},
 			{
-				"name": "Copy data1",
+				"name": "Copy Streams Data",
 				"type": "Copy",
 				"dependsOn": [
 					{
@@ -199,7 +199,7 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "DelimitedText2",
+						"referenceName": "StreamsCSV",
 						"type": "DatasetReference"
 					}
 				],
@@ -255,7 +255,7 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "TopGames",
+						"referenceName": "SqlPoolTable2",
 						"type": "DatasetReference"
 					}
 				]
