@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "1",
 				"spark.dynamicAllocation.maxExecutors": "1",
-				"spark.autotune.trackingId": "56ade5d0-c008-4d8c-a6ac-4f3100b463cc"
+				"spark.autotune.trackingId": "1dcabaa0-ec8d-4423-94e1-066a27228eeb"
 			}
 		},
 		"metadata": {
@@ -306,7 +306,7 @@
 					"            new_df[\"id\"] = new_df[\"datasourceId\"]\r\n",
 					"    datasources_df = pd.concat([datasources_df,new_df],ignore_index=True)\r\n",
 					"mssparkutils.fs.put(\"/PBIMetadata/Datasources.csv\", datasources_df.to_csv(index=False), True)\r\n",
-					"#print(datasources_df.shape)"
+					"print(datasources_df.shape)"
 				],
 				"execution_count": 97
 			},
@@ -338,27 +338,28 @@
 				},
 				"source": [
 					"refresh_df = pd.DataFrame()\r\n",
-					"resources = [\"datasets\", \"dataflows\"]\r\n",
 					"datasets_dataflows = data_df[(data_df['type'] == 'dataset') | (data_df['type'] == 'dataflow')]\r\n",
-					"for id_ in datasets_dataflows:\r\n",
-					"    group = data_df[data_df[\"id\"] == id_][\"group_id\"].iloc[0]\r\n",
-					"    type_ = dat\r\n",
+					"for id_ in datasets_dataflows[\"id\"]:\r\n",
+					"    group = datasets_dataflows[datasets_dataflows[\"id\"] == id_][\"group_id\"].iloc[0]\r\n",
+					"    type_ = datasets_dataflows[datasets_dataflows[\"id\"] == id_][\"type\"].iloc[0] + \"s\"\r\n",
 					"    url = \"https://api.powerbi.com/v1.0/myorg/groups/\"\r\n",
-					"    url += group + \"/\" + resource + \"/\" + id_ + \"/\" + \"datasources\"\r\n",
+					"    url += group + \"/\" + type_ + \"/\" + id_ + \"/\"\r\n",
+					"    if type_ == \"datasets\":\r\n",
+					"        url += \"refreshes\"\r\n",
+					"    else:\r\n",
+					"        url += \"transactions\"\r\n",
 					"    resp = requests.get(url, headers=headers)\r\n",
 					"    obj = resp.json()\r\n",
 					"    new_df = pd.DataFrame()\r\n",
-					"    if \"value\" in obj.keys():\r\n",
-					"        if len(obj[\"value\"]) > 0:\r\n",
-					"            new_df = pd.DataFrame.from_records(obj[\"value\"])\r\n",
-					"            new_df[\"resource_id\"] = id_\r\n",
-					"            new_df[\"group_id\"] = group\r\n",
-					"            new_df[\"resource_type\"] = resource[:-1]\r\n",
+					"    new_df = pd.DataFrame.from_records(obj[\"value\"])\r\n",
+					"    new_df[\"resource_id\"] = id_\r\n",
+					"    new_df[\"group_id\"] = group\r\n",
+					"    new_df[\"resource_type\"] = type_[:-1]\r\n",
 					"    refresh_df = pd.concat([refresh_df,new_df],ignore_index=True)\r\n",
-					"#mssparkutils.fs.put(\"/PBIMetadata/RefreshHistory.csv\", refresh_df.to_csv(index=False), True)\r\n",
-					"print(datasets_dataflows.shape)"
+					"mssparkutils.fs.put(\"/PBIMetadata/RefreshHistory.csv\", refresh_df.to_csv(index=False), True)\r\n",
+					"print(refresh_df.shape)"
 				],
-				"execution_count": 102
+				"execution_count": 120
 			},
 			{
 				"cell_type": "code",
