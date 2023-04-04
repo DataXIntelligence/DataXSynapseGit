@@ -1,0 +1,9 @@
+{
+	"name": "Twitch Streamer Data Pipeline",
+	"properties": {
+		"folder": {
+			"name": "Twitch"
+		},
+		"annotations": []
+	}
+}
