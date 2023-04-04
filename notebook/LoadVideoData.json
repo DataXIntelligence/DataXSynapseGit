@@ -22,14 +22,11 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "1",
 				"spark.dynamicAllocation.maxExecutors": "1",
-				"spark.autotune.trackingId": "f5f52acd-6366-4bd1-9b5c-416db760d917"
+				"spark.autotune.trackingId": "62a08c5c-1161-41df-abf3-0c9e3f75a290"
 			}
 		},
 		"metadata": {
 			"saveOutput": true,
-			"synapse_widget": {
-				"version": "0.1"
-			},
 			"enableDebugMode": false,
 			"kernelspec": {
 				"name": "synapse_pyspark",
@@ -45,14 +42,13 @@
 				"endpoint": "https://dataxsynapsedev.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/SparkPool01",
 				"auth": {
 					"type": "AAD",
-					"authResource": "https://dev.azuresynapse.net",
-					"authHeader": null
+					"authResource": "https://dev.azuresynapse.net"
 				},
 				"sparkVersion": "3.1",
 				"nodeCount": 10,
 				"cores": 4,
 				"memory": 28,
-				"extraHeader": null
+				"automaticScaleJobs": false
 			},
 			"sessionKeepAliveTimeout": 30
 		},
@@ -82,7 +78,7 @@
 					"\r\n",
 					"languages = [\"en\", \"es\", \"fr\", \"pt\", \"de\", \"zh\", \"ja\", \"ar\", \"it\", \"ru\"]"
 				],
-				"execution_count": 10
+				"execution_count": 1
 			},
 			{
 				"cell_type": "markdown",
@@ -117,7 +113,7 @@
 					"TopGames_df = pd.DataFrame.from_records(topGames[\"data\"])\r\n",
 					"mssparkutils.fs.put(TOP_GAMES_FILENAME, TopGames_df.to_csv(index=False), True)"
 				],
-				"execution_count": 11
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -155,6 +151,11 @@
 					"    TopVideos_df = pd.DataFrame.from_records(topVideosObj[\"data\"])\r\n",
 					"    for video in TopVideos_df.index:\r\n",
 					"        tuples.add(tuple([int(TopVideos_df['user_id'][video]),TopVideos_df['user_name'][video],TopVideos_df['language'][video]]))\r\n",
+					"        title = TopVideos_df['title'][video]\r\n",
+					"        if ',' in title:\r\n",
+					"            title = title.replace(',', '')\r\n",
+					"            print(title)\r\n",
+					"        TopVideos_df['title'][video] = title\r\n",
 					"    TopVideos_df[\"game_id\"] = int(currentGameID)\r\n",
 					"    aux_df = pd.concat([aux_df,TopVideos_df], axis=0)\r\n",
 					"\r\n",
@@ -164,7 +165,7 @@
 					"\r\n",
 					"print(\"--- %s seconds ---\" % (time.time() - start_time))"
 				],
-				"execution_count": 12
+				"execution_count": null
 			}
 		]
 	}
