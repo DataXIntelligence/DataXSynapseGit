@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "1",
 				"spark.dynamicAllocation.maxExecutors": "1",
-				"spark.autotune.trackingId": "d89aa614-4f08-44b5-809a-b9bc493177db"
+				"spark.autotune.trackingId": "10bcde63-1e84-40bc-9839-ea5a0b106bd3"
 			}
 		},
 		"metadata": {
@@ -465,15 +465,14 @@
 					"    resp = requests.get(url, headers=headers)\r\n",
 					"    obj = resp.json()\r\n",
 					"    new_df = pd.DataFrame.from_records(obj[\"value\"])\r\n",
+					"    new_df[\"group_id\"] = group\r\n",
 					"    users_df = pd.concat([users_df,new_df],ignore_index=True)\r\n",
 					"\r\n",
 					"print(users_df.shape)\r\n",
-					"users_df.drop_duplicates(subset=\"identifier\", inplace=True)\r\n",
-					"users_df.reset_index(inplace=True, drop=True)\r\n",
-					"print(users_df)\r\n",
+					"#print(users_df)\r\n",
 					"mssparkutils.fs.put(\"/PBIMetadata/Users.csv\", users_df.to_csv(index=False), True)"
 				],
-				"execution_count": 30
+				"execution_count": 34
 			},
 			{
 				"cell_type": "code",
