@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "1",
 				"spark.dynamicAllocation.maxExecutors": "1",
-				"spark.autotune.trackingId": "d8493ac1-f5b8-4ee6-b197-f16817c55077"
+				"spark.autotune.trackingId": "9d2eba32-64bd-4848-9d3d-a85be570c4f8"
 			}
 		},
 		"metadata": {
@@ -530,7 +530,7 @@
 				"metadata": {
 					"jupyter": {
 						"source_hidden": false,
-						"outputs_hidden": false
+						"outputs_hidden": true
 					},
 					"nteract": {
 						"transient": {
@@ -539,14 +539,14 @@
 					}
 				},
 				"source": [
-					"groupId = \"ac1176e8-1b38-40d3-91e4-3b8f5983aa5f\"\r\n",
-					"reportId = \"269fd5e9-f69b-44f0-9598-42459899ecb1\"\r\n",
-					"startTime = '2022-01-01T00:00:00Z'\r\n",
-					"endTime = '2022-01-01T23:59:59Z'\r\n",
-					"url = f\"https://api.powerbi.com/v1.0/myorg/admin/activityevents?startDateTime='2022-01-01T00:00:00Z'&endDateTime='2022-01-01T23:59:59Z\"\r\n",
-					"resp = requests.get(url, headers=headers)\r\n",
-					"print(resp)\r\n",
-					"obj = resp.json()"
+					"# groupId = \"ac1176e8-1b38-40d3-91e4-3b8f5983aa5f\"\r\n",
+					"# reportId = \"269fd5e9-f69b-44f0-9598-42459899ecb1\"\r\n",
+					"# startTime = '2022-01-01T00:00:00Z'\r\n",
+					"# endTime = '2022-01-01T23:59:59Z'\r\n",
+					"# url = f\"https://api.powerbi.com/v1.0/myorg/admin/activityevents?startDateTime='2022-01-01T00:00:00Z'&endDateTime='2022-01-01T23:59:59Z\"\r\n",
+					"# resp = requests.get(url, headers=headers)\r\n",
+					"# print(resp)\r\n",
+					"# obj = resp.json()"
 				],
 				"execution_count": 127
 			}
