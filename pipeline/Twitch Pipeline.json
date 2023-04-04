@@ -263,7 +263,8 @@
 					},
 					"sink": {
 						"type": "SqlPoolSink",
-						"writeBehavior": "Insert"
+						"writeBehavior": "Insert",
+						"tableOption": "autoCreate"
 					},
 					"enableStaging": false,
 					"translator": {
@@ -322,7 +323,8 @@
 					"sink": {
 						"type": "SqlPoolSink",
 						"writeBehavior": "Insert",
-						"sqlWriterUseTableLock": false
+						"sqlWriterUseTableLock": false,
+						"tableOption": "autoCreate"
 					},
 					"enableStaging": false,
 					"translator": {
