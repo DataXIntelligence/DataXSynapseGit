@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "1",
 				"spark.dynamicAllocation.maxExecutors": "1",
-				"spark.autotune.trackingId": "88650fd3-f486-425d-a0be-7f39c1f6426e"
+				"spark.autotune.trackingId": "d89aa614-4f08-44b5-809a-b9bc493177db"
 			}
 		},
 		"metadata": {
@@ -125,7 +125,7 @@
 					"headers = CaseInsensitiveDict()\r\n",
 					"headers[\"Authorization\"] = \"Bearer \" + access_token"
 				],
-				"execution_count": 4
+				"execution_count": 22
 			},
 			{
 				"cell_type": "markdown",
@@ -145,7 +145,7 @@
 				"metadata": {
 					"jupyter": {
 						"source_hidden": false,
-						"outputs_hidden": true
+						"outputs_hidden": false
 					},
 					"nteract": {
 						"transient": {
@@ -164,7 +164,7 @@
 					"mssparkutils.fs.put(\"/PBIMetadata/Groups.csv\", groups_df.to_csv(index=False), True)\r\n",
 					"print(groups_df.head())"
 				],
-				"execution_count": 5
+				"execution_count": 23
 			},
 			{
 				"cell_type": "markdown",
@@ -457,9 +457,23 @@
 					}
 				},
 				"source": [
-					""
+					"users_df = pd.DataFrame()\r\n",
+					"for group in groups_df[\"id\"]:\r\n",
+					"    group = str(group)\r\n",
+					"    url = \"https://api.powerbi.com/v1.0/myorg/groups/\"\r\n",
+					"    url += group + \"/users\"\r\n",
+					"    resp = requests.get(url, headers=headers)\r\n",
+					"    obj = resp.json()\r\n",
+					"    new_df = pd.DataFrame.from_records(obj[\"value\"])\r\n",
+					"    users_df = pd.concat([users_df,new_df],ignore_index=True)\r\n",
+					"\r\n",
+					"print(users_df.shape)\r\n",
+					"users_df.drop_duplicates(subset=\"identifier\", inplace=True)\r\n",
+					"users_df.reset_index(inplace=True, drop=True)\r\n",
+					"print(users_df)\r\n",
+					"mssparkutils.fs.put(\"/PBIMetadata/Users.csv\", users_df.to_csv(index=False), True)"
 				],
-				"execution_count": 17
+				"execution_count": 30
 			},
 			{
 				"cell_type": "code",
