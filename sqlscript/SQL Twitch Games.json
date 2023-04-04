@@ -5,7 +5,7 @@
 			"name": "Twitch"
 		},
 		"content": {
-			"query": "SELECT TOP (100) [id]\n,[name]\n,[box_art_url]\n,[igdb_id]\n FROM [Twitch].[Games]",
+			"query": "SELECT *\n,[name]\n,[box_art_url]\n,[igdb_id]\n FROM [Twitch].[Games]",
 			"metadata": {
 				"language": "sql"
 			},

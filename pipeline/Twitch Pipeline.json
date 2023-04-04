@@ -279,7 +279,7 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "GamesDataCSV",
+						"referenceName": "GamesData",
 						"type": "DatasetReference"
 					}
 				],
