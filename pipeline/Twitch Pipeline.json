@@ -74,104 +74,6 @@
 				}
 			},
 			{
-				"name": "LoadStreamersData",
-				"type": "SynapseNotebook",
-				"dependsOn": [
-					{
-						"activity": "Copy Videos Data",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"notebook": {
-						"referenceName": "LoadStreamersData",
-						"type": "NotebookReference"
-					},
-					"snapshot": true,
-					"sparkPool": {
-						"referenceName": "SparkPool01",
-						"type": "BigDataPoolReference"
-					},
-					"executorSize": "Small",
-					"conf": {
-						"spark.dynamicAllocation.enabled": null,
-						"spark.dynamicAllocation.minExecutors": null,
-						"spark.dynamicAllocation.maxExecutors": null
-					},
-					"driverSize": "Small",
-					"numExecutors": null
-				}
-			},
-			{
-				"name": "Copy Streamers Data",
-				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "LoadStreamersData",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "DelimitedTextSource",
-						"storeSettings": {
-							"type": "AzureBlobFSReadSettings",
-							"recursive": true,
-							"enablePartitionDiscovery": false
-						},
-						"formatSettings": {
-							"type": "DelimitedTextReadSettings"
-						}
-					},
-					"sink": {
-						"type": "SqlPoolSink",
-						"writeBehavior": "Insert",
-						"tableOption": "autoCreate"
-					},
-					"enableStaging": false,
-					"translator": {
-						"type": "TabularTranslator",
-						"typeConversion": true,
-						"typeConversionSettings": {
-							"allowDataTruncation": true,
-							"treatBooleanAsNumber": false
-						}
-					}
-				},
-				"inputs": [
-					{
-						"referenceName": "Streamers",
-						"type": "DatasetReference"
-					}
-				],
-				"outputs": [
-					{
-						"referenceName": "StreamersTable",
-						"type": "DatasetReference"
-					}
-				]
-			},
-			{
 				"name": "Copy Streams Data",
 				"type": "Copy",
 				"dependsOn": [
@@ -204,7 +106,7 @@
 					},
 					"sink": {
 						"type": "SqlPoolSink",
-						"preCopyScript": "TRUNCATE TABLE StreamsTable",
+						"preCopyScript": "TRUNCATE TABLE Twitch.Streams",
 						"writeBehavior": "Insert",
 						"sqlWriterUseTableLock": false,
 						"tableOption": "autoCreate"
@@ -265,7 +167,7 @@
 					},
 					"sink": {
 						"type": "SqlPoolSink",
-						"preCopyScript": "TRUNCATE TABLE GamesTable",
+						"preCopyScript": "TRUNCATE TABLE Twitch.Games",
 						"writeBehavior": "Insert",
 						"tableOption": "autoCreate"
 					},
@@ -325,7 +227,7 @@
 					},
 					"sink": {
 						"type": "SqlPoolSink",
-						"preCopyScript": "TRUNCATE TABLE VideosTable",
+						"preCopyScript": "TRUNCATE TABLE Twitch.Videos",
 						"writeBehavior": "Insert",
 						"sqlWriterUseTableLock": false,
 						"tableOption": "autoCreate"
