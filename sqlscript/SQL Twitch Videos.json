@@ -1,6 +1,9 @@
 {
 	"name": "SQL Twitch Videos",
 	"properties": {
+		"folder": {
+			"name": "Twitch"
+		},
 		"content": {
 			"query": "SELECT TOP (100) [id]\n,[stream_id]\n,[user_id]\n,[user_login]\n,[user_name]\n,[title]\n,[description]\n,[created_at]\n,[published_at]\n,[url]\n,[thumbnail_url]\n,[viewable]\n,[view_count]\n,[language]\n,[type]\n,[duration]\n,[muted_segments]\n,[game_id]\n FROM [Twitch].[Videos]",
 			"metadata": {

@@ -1,6 +1,9 @@
 {
 	"name": "SQL Twitch Games",
 	"properties": {
+		"folder": {
+			"name": "Twitch"
+		},
 		"content": {
 			"query": "SELECT TOP (100) [id]\n,[name]\n,[box_art_url]\n,[igdb_id]\n FROM [Twitch].[Games]",
 			"metadata": {
