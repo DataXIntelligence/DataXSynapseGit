@@ -22,7 +22,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "1",
 				"spark.dynamicAllocation.maxExecutors": "1",
-				"spark.autotune.trackingId": "abc7348f-33e0-4a74-b9d6-0e70813dd4ed"
+				"spark.autotune.trackingId": "4e5cf608-27ec-488c-b458-720453863f89"
 			}
 		},
 		"metadata": {
@@ -78,7 +78,7 @@
 					"\r\n",
 					"languages = [\"en\", \"es\", \"fr\", \"pt\", \"de\", \"zh\", \"ja\", \"ar\", \"it\", \"ru\"]"
 				],
-				"execution_count": 21
+				"execution_count": 22
 			},
 			{
 				"cell_type": "markdown",
@@ -113,7 +113,7 @@
 					"TopGames_df = pd.DataFrame.from_records(topGames[\"data\"])\r\n",
 					"mssparkutils.fs.put(TOP_GAMES_FILENAME, TopGames_df.to_csv(index=False), True)"
 				],
-				"execution_count": 14
+				"execution_count": 23
 			},
 			{
 				"cell_type": "markdown",
@@ -143,7 +143,6 @@
 				},
 				"source": [
 					"aux_df = pd.DataFrame()\r\n",
-					"print(TopGames_df.head())\r\n",
 					"for game in TopGames_df.index:\r\n",
 					"    currentGameID = TopGames_df['id'][game]\r\n",
 					"    string = \"https://api.twitch.tv/helix/videos?first=100&game_id=\" + currentGameID + \"&sort=views\"\r\n",
@@ -162,7 +161,7 @@
 					"\r\n",
 					"print(\"--- %s seconds ---\" % (time.time() - start_time))"
 				],
-				"execution_count": 20
+				"execution_count": 25
 			}
 		]
 	}
