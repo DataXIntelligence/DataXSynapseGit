@@ -1,0 +1,33 @@
+{
+	"name": "TwitchStreamerDataTrigger",
+	"properties": {
+		"description": "Updates the data once per week. Estimate run time = 35 - 60 min",
+		"annotations": [],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "Twitch Streamer Data Pipeline",
+					"type": "PipelineReference"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Week",
+				"interval": 1,
+				"startTime": "2023-04-04T11:06:00Z",
+				"timeZone": "UTC",
+				"schedule": {
+					"hours": [
+						7
+					],
+					"weekDays": [
+						"Sunday"
+					]
+				}
+			}
+		}
+	}
+}
