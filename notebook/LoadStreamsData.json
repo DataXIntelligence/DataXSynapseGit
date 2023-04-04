@@ -22,14 +22,11 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "9c5fae65-9e88-4ca5-9ff3-abdbd22c2afb"
+				"spark.autotune.trackingId": "e6abfa52-55f8-4f2c-9f3a-ef723eb30905"
 			}
 		},
 		"metadata": {
 			"saveOutput": true,
-			"synapse_widget": {
-				"version": "0.1"
-			},
 			"enableDebugMode": false,
 			"kernelspec": {
 				"name": "synapse_pyspark",
@@ -45,13 +42,13 @@
 				"endpoint": "https://dataxsynapsedev.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/SparkPool01",
 				"auth": {
 					"type": "AAD",
-					"authResource": "https://dev.azuresynapse.net",
-					"authHeader": null
+					"authResource": "https://dev.azuresynapse.net"
 				},
 				"sparkVersion": "3.1",
 				"nodeCount": 10,
 				"cores": 4,
-				"memory": 28
+				"memory": 28,
+				"automaticScaleJobs": false
 			},
 			"sessionKeepAliveTimeout": 30
 		},
@@ -146,7 +143,9 @@
 					"    for stream in streams_df.index:\r\n",
 					"        tuples.add(tuple([int(streams_df['user_id'][stream]),streams_df['user_name'][stream],streams_df['language'][stream]]))\r\n",
 					"    aux_df = pd.concat([aux_df,streams_df], axis=0)\r\n",
-					"    \r\n",
+					"    streams_df[\"title\"] = streams_df[\"title\"].str.replace(\",\", \"\\,\").str.replace('\"', \"'\")\r\n",
+					"    streams_df[\"description\"] = streams_df[\"description\"].str.replace(\",\", \"\\,\").str.replace('\"', \"'\")\r\n",
+					"\r\n",
 					"mssparkutils.fs.put(STREAMS_FILENAME, aux_df.to_csv(index=False), True)\r\n",
 					"streamers_df = pd.DataFrame(set(tuples),columns=['user_id', 'user_name', 'language'])\r\n",
 					"mssparkutils.fs.put(STREAMERS_FILENAME, streamers_df.to_csv(index=False), True)\r\n",
