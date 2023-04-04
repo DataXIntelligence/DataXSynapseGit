@@ -22,7 +22,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "1",
 				"spark.dynamicAllocation.maxExecutors": "1",
-				"spark.autotune.trackingId": "56899f35-175d-4153-b277-edc037281d4f"
+				"spark.autotune.trackingId": "66747a19-6274-4f26-8e78-38f916ece411"
 			}
 		},
 		"metadata": {
@@ -152,16 +152,16 @@
 					"    for video in TopVideos_df.index:\r\n",
 					"        tuples.add(tuple([int(TopVideos_df['user_id'][video]),TopVideos_df['user_name'][video],TopVideos_df['language'][video]]))\r\n",
 					"    TopVideos_df[\"title\"] = TopVideos_df[\"title\"].str.replace(\",\", \"\\,\")\r\n",
+					"    TopVideos_df[\"description\"] = TopVideos_df[\"description\"].str.replace(\",\", \"\\,\")\r\n",
 					"    TopVideos_df[\"game_id\"] = int(currentGameID)\r\n",
 					"    aux_df = pd.concat([aux_df,TopVideos_df], axis=0)\r\n",
-					"print(aux_df.iloc[1748])\r\n",
 					"mssparkutils.fs.put(ALL_TOP_VIDEOS_FILENAME, aux_df.to_csv(index=False), True)\r\n",
 					"streamers_df = pd.DataFrame(set(tuples),columns=['user_id', 'user_name', 'language'])\r\n",
 					"mssparkutils.fs.put(STREAMERS_FILENAME, streamers_df.to_csv(index=False), True)\r\n",
 					"\r\n",
 					"print(\"--- %s seconds ---\" % (time.time() - start_time))"
 				],
-				"execution_count": 17
+				"execution_count": 18
 			}
 		]
 	}
