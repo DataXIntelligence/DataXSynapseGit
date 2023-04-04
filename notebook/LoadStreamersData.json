@@ -22,7 +22,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "1",
 				"spark.dynamicAllocation.maxExecutors": "1",
-				"spark.autotune.trackingId": "bc563351-4335-4798-bfe7-e903be086c2a"
+				"spark.autotune.trackingId": "f8cae343-ec15-41d8-82ba-63b50d4b5c64"
 			}
 		},
 		"metadata": {
@@ -104,7 +104,7 @@
 					"headers[\"Authorization\"] = \"Bearer \" + secret\r\n",
 					"headers[\"Client-Id\"] = \"euj1dlm3po5d9e0xi03am76u5jhyz9\""
 				],
-				"execution_count": 3
+				"execution_count": 4
 			},
 			{
 				"cell_type": "markdown",
@@ -147,6 +147,7 @@
 					"    streamers_df[\"language\"] = streamersCSV_df[\"language\"][streamer]\r\n",
 					"    streamers_df[\"followers\"] = followers_obj[\"total\"]\r\n",
 					"   \r\n",
+					"    streamers_df[\"description\"] = streamers_df[\"description\"].str.replace('\"', \"'\")\r\n",
 					"    streamersData = pd.concat([streamersData,streamers_df], axis=0)\r\n",
 					"    followers_obj = json.loads(resp.text)\r\n",
 					"#streamersData.to_csv(FILENAME, index=False)\r\n",
@@ -154,7 +155,7 @@
 					"\r\n",
 					"print(\"--- %s seconds ---\" % (time.time() - start_time))"
 				],
-				"execution_count": 31
+				"execution_count": 7
 			}
 		]
 	}
