@@ -22,7 +22,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "1",
 				"spark.dynamicAllocation.maxExecutors": "1",
-				"spark.autotune.trackingId": "62a08c5c-1161-41df-abf3-0c9e3f75a290"
+				"spark.autotune.trackingId": "92c5ad2f-5866-49e4-86b4-dc05c81023ba"
 			}
 		},
 		"metadata": {
@@ -78,7 +78,7 @@
 					"\r\n",
 					"languages = [\"en\", \"es\", \"fr\", \"pt\", \"de\", \"zh\", \"ja\", \"ar\", \"it\", \"ru\"]"
 				],
-				"execution_count": 1
+				"execution_count": 13
 			},
 			{
 				"cell_type": "markdown",
@@ -113,7 +113,7 @@
 					"TopGames_df = pd.DataFrame.from_records(topGames[\"data\"])\r\n",
 					"mssparkutils.fs.put(TOP_GAMES_FILENAME, TopGames_df.to_csv(index=False), True)"
 				],
-				"execution_count": null
+				"execution_count": 14
 			},
 			{
 				"cell_type": "markdown",
@@ -151,11 +151,7 @@
 					"    TopVideos_df = pd.DataFrame.from_records(topVideosObj[\"data\"])\r\n",
 					"    for video in TopVideos_df.index:\r\n",
 					"        tuples.add(tuple([int(TopVideos_df['user_id'][video]),TopVideos_df['user_name'][video],TopVideos_df['language'][video]]))\r\n",
-					"        title = TopVideos_df['title'][video]\r\n",
-					"        if ',' in title:\r\n",
-					"            title = title.replace(',', '')\r\n",
-					"            print(title)\r\n",
-					"        TopVideos_df['title'][video] = title\r\n",
+					"    TopVideos_df[\"title\"] = TopVideos_df[\"title\"].str.replace(\",\", \"\\,\")\r\n",
 					"    TopVideos_df[\"game_id\"] = int(currentGameID)\r\n",
 					"    aux_df = pd.concat([aux_df,TopVideos_df], axis=0)\r\n",
 					"\r\n",
@@ -165,7 +161,7 @@
 					"\r\n",
 					"print(\"--- %s seconds ---\" % (time.time() - start_time))"
 				],
-				"execution_count": null
+				"execution_count": 16
 			}
 		]
 	}
