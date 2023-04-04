@@ -264,6 +264,7 @@
 					},
 					"sink": {
 						"type": "SqlPoolSink",
+						"preCopyScript": "TRUNCATE TABLE GamesTable",
 						"writeBehavior": "Insert",
 						"tableOption": "autoCreate"
 					},
