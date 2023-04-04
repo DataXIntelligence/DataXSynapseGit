@@ -1,5 +1,5 @@
 {
-	"name": "SQL Streams",
+	"name": "SQL Twitch Streams",
 	"properties": {
 		"content": {
 			"query": "SELECT TOP (100) [id]\n,[user_id]\n,[user_login]\n,[user_name]\n,[game_id]\n,[game_name]\n,[type]\n,[title]\n,[viewer_count]\n,[started_at]\n,[language]\n,[thumbnail_url]\n,[tag_ids]\n,[tags]\n,[is_mature]\n FROM [Twitch].[Streams]",
