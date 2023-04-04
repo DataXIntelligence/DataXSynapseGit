@@ -22,7 +22,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "e6abfa52-55f8-4f2c-9f3a-ef723eb30905"
+				"spark.autotune.trackingId": "284367ff-3178-4f71-bcb1-84470c120d6b"
 			}
 		},
 		"metadata": {
@@ -144,7 +144,6 @@
 					"        tuples.add(tuple([int(streams_df['user_id'][stream]),streams_df['user_name'][stream],streams_df['language'][stream]]))\r\n",
 					"    aux_df = pd.concat([aux_df,streams_df], axis=0)\r\n",
 					"    streams_df[\"title\"] = streams_df[\"title\"].str.replace(\",\", \"\\,\").str.replace('\"', \"'\")\r\n",
-					"    streams_df[\"description\"] = streams_df[\"description\"].str.replace(\",\", \"\\,\").str.replace('\"', \"'\")\r\n",
 					"\r\n",
 					"mssparkutils.fs.put(STREAMS_FILENAME, aux_df.to_csv(index=False), True)\r\n",
 					"streamers_df = pd.DataFrame(set(tuples),columns=['user_id', 'user_name', 'language'])\r\n",
