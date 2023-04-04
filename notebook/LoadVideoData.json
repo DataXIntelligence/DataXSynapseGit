@@ -22,7 +22,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "1",
 				"spark.dynamicAllocation.maxExecutors": "1",
-				"spark.autotune.trackingId": "cb456175-ddaa-4429-85c3-843632c31d3d"
+				"spark.autotune.trackingId": "abc7348f-33e0-4a74-b9d6-0e70813dd4ed"
 			}
 		},
 		"metadata": {
@@ -78,7 +78,7 @@
 					"\r\n",
 					"languages = [\"en\", \"es\", \"fr\", \"pt\", \"de\", \"zh\", \"ja\", \"ar\", \"it\", \"ru\"]"
 				],
-				"execution_count": 13
+				"execution_count": 21
 			},
 			{
 				"cell_type": "markdown",
@@ -143,6 +143,7 @@
 				},
 				"source": [
 					"aux_df = pd.DataFrame()\r\n",
+					"print(TopGames_df.head())\r\n",
 					"for game in TopGames_df.index:\r\n",
 					"    currentGameID = TopGames_df['id'][game]\r\n",
 					"    string = \"https://api.twitch.tv/helix/videos?first=100&game_id=\" + currentGameID + \"&sort=views\"\r\n",
@@ -151,8 +152,8 @@
 					"    TopVideos_df = pd.DataFrame.from_records(topVideosObj[\"data\"])\r\n",
 					"    for video in TopVideos_df.index:\r\n",
 					"        tuples.add(tuple([int(TopVideos_df['user_id'][video]),TopVideos_df['user_name'][video],TopVideos_df['language'][video]]))\r\n",
-					"    TopVideos_df[\"title\"] = TopVideos_df[\"title\"].str.replace(\",\", \"\\,\").str.replace('\"', \"'\")\r\n",
-					"    TopVideos_df[\"description\"] = TopVideos_df[\"description\"].str.replace(\",\", \"\\,\").str.replace('\"', \"'\")\r\n",
+					"    TopVideos_df[\"title\"] = TopVideos_df[\"title\"].str.replace('\"', \"'\")\r\n",
+					"    TopVideos_df[\"description\"] = TopVideos_df[\"description\"].str.replace('\"', \"'\")\r\n",
 					"    TopVideos_df[\"game_id\"] = int(currentGameID)\r\n",
 					"    aux_df = pd.concat([aux_df,TopVideos_df], axis=0)\r\n",
 					"mssparkutils.fs.put(ALL_TOP_VIDEOS_FILENAME, aux_df.to_csv(index=False), True)\r\n",
@@ -161,7 +162,7 @@
 					"\r\n",
 					"print(\"--- %s seconds ---\" % (time.time() - start_time))"
 				],
-				"execution_count": 18
+				"execution_count": 20
 			}
 		]
 	}
