@@ -145,7 +145,8 @@
 					},
 					"sink": {
 						"type": "SqlPoolSink",
-						"writeBehavior": "Insert"
+						"writeBehavior": "Insert",
+						"tableOption": "autoCreate"
 					},
 					"enableStaging": false,
 					"translator": {
@@ -165,7 +166,7 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "SqlPoolTable5",
+						"referenceName": "StreamersTable",
 						"type": "DatasetReference"
 					}
 				]

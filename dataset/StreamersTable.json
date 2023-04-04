@@ -1,0 +1,16 @@
+{
+	"name": "StreamersTable",
+	"properties": {
+		"annotations": [],
+		"type": "SqlPoolTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "Twitch",
+			"table": "Streamers"
+		},
+		"sqlPool": {
+			"referenceName": "DataXDW",
+			"type": "SqlPoolReference"
+		}
+	}
+}
