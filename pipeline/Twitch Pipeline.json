@@ -351,6 +351,9 @@
 				]
 			}
 		],
+		"folder": {
+			"name": "Twitch"
+		},
 		"annotations": [],
 		"lastPublishTime": "2023-04-03T11:02:45Z"
 	},
