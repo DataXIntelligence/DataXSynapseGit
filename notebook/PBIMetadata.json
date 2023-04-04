@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "1",
 				"spark.dynamicAllocation.maxExecutors": "1",
-				"spark.autotune.trackingId": "0a7cd566-1e47-4c6f-b729-6eca565b5c74"
+				"spark.autotune.trackingId": "d8493ac1-f5b8-4ee6-b197-f16817c55077"
 			}
 		},
 		"metadata": {
@@ -82,7 +82,7 @@
 					"import json\r\n",
 					"import pandas as pd"
 				],
-				"execution_count": 53
+				"execution_count": 68
 			},
 			{
 				"cell_type": "code",
@@ -105,7 +105,7 @@
 					"    except:\r\n",
 					"        pass"
 				],
-				"execution_count": 54
+				"execution_count": 69
 			},
 			{
 				"cell_type": "markdown",
@@ -139,7 +139,7 @@
 					"client_secret = mssparkutils.credentials.getSecretWithLS('ls_keyvault', 'PBIMetadataClientSecret')\r\n",
 					"account_password = mssparkutils.credentials.getSecretWithLS('ls_keyvault', 'PBIMetadataClientUserAndPassword')"
 				],
-				"execution_count": 55
+				"execution_count": 70
 			},
 			{
 				"cell_type": "code",
@@ -162,7 +162,7 @@
 					"headers = CaseInsensitiveDict()\r\n",
 					"headers[\"Authorization\"] = \"Bearer \" + access_token"
 				],
-				"execution_count": 56
+				"execution_count": 71
 			},
 			{
 				"cell_type": "markdown",
@@ -201,7 +201,7 @@
 					"mssparkutils.fs.put(\"/PBIMetadata/Groups.csv\", groups_df.to_csv(index=False), True)\r\n",
 					"print(groups_df.head())"
 				],
-				"execution_count": 57
+				"execution_count": 73
 			},
 			{
 				"cell_type": "markdown",
@@ -250,7 +250,7 @@
 					"print(data_df.shape)\r\n",
 					"mssparkutils.fs.put(\"/PBIMetadata/Resources.csv\", data_df.to_csv(index=False), True)"
 				],
-				"execution_count": 59
+				"execution_count": 74
 			},
 			{
 				"cell_type": "markdown",
@@ -294,7 +294,7 @@
 					"mssparkutils.fs.put(\"/PBIMetadata/ReportPages.csv\", pages_df.to_csv(index=False), True)\r\n",
 					"print(pages_df.shape)"
 				],
-				"execution_count": 60
+				"execution_count": 75
 			},
 			{
 				"cell_type": "markdown",
@@ -346,7 +346,7 @@
 					"mssparkutils.fs.put(\"/PBIMetadata/Datasources.csv\", datasources_df.to_csv(index=False), True)\r\n",
 					"print(datasources_df.shape)"
 				],
-				"execution_count": 62
+				"execution_count": 76
 			},
 			{
 				"cell_type": "markdown",
@@ -397,7 +397,7 @@
 					"mssparkutils.fs.put(\"/PBIMetadata/RefreshHistory.csv\", refresh_df.to_csv(index=False), True)\r\n",
 					"print(refresh_df.shape)"
 				],
-				"execution_count": 63
+				"execution_count": 77
 			},
 			{
 				"cell_type": "markdown",
@@ -444,7 +444,7 @@
 					"\r\n",
 					"#mssparkutils.fs.put(\"/PBIMetadata/Imports.csv\", imports_df.to_csv(index=False), True)"
 				],
-				"execution_count": 64
+				"execution_count": 78
 			},
 			{
 				"cell_type": "code",
@@ -478,7 +478,7 @@
 					"data_df.loc[data_df[\"isFromPbix\"] != \"TRUE\", \"isFromPbix\"] = \"FALSE\"\r\n",
 					"mssparkutils.fs.put(\"/PBIMetadata/Resources.csv\", data_df.to_csv(index=False), True)"
 				],
-				"execution_count": 65
+				"execution_count": 79
 			},
 			{
 				"cell_type": "markdown",
@@ -523,7 +523,32 @@
 					"#print(users_df)\r\n",
 					"mssparkutils.fs.put(\"/PBIMetadata/Users.csv\", users_df.to_csv(index=False), True)"
 				],
-				"execution_count": 66
+				"execution_count": 80
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"groupId = \"ac1176e8-1b38-40d3-91e4-3b8f5983aa5f\"\r\n",
+					"reportId = \"269fd5e9-f69b-44f0-9598-42459899ecb1\"\r\n",
+					"startTime = '2022-01-01T00:00:00Z'\r\n",
+					"endTime = '2022-01-01T23:59:59Z'\r\n",
+					"url = f\"https://api.powerbi.com/v1.0/myorg/admin/activityevents?startDateTime='2022-01-01T00:00:00Z'&endDateTime='2022-01-01T23:59:59Z\"\r\n",
+					"resp = requests.get(url, headers=headers)\r\n",
+					"print(resp)\r\n",
+					"obj = resp.json()"
+				],
+				"execution_count": 127
 			}
 		]
 	}
