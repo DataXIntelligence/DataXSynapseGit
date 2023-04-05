@@ -227,6 +227,7 @@
 					},
 					"sink": {
 						"type": "SqlPoolSink",
+						"preCopyScript": "TRUNCATE TABLE Twitch.Videos",
 						"writeBehavior": "Insert",
 						"sqlWriterUseTableLock": false,
 						"tableOption": "autoCreate"
