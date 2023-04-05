@@ -18,6 +18,7 @@
 				"frequency": "Week",
 				"interval": 1,
 				"startTime": "2023-04-04T11:06:00Z",
+				"endTime": "2023-04-06T11:55:27Z",
 				"timeZone": "UTC",
 				"schedule": {
 					"hours": [
