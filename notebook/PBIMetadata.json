@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "1",
 				"spark.dynamicAllocation.maxExecutors": "1",
-				"spark.autotune.trackingId": "ff23a994-54bf-4439-b5f6-d05cc7ddd017"
+				"spark.autotune.trackingId": "b695e82e-98c5-4c6b-98a7-061aee3a0edb"
 			}
 		},
 		"metadata": {
@@ -82,7 +82,7 @@
 					"import json\r\n",
 					"import pandas as pd"
 				],
-				"execution_count": 59
+				"execution_count": 76
 			},
 			{
 				"cell_type": "code",
@@ -105,7 +105,7 @@
 					"    except:\r\n",
 					"        pass"
 				],
-				"execution_count": 63
+				"execution_count": 77
 			},
 			{
 				"cell_type": "markdown",
@@ -182,7 +182,7 @@
 				"metadata": {
 					"jupyter": {
 						"source_hidden": false,
-						"outputs_hidden": true
+						"outputs_hidden": false
 					},
 					"nteract": {
 						"transient": {
@@ -201,7 +201,7 @@
 					"mssparkutils.fs.put(\"/PBIMetadata/Groups.csv\", groups_df.to_csv(index=False), True)\r\n",
 					"print(groups_df.head())"
 				],
-				"execution_count": 19
+				"execution_count": 98
 			},
 			{
 				"cell_type": "markdown",
@@ -569,7 +569,7 @@
 					"client_id = '95e2c30e-8533-4c18-b3c7-4718847e9f28'\r\n",
 					"tenant_id = '89248974-515e-4d65-9469-ab424abfd2d2'"
 				],
-				"execution_count": 57
+				"execution_count": 78
 			},
 			{
 				"cell_type": "code",
@@ -592,7 +592,7 @@
 					"headers = CaseInsensitiveDict()\r\n",
 					"headers[\"Authorization\"] = \"Bearer \" + access_token"
 				],
-				"execution_count": 61
+				"execution_count": 79
 			},
 			{
 				"cell_type": "code",
@@ -608,17 +608,35 @@
 					}
 				},
 				"source": [
-					"url = \"https://api.powerbi.com/v1.0/myorg/admin/activityevents?startDateTime='2023-03-20T07:55:00.000Z'&endDateTime='2023-03-20T08:55:00.000Z'\"\r\n",
+					"url = \"https://api.powerbi.com/v1.0/myorg/admin/activityevents?startDateTime='2023-04-04T00:00:00Z'&endDateTime='2023-04-04T23:59:59Z'\"\r\n",
 					"\r\n",
 					"resp = requests.get(url, headers=headers)\r\n",
-					"safe_print(resp)\r\n",
+					"#safe_print(resp)\r\n",
 					"obj = resp.json()\r\n",
+					"#print(obj)\r\n",
 					"\r\n",
-					"groups_df = pd.DataFrame.from_records(obj[\"activityEventEntities\"])\r\n",
-					"mssparkutils.fs.put(\"/PBIMetadata/Groups.csv\", groups_df.to_csv(index=False), True)\r\n",
-					"print(groups_df.head())"
+					"activity_events_df = pd.DataFrame.from_records(obj[\"activityEventEntities\"])\r\n",
+					"print(activity_events_df[\"Operation\"])"
 				],
-				"execution_count": 75
+				"execution_count": 102
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					""
+				],
+				"execution_count": null
 			}
 		]
 	}
