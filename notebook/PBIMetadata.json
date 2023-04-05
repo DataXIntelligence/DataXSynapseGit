@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "1",
 				"spark.dynamicAllocation.maxExecutors": "1",
-				"spark.autotune.trackingId": "eb5ffe11-ca89-4e85-b45c-349661b67d4d"
+				"spark.autotune.trackingId": "ff23a994-54bf-4439-b5f6-d05cc7ddd017"
 			}
 		},
 		"metadata": {
@@ -82,7 +82,7 @@
 					"import json\r\n",
 					"import pandas as pd"
 				],
-				"execution_count": 15
+				"execution_count": 59
 			},
 			{
 				"cell_type": "code",
@@ -105,7 +105,7 @@
 					"    except:\r\n",
 					"        pass"
 				],
-				"execution_count": 16
+				"execution_count": 63
 			},
 			{
 				"cell_type": "markdown",
@@ -550,6 +550,75 @@
 					"# obj = resp.json()"
 				],
 				"execution_count": 27
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"client_secret = mssparkutils.credentials.getSecretWithLS('ls_keyvault', 'PBIServPrincipalAPISecret')\r\n",
+					"client_id = '95e2c30e-8533-4c18-b3c7-4718847e9f28'\r\n",
+					"tenant_id = '89248974-515e-4d65-9469-ab424abfd2d2'"
+				],
+				"execution_count": 57
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"body = f'grant_type=client_credentials&resource=https://analysis.windows.net/powerbi/api&client_id={client_id}&client_secret={client_secret}'\r\n",
+					"r = requests.post(f'https://login.microsoftonline.com/{tenant_id}/oauth2/token', data=body)\r\n",
+					"access_token = r.json()['access_token']\r\n",
+					"\r\n",
+					"headers = CaseInsensitiveDict()\r\n",
+					"headers[\"Authorization\"] = \"Bearer \" + access_token"
+				],
+				"execution_count": 61
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"url = \"https://api.powerbi.com/v1.0/myorg/admin/activityevents?startDateTime='2023-03-20T07:55:00.000Z'&endDateTime='2023-03-20T08:55:00.000Z'\"\r\n",
+					"\r\n",
+					"resp = requests.get(url, headers=headers)\r\n",
+					"safe_print(resp)\r\n",
+					"obj = resp.json()\r\n",
+					"\r\n",
+					"groups_df = pd.DataFrame.from_records(obj[\"activityEventEntities\"])\r\n",
+					"mssparkutils.fs.put(\"/PBIMetadata/Groups.csv\", groups_df.to_csv(index=False), True)\r\n",
+					"print(groups_df.head())"
+				],
+				"execution_count": 75
 			}
 		]
 	}
