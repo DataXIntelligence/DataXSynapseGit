@@ -22,7 +22,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "1",
 				"spark.dynamicAllocation.maxExecutors": "1",
-				"spark.autotune.trackingId": "6ff62383-bdf8-41d2-9389-4237c9ba207b"
+				"spark.autotune.trackingId": "2a7388d3-43dd-458a-bc8c-a9caecc8946b"
 			}
 		},
 		"metadata": {
@@ -103,7 +103,7 @@
 					"headers[\"Authorization\"] = \"Bearer \" + secret\r\n",
 					"headers[\"Client-Id\"] = \"euj1dlm3po5d9e0xi03am76u5jhyz9\""
 				],
-				"execution_count": 1
+				"execution_count": 2
 			},
 			{
 				"cell_type": "markdown",
