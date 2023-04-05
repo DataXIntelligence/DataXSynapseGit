@@ -22,7 +22,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "1",
 				"spark.dynamicAllocation.maxExecutors": "1",
-				"spark.autotune.trackingId": "0777baaf-e00b-4d7c-80a5-5902d9d3c3df"
+				"spark.autotune.trackingId": "78c17f46-87a8-426e-a216-f068476a3527"
 			}
 		},
 		"metadata": {
@@ -91,9 +91,8 @@
 					"from requests.structures import CaseInsensitiveDict\r\n",
 					"from notebookutils import mssparkutils\r\n",
 					"\r\n",
-					"#STREAMERS_FILENAME = \"abfss://dataxsynapsefs@adlsdatax01.dfs.core.windows.net/Training/Cristian/Streamers.csv\"\r\n",
+					"STREAMERS_FILENAME = \"abfss://dataxsynapsefs@adlsdatax01.dfs.core.windows.net/Training/Cristian/Streamers.csv\"\r\n",
 					"FILENAME = \"abfss://dataxsynapsefs@adlsdatax01.dfs.core.windows.net/Training/Cristian/StreamersData.csv\"\r\n",
-					"STREAMERS_FILENAME = \"abfss://dataxsynapsefs@adlsdatax01.dfs.core.windows.net/Training/Cristian/streamersiddeprueba.csv\"\r\n",
 					"\r\n",
 					"start_time = time.time()\r\n",
 					"streamersCSV = spark.read.csv(STREAMERS_FILENAME, header=True, inferSchema=True)\r\n",
