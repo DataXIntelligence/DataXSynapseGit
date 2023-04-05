@@ -1,0 +1,20 @@
+{
+	"name": "SQL Twitch Streamers",
+	"properties": {
+		"folder": {
+			"name": "Twitch"
+		},
+		"content": {
+			"query": "SELECT TOP (100) [id]\n,[login]\n,[display_name]\n,[type]\n,[broadcaster_type]\n,[description]\n,[profile_image_url]\n,[offline_image_url]\n,[view_count]\n,[created_at]\n,[language]\n,[followers]\n FROM [Twitch].[Streamers]",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "DataXDW",
+				"poolName": "DataXDW"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
