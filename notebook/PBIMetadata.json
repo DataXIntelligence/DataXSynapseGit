@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "1",
 				"spark.dynamicAllocation.maxExecutors": "1",
-				"spark.autotune.trackingId": "4086e6cf-6da1-455c-a938-5e6ed7615221"
+				"spark.autotune.trackingId": "eb5ffe11-ca89-4e85-b45c-349661b67d4d"
 			}
 		},
 		"metadata": {
@@ -342,14 +342,12 @@
 					"            new_df[\"group_id\"] = group\r\n",
 					"            new_df[\"resource_type\"] = resource[:-1]\r\n",
 					"            new_df[\"id\"] = new_df[\"datasourceId\"]\r\n",
-					"            for connectionDetails in new_df[\"connectionDetails\"]:\r\n",
-					"                for key in connectionDetails.keys():\r\n",
-					"                    new_df[key] = connectionDetails[key]\r\n",
+					"            new_df = pd.concat([new_df.drop(['connectionDetails'], axis=1), new_df['connectionDetails'].apply(pd.Series)], axis=1)\r\n",
 					"    datasources_df = pd.concat([datasources_df,new_df],ignore_index=True)\r\n",
 					"mssparkutils.fs.put(\"/PBIMetadata/Datasources.csv\", datasources_df.to_csv(index=False), True)\r\n",
-					"print(datasources_df.shape)"
+					"print(datasources_df)"
 				],
-				"execution_count": 30
+				"execution_count": 55
 			},
 			{
 				"cell_type": "markdown",
