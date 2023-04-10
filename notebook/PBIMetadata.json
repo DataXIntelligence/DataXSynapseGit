@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "1",
 				"spark.dynamicAllocation.maxExecutors": "1",
-				"spark.autotune.trackingId": "3683f64f-e422-4939-a1bc-4f8563a0c646"
+				"spark.autotune.trackingId": "cc951c96-b2bc-416e-b9a2-71c3830fd229"
 			}
 		},
 		"metadata": {
@@ -83,7 +83,7 @@
 					"import pandas as pd\r\n",
 					"from datetime import datetime, timezone, timedelta"
 				],
-				"execution_count": 111
+				"execution_count": 154
 			},
 			{
 				"cell_type": "code",
@@ -106,7 +106,7 @@
 					"    except:\r\n",
 					"        pass"
 				],
-				"execution_count": 112
+				"execution_count": 155
 			},
 			{
 				"cell_type": "markdown",
@@ -140,7 +140,7 @@
 					"client_secret = mssparkutils.credentials.getSecretWithLS('ls_keyvault', 'PBIMetadataClientSecret')\r\n",
 					"account_password = mssparkutils.credentials.getSecretWithLS('ls_keyvault', 'PBIMetadataClientUserAndPassword')"
 				],
-				"execution_count": 113
+				"execution_count": 156
 			},
 			{
 				"cell_type": "code",
@@ -163,7 +163,7 @@
 					"headers = CaseInsensitiveDict()\r\n",
 					"headers[\"Authorization\"] = \"Bearer \" + access_token"
 				],
-				"execution_count": 114
+				"execution_count": 157
 			},
 			{
 				"cell_type": "markdown",
@@ -202,7 +202,7 @@
 					"mssparkutils.fs.put(\"/PBIMetadata/Groups.csv\", groups_df.to_csv(index=False), True)\r\n",
 					"print(groups_df.head())"
 				],
-				"execution_count": 115
+				"execution_count": 158
 			},
 			{
 				"cell_type": "markdown",
@@ -251,7 +251,7 @@
 					"print(data_df.shape)\r\n",
 					"mssparkutils.fs.put(\"/PBIMetadata/Resources.csv\", data_df.to_csv(index=False), True)"
 				],
-				"execution_count": 116
+				"execution_count": 159
 			},
 			{
 				"cell_type": "markdown",
@@ -295,7 +295,7 @@
 					"mssparkutils.fs.put(\"/PBIMetadata/ReportPages.csv\", pages_df.to_csv(index=False), True)\r\n",
 					"print(pages_df.shape)"
 				],
-				"execution_count": 117
+				"execution_count": 160
 			},
 			{
 				"cell_type": "markdown",
@@ -347,7 +347,7 @@
 					"mssparkutils.fs.put(\"/PBIMetadata/Datasources.csv\", datasources_df.to_csv(index=False), True)\r\n",
 					"print(datasources_df.shape)"
 				],
-				"execution_count": 119
+				"execution_count": 161
 			},
 			{
 				"cell_type": "markdown",
