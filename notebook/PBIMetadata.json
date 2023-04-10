@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "1",
 				"spark.dynamicAllocation.maxExecutors": "1",
-				"spark.autotune.trackingId": "1522fb29-4467-4cba-b310-6e03433164d7"
+				"spark.autotune.trackingId": "53dd8517-b3e1-434a-a9d4-62bd19e0a02a"
 			}
 		},
 		"metadata": {
@@ -630,9 +630,9 @@
 				},
 				"source": [
 					"#print(activity_events_df[activity_events_df[\"Operation\"] == \"ViewReport\"])\r\n",
-					"mssparkutils.fs.put(\"/PBIMetadata/ActivityEvents.csv\", users_df.to_csv(index=False), True)"
+					"mssparkutils.fs.put(\"/PBIMetadata/ActivityEvents.csv\", activity_events_df.to_csv(index=False), True)"
 				],
-				"execution_count": 109
+				"execution_count": 110
 			},
 			{
 				"cell_type": "code",
