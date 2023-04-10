@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "1",
 				"spark.dynamicAllocation.maxExecutors": "1",
-				"spark.autotune.trackingId": "45a50094-77fe-4c8e-aa83-12892ade0816"
+				"spark.autotune.trackingId": "ba48e99b-9c9c-4fbb-8de7-211b58f5a85a"
 			}
 		},
 		"metadata": {
@@ -80,9 +80,10 @@
 					"import requests \r\n",
 					"from requests.structures import CaseInsensitiveDict\r\n",
 					"import json\r\n",
-					"import pandas as pd"
+					"import pandas as pd\r\n",
+					"from datetime import datetime, timezone, timedelta"
 				],
-				"execution_count": 5
+				"execution_count": 92
 			},
 			{
 				"cell_type": "code",
@@ -530,31 +531,6 @@
 				"metadata": {
 					"jupyter": {
 						"source_hidden": false,
-						"outputs_hidden": true
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
-					"# groupId = \"ac1176e8-1b38-40d3-91e4-3b8f5983aa5f\"\r\n",
-					"# reportId = \"269fd5e9-f69b-44f0-9598-42459899ecb1\"\r\n",
-					"# startTime = '2022-01-01T00:00:00Z'\r\n",
-					"# endTime = '2022-01-01T23:59:59Z'\r\n",
-					"# url = f\"https://api.powerbi.com/v1.0/myorg/admin/activityevents?startDateTime='2022-01-01T00:00:00Z'&endDateTime='2022-01-01T23:59:59Z\"\r\n",
-					"# resp = requests.get(url, headers=headers)\r\n",
-					"# print(resp)\r\n",
-					"# obj = resp.json()"
-				],
-				"execution_count": 17
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
 						"outputs_hidden": false
 					},
 					"nteract": {
@@ -607,22 +583,37 @@
 					}
 				},
 				"source": [
-					"startTime = '2023-04-04T00:00:00Z'\r\n",
-					"endTime = '2023-04-04T23:59:59Z'\r\n",
+					"dates = []\r\n",
+					"dates.append(datetime.now())\r\n",
 					"activity_events_df = pd.DataFrame()\r\n",
+					"for i in range(1,29):\r\n",
+					"    dates.append(datetime.now() - timedelta(i))\r\n",
+					"for date in dates:\r\n",
+					"    # print(date.strftime(f\"%Y-%m-%dT00:00:00Z\"))\r\n",
+					"    # print(date.strftime(f\"%Y-%m-%dT23:59:59Z\"))\r\n",
+					"    startTime = date.strftime(f\"%Y-%m-%dT00:00:00Z\")\r\n",
+					"    endTime = date.strftime(f\"%Y-%m-%dT23:59:59Z\")\r\n",
 					"\r\n",
-					"url = f\"https://api.powerbi.com/v1.0/myorg/admin/activityevents?startDateTime='{startTime}'&endDateTime='{endTime}'\"\r\n",
+					"    url = f\"https://api.powerbi.com/v1.0/myorg/admin/activityevents?startDateTime='{startTime}'&endDateTime='{endTime}'\"\r\n",
 					"\r\n",
-					"resp = requests.get(url, headers=headers)\r\n",
-					"#safe_print(resp)\r\n",
-					"obj = resp.json()\r\n",
-					"#continuationToken = obj[\"continuationToken\"]\r\n",
-					"url = obj[\"continuationUri\"]\r\n",
+					"    resp = requests.get(url, headers=headers)\r\n",
+					"    #safe_print(resp)\r\n",
+					"    obj = resp.json()\r\n",
 					"\r\n",
-					"activity_events_df = pd.DataFrame.from_records(obj[\"activityEventEntities\"])\r\n",
-					"#print(activity_events_df)"
+					"    new_df = pd.DataFrame.from_records(obj[\"activityEventEntities\"])\r\n",
+					"    activity_events_df = pd.concat([activity_events_df,new_df],ignore_index=True)\r\n",
+					"\r\n",
+					"    while(not obj[\"lastResultSet\"]):\r\n",
+					"        url = obj[\"continuationUri\"]\r\n",
+					"        resp = requests.get(url, headers=headers)\r\n",
+					"        obj = resp.json()\r\n",
+					"\r\n",
+					"        new_df = pd.DataFrame.from_records(obj[\"activityEventEntities\"])\r\n",
+					"        activity_events_df = pd.concat([activity_events_df,new_df],ignore_index=True)\r\n",
+					"print(activity_events_df.shape)\r\n",
+					""
 				],
-				"execution_count": 57
+				"execution_count": 105
 			},
 			{
 				"cell_type": "code",
@@ -638,16 +629,11 @@
 					}
 				},
 				"source": [
-					"#url = f\"https://api.powerbi.com/v1.0/myorg/admin/activityevents?continuationToken={continuationToken}\"\r\n",
-					"resp = requests.get(url, headers=headers)\r\n",
-					"#safe_print(resp)\r\n",
-					"obj = resp.json()\r\n",
 					"\r\n",
-					"\r\n",
-					"activity_events_df2 = pd.DataFrame.from_records(obj[\"activityEventEntities\"])\r\n",
-					"#print(activity_events_df2)"
+					"print(activity_events_df[activity_events_df[\"Operation\"] == \"ViewReport\"])\r\n",
+					""
 				],
-				"execution_count": 59
+				"execution_count": 108
 			},
 			{
 				"cell_type": "code",
