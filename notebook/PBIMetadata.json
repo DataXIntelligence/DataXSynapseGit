@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "1",
 				"spark.dynamicAllocation.maxExecutors": "1",
-				"spark.autotune.trackingId": "4303df64-080e-42a9-8e8c-0be13568360f"
+				"spark.autotune.trackingId": "31b4af49-ef26-489b-875d-960cea562d1f"
 			}
 		},
 		"metadata": {
@@ -83,7 +83,7 @@
 					"import pandas as pd\r\n",
 					"from datetime import datetime, timezone, timedelta"
 				],
-				"execution_count": 173
+				"execution_count": 190
 			},
 			{
 				"cell_type": "code",
@@ -650,14 +650,9 @@
 					}
 				},
 				"source": [
-					"#print(activity_events_df[~activity_events_df[\"DashboardId\"].isnull()][\"DashboardName\"])\r\n",
-					"resourcesId = [\"DataflowId\", \"DatasourceId\", \"DatasetId\", \"ReportId\", \"DashboardId\"]\r\n",
-					"kk_df = activity_events_df.drop([\"DataflowId\", \"DatasourceId\", \"DatasetId\", \"ReportId\"], axis=1)\r\n",
-					"if resourcesId[4] in kk_df.columns:\r\n",
-					"    print(kk_df[~kk_df[resourcesId[4]].isnull()][resourcesId[4]])\r\n",
-					"#Relciones: DataflowId, DatasourceId, DatasetId, ReportId, DashboardId"
+					"print(activity_events_df[activity_events_df[\"WorkspaceId\"].isnull()][\"Operation\"])"
 				],
-				"execution_count": 189
+				"execution_count": 194
 			},
 			{
 				"cell_type": "code",
