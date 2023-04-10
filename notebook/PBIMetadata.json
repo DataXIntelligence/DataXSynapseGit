@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "1",
 				"spark.dynamicAllocation.maxExecutors": "1",
-				"spark.autotune.trackingId": "1f71718e-040f-4b3d-8ab1-e30eb06c300e"
+				"spark.autotune.trackingId": "3683f64f-e422-4939-a1bc-4f8563a0c646"
 			}
 		},
 		"metadata": {
@@ -596,6 +596,7 @@
 					}
 				},
 				"source": [
+					"resourcesId = [\"DataflowId\", \"DatasourceId\", \"DatasetId\", \"ReportId\", \"DashboardId\"]\r\n",
 					"dates = []\r\n",
 					"dates.append(datetime.now())\r\n",
 					"activity_events_df = pd.DataFrame()\r\n",
@@ -614,14 +615,9 @@
 					"    obj = resp.json()\r\n",
 					"\r\n",
 					"    new_df = pd.DataFrame.from_records(obj[\"activityEventEntities\"])\r\n",
-					"    if \"DataflowId\" in new_df.columns:\r\n",
-					"        new_df[\"ResourceId\"] = new_df[\"DataflowId\"]\r\n",
-					"    if \"DatasourceId\" in new_df.columns:\r\n",
-					"        new_df[\"ResourceId\"] = new_df[\"DatasourceId\"]\r\n",
-					"    if \"DatasetId\" in new_df.columns:\r\n",
-					"        new_df[\"ResourceId\"] = new_df[\"DatasetId\"]\r\n",
-					"    if \"ReportId\" in new_df.columns:\r\n",
-					"        new_df[\"ResourceId\"] = new_df[\"ReportId\"]\r\n",
+					"    for resource in resourcesId:\r\n",
+					"            if resource in new_df.columns:\r\n",
+					"                new_df[\"ResourceId\"] = new_df[resource]\r\n",
 					"\r\n",
 					"    activity_events_df = pd.concat([activity_events_df,new_df],ignore_index=True)\r\n",
 					"\r\n",
@@ -631,14 +627,9 @@
 					"        obj = resp.json()\r\n",
 					"\r\n",
 					"        new_df = pd.DataFrame.from_records(obj[\"activityEventEntities\"])\r\n",
-					"        if \"DataflowId\" in new_df.columns:\r\n",
-					"        new_df[\"ResourceId\"] = new_df[\"DataflowId\"]\r\n",
-					"        if \"DatasourceId\" in new_df.columns:\r\n",
-					"            new_df[\"ResourceId\"] = new_df[\"DatasourceId\"]\r\n",
-					"        if \"DatasetId\" in new_df.columns:\r\n",
-					"            new_df[\"ResourceId\"] = new_df[\"DatasetId\"]\r\n",
-					"        if \"ReportId\" in new_df.columns:\r\n",
-					"            new_df[\"ResourceId\"] = new_df[\"ReportId\"]\r\n",
+					"        for resource in resourcesId:\r\n",
+					"            if resource in new_df.columns:\r\n",
+					"                new_df[\"ResourceId\"] = new_df[resource]\r\n",
 					"        activity_events_df = pd.concat([activity_events_df,new_df],ignore_index=True)\r\n",
 					"print(activity_events_df.shape)\r\n",
 					"mssparkutils.fs.put(\"/PBIMetadata/ActivityEvents.csv\", activity_events_df.to_csv(index=False), True)"
@@ -659,10 +650,14 @@
 					}
 				},
 				"source": [
-					"print(activity_events_df[~activity_events_df[\"DashboardId\"].isnull()][\"DashboardName\"])\r\n",
+					"#print(activity_events_df[~activity_events_df[\"DashboardId\"].isnull()][\"DashboardName\"])\r\n",
+					"resourcesId = [\"DataflowId\", \"DatasourceId\", \"DatasetId\", \"ReportId\", \"DashboardId\"]\r\n",
+					"kk_df = activity_events_df.drop([\"DataflowId\", \"DatasourceId\", \"DatasetId\", \"ReportId\"], axis=1)\r\n",
+					"if resourcesId[4] in kk_df.columns:\r\n",
+					"    print(kk_df[~kk_df[resourcesId[4]].isnull()][resourcesId[4]])\r\n",
 					"#Relciones: DataflowId, DatasourceId, DatasetId, ReportId, DashboardId"
 				],
-				"execution_count": 145
+				"execution_count": 153
 			},
 			{
 				"cell_type": "code",
