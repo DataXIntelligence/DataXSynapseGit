@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "1",
 				"spark.dynamicAllocation.maxExecutors": "1",
-				"spark.autotune.trackingId": "b695e82e-98c5-4c6b-98a7-061aee3a0edb"
+				"spark.autotune.trackingId": "b6e53263-d5d7-466d-ae28-f93164eb26eb"
 			}
 		},
 		"metadata": {
@@ -82,7 +82,7 @@
 					"import json\r\n",
 					"import pandas as pd"
 				],
-				"execution_count": 76
+				"execution_count": 5
 			},
 			{
 				"cell_type": "code",
@@ -105,7 +105,7 @@
 					"    except:\r\n",
 					"        pass"
 				],
-				"execution_count": 77
+				"execution_count": 6
 			},
 			{
 				"cell_type": "markdown",
@@ -139,7 +139,7 @@
 					"client_secret = mssparkutils.credentials.getSecretWithLS('ls_keyvault', 'PBIMetadataClientSecret')\r\n",
 					"account_password = mssparkutils.credentials.getSecretWithLS('ls_keyvault', 'PBIMetadataClientUserAndPassword')"
 				],
-				"execution_count": 17
+				"execution_count": 7
 			},
 			{
 				"cell_type": "code",
@@ -162,7 +162,7 @@
 					"headers = CaseInsensitiveDict()\r\n",
 					"headers[\"Authorization\"] = \"Bearer \" + access_token"
 				],
-				"execution_count": 18
+				"execution_count": 8
 			},
 			{
 				"cell_type": "markdown",
@@ -194,14 +194,14 @@
 					"url = \"https://api.powerbi.com/v1.0/myorg/groups\"\r\n",
 					"\r\n",
 					"resp = requests.get(url, headers=headers)\r\n",
-					"safe_print(resp)\r\n",
+					"#safe_print(resp)\r\n",
 					"obj = resp.json()\r\n",
 					"\r\n",
 					"groups_df = pd.DataFrame.from_records(obj[\"value\"])\r\n",
 					"mssparkutils.fs.put(\"/PBIMetadata/Groups.csv\", groups_df.to_csv(index=False), True)\r\n",
 					"print(groups_df.head())"
 				],
-				"execution_count": 98
+				"execution_count": 9
 			},
 			{
 				"cell_type": "markdown",
@@ -250,7 +250,7 @@
 					"print(data_df.shape)\r\n",
 					"mssparkutils.fs.put(\"/PBIMetadata/Resources.csv\", data_df.to_csv(index=False), True)"
 				],
-				"execution_count": 20
+				"execution_count": 10
 			},
 			{
 				"cell_type": "markdown",
@@ -294,7 +294,7 @@
 					"mssparkutils.fs.put(\"/PBIMetadata/ReportPages.csv\", pages_df.to_csv(index=False), True)\r\n",
 					"print(pages_df.shape)"
 				],
-				"execution_count": 21
+				"execution_count": 11
 			},
 			{
 				"cell_type": "markdown",
@@ -347,7 +347,7 @@
 					"mssparkutils.fs.put(\"/PBIMetadata/Datasources.csv\", datasources_df.to_csv(index=False), True)\r\n",
 					"print(datasources_df)"
 				],
-				"execution_count": 55
+				"execution_count": 12
 			},
 			{
 				"cell_type": "markdown",
@@ -398,7 +398,7 @@
 					"mssparkutils.fs.put(\"/PBIMetadata/RefreshHistory.csv\", refresh_df.to_csv(index=False), True)\r\n",
 					"print(refresh_df.shape)"
 				],
-				"execution_count": 23
+				"execution_count": 13
 			},
 			{
 				"cell_type": "markdown",
@@ -445,7 +445,7 @@
 					"\r\n",
 					"#mssparkutils.fs.put(\"/PBIMetadata/Imports.csv\", imports_df.to_csv(index=False), True)"
 				],
-				"execution_count": 24
+				"execution_count": 14
 			},
 			{
 				"cell_type": "code",
@@ -479,7 +479,7 @@
 					"data_df.loc[data_df[\"isFromPbix\"] != \"TRUE\", \"isFromPbix\"] = \"FALSE\"\r\n",
 					"mssparkutils.fs.put(\"/PBIMetadata/Resources.csv\", data_df.to_csv(index=False), True)"
 				],
-				"execution_count": 25
+				"execution_count": 15
 			},
 			{
 				"cell_type": "markdown",
@@ -524,7 +524,7 @@
 					"#print(users_df)\r\n",
 					"mssparkutils.fs.put(\"/PBIMetadata/Users.csv\", users_df.to_csv(index=False), True)"
 				],
-				"execution_count": 26
+				"execution_count": 16
 			},
 			{
 				"cell_type": "code",
@@ -549,7 +549,7 @@
 					"# print(resp)\r\n",
 					"# obj = resp.json()"
 				],
-				"execution_count": 27
+				"execution_count": 17
 			},
 			{
 				"cell_type": "code",
@@ -569,7 +569,7 @@
 					"client_id = '95e2c30e-8533-4c18-b3c7-4718847e9f28'\r\n",
 					"tenant_id = '89248974-515e-4d65-9469-ab424abfd2d2'"
 				],
-				"execution_count": 78
+				"execution_count": 18
 			},
 			{
 				"cell_type": "code",
@@ -592,7 +592,7 @@
 					"headers = CaseInsensitiveDict()\r\n",
 					"headers[\"Authorization\"] = \"Bearer \" + access_token"
 				],
-				"execution_count": 79
+				"execution_count": 19
 			},
 			{
 				"cell_type": "code",
@@ -616,9 +616,9 @@
 					"#print(obj)\r\n",
 					"\r\n",
 					"activity_events_df = pd.DataFrame.from_records(obj[\"activityEventEntities\"])\r\n",
-					"print(activity_events_df[\"Operation\"])"
+					"print(activity_events_df)"
 				],
-				"execution_count": 102
+				"execution_count": 21
 			},
 			{
 				"cell_type": "code",
