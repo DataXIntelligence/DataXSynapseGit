@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "1",
 				"spark.dynamicAllocation.maxExecutors": "1",
-				"spark.autotune.trackingId": "b6e53263-d5d7-466d-ae28-f93164eb26eb"
+				"spark.autotune.trackingId": "45a50094-77fe-4c8e-aa83-12892ade0816"
 			}
 		},
 		"metadata": {
@@ -326,7 +326,6 @@
 				},
 				"source": [
 					"datasources_df = pd.DataFrame()\r\n",
-					"resources = [\"datasets\", \"dataflows\", \"reports\"]\r\n",
 					"for id_ in data_df[\"id\"]:\r\n",
 					"    group = data_df[data_df[\"id\"] == id_][\"group_id\"].iloc[0]\r\n",
 					"    resource = data_df[data_df[\"id\"] == id_][\"type\"].iloc[0] + \"s\"\r\n",
@@ -347,7 +346,7 @@
 					"mssparkutils.fs.put(\"/PBIMetadata/Datasources.csv\", datasources_df.to_csv(index=False), True)\r\n",
 					"print(datasources_df)"
 				],
-				"execution_count": 12
+				"execution_count": 23
 			},
 			{
 				"cell_type": "markdown",
@@ -592,7 +591,7 @@
 					"headers = CaseInsensitiveDict()\r\n",
 					"headers[\"Authorization\"] = \"Bearer \" + access_token"
 				],
-				"execution_count": 19
+				"execution_count": 51
 			},
 			{
 				"cell_type": "code",
@@ -608,17 +607,47 @@
 					}
 				},
 				"source": [
-					"url = \"https://api.powerbi.com/v1.0/myorg/admin/activityevents?startDateTime='2023-04-04T00:00:00Z'&endDateTime='2023-04-04T23:59:59Z'\"\r\n",
+					"startTime = '2023-04-04T00:00:00Z'\r\n",
+					"endTime = '2023-04-04T23:59:59Z'\r\n",
+					"activity_events_df = pd.DataFrame()\r\n",
+					"\r\n",
+					"url = f\"https://api.powerbi.com/v1.0/myorg/admin/activityevents?startDateTime='{startTime}'&endDateTime='{endTime}'\"\r\n",
 					"\r\n",
 					"resp = requests.get(url, headers=headers)\r\n",
 					"#safe_print(resp)\r\n",
 					"obj = resp.json()\r\n",
-					"#print(obj)\r\n",
+					"#continuationToken = obj[\"continuationToken\"]\r\n",
+					"url = obj[\"continuationUri\"]\r\n",
 					"\r\n",
 					"activity_events_df = pd.DataFrame.from_records(obj[\"activityEventEntities\"])\r\n",
-					"print(activity_events_df)"
+					"#print(activity_events_df)"
 				],
-				"execution_count": 21
+				"execution_count": 57
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"#url = f\"https://api.powerbi.com/v1.0/myorg/admin/activityevents?continuationToken={continuationToken}\"\r\n",
+					"resp = requests.get(url, headers=headers)\r\n",
+					"#safe_print(resp)\r\n",
+					"obj = resp.json()\r\n",
+					"\r\n",
+					"\r\n",
+					"activity_events_df2 = pd.DataFrame.from_records(obj[\"activityEventEntities\"])\r\n",
+					"#print(activity_events_df2)"
+				],
+				"execution_count": 59
 			},
 			{
 				"cell_type": "code",
