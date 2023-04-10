@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "1",
 				"spark.dynamicAllocation.maxExecutors": "1",
-				"spark.autotune.trackingId": "36c88b77-c195-4118-9af2-a7027f84ea6d"
+				"spark.autotune.trackingId": "1f71718e-040f-4b3d-8ab1-e30eb06c300e"
 			}
 		},
 		"metadata": {
@@ -614,6 +614,15 @@
 					"    obj = resp.json()\r\n",
 					"\r\n",
 					"    new_df = pd.DataFrame.from_records(obj[\"activityEventEntities\"])\r\n",
+					"    if \"DataflowId\" in new_df.columns:\r\n",
+					"        new_df[\"ResourceId\"] = new_df[\"DataflowId\"]\r\n",
+					"    if \"DatasourceId\" in new_df.columns:\r\n",
+					"        new_df[\"ResourceId\"] = new_df[\"DatasourceId\"]\r\n",
+					"    if \"DatasetId\" in new_df.columns:\r\n",
+					"        new_df[\"ResourceId\"] = new_df[\"DatasetId\"]\r\n",
+					"    if \"ReportId\" in new_df.columns:\r\n",
+					"        new_df[\"ResourceId\"] = new_df[\"ReportId\"]\r\n",
+					"\r\n",
 					"    activity_events_df = pd.concat([activity_events_df,new_df],ignore_index=True)\r\n",
 					"\r\n",
 					"    while(not obj[\"lastResultSet\"]):\r\n",
@@ -622,6 +631,14 @@
 					"        obj = resp.json()\r\n",
 					"\r\n",
 					"        new_df = pd.DataFrame.from_records(obj[\"activityEventEntities\"])\r\n",
+					"        if \"DataflowId\" in new_df.columns:\r\n",
+					"        new_df[\"ResourceId\"] = new_df[\"DataflowId\"]\r\n",
+					"        if \"DatasourceId\" in new_df.columns:\r\n",
+					"            new_df[\"ResourceId\"] = new_df[\"DatasourceId\"]\r\n",
+					"        if \"DatasetId\" in new_df.columns:\r\n",
+					"            new_df[\"ResourceId\"] = new_df[\"DatasetId\"]\r\n",
+					"        if \"ReportId\" in new_df.columns:\r\n",
+					"            new_df[\"ResourceId\"] = new_df[\"ReportId\"]\r\n",
 					"        activity_events_df = pd.concat([activity_events_df,new_df],ignore_index=True)\r\n",
 					"print(activity_events_df.shape)\r\n",
 					"mssparkutils.fs.put(\"/PBIMetadata/ActivityEvents.csv\", activity_events_df.to_csv(index=False), True)"
@@ -642,10 +659,10 @@
 					}
 				},
 				"source": [
-					"print(activity_events_df[~activity_events_df[\"ArtifactName\"].isnull()][\"ArtifactId\"])\r\n",
-					"#Relciones: DataflowId, DatasourceId, DatasetId"
+					"print(activity_events_df[~activity_events_df[\"DashboardId\"].isnull()][\"DashboardName\"])\r\n",
+					"#Relciones: DataflowId, DatasourceId, DatasetId, ReportId, DashboardId"
 				],
-				"execution_count": 139
+				"execution_count": 145
 			},
 			{
 				"cell_type": "code",
