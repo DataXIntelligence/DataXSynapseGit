@@ -22,7 +22,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "1",
 				"spark.dynamicAllocation.maxExecutors": "1",
-				"spark.autotune.trackingId": "4d19fdf1-29f9-4e4f-9af1-f80cc459d976"
+				"spark.autotune.trackingId": "b638bd74-b947-4c7f-81aa-33be32a7a991"
 			}
 		},
 		"metadata": {
@@ -103,7 +103,7 @@
 					"headers[\"Authorization\"] = \"Bearer \" + secret\r\n",
 					"headers[\"Client-Id\"] = \"euj1dlm3po5d9e0xi03am76u5jhyz9\""
 				],
-				"execution_count": 12
+				"execution_count": 2
 			},
 			{
 				"cell_type": "markdown",
@@ -146,7 +146,7 @@
 					"    streamers_df[\"language\"] = streamersCSV_df[\"language\"][streamer]\r\n",
 					"    streamers_df[\"followers\"] = followers_obj[\"total\"]\r\n",
 					"\r\n",
-					"    if not streamers_df['description'].isna().any():\r\n",
+					"    if 'description' in streamers_df.columns and not streamers_df['description'].isnull().all():\r\n",
 					"        streamers_df[\"description\"] = streamers_df[\"description\"].str.replace('\"', \"'\")\r\n",
 					"        \r\n",
 					"    streamersData = pd.concat([streamersData,streamers_df], axis=0)\r\n",
@@ -156,7 +156,7 @@
 					"\r\n",
 					"print(\"--- %s seconds ---\" % (time.time() - start_time))"
 				],
-				"execution_count": 13
+				"execution_count": 3
 			}
 		]
 	}
