@@ -22,7 +22,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "1",
 				"spark.dynamicAllocation.maxExecutors": "1",
-				"spark.autotune.trackingId": "b638bd74-b947-4c7f-81aa-33be32a7a991"
+				"spark.autotune.trackingId": "19ea3f83-34ac-42d7-937d-93f2b2cf146a"
 			}
 		},
 		"metadata": {
@@ -97,7 +97,7 @@
 					"start_time = time.time()\r\n",
 					"streamersCSV = spark.read.csv(STREAMERS_FILENAME, header=True, inferSchema=True)\r\n",
 					"streamersCSV_df = streamersCSV.toPandas()\r\n",
-					"\r\n",
+					"#streamersCSV_df = streamersCSV.drop_duplicates(subset=\"user_name\")\r\n",
 					"headers = CaseInsensitiveDict()\r\n",
 					"secret = mssparkutils.credentials.getSecretWithLS('ls_keyvault', 'TwitchSecret')\r\n",
 					"headers[\"Authorization\"] = \"Bearer \" + secret\r\n",
