@@ -22,7 +22,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "1",
 				"spark.dynamicAllocation.maxExecutors": "1",
-				"spark.autotune.trackingId": "db665a9f-0969-470c-8e26-e5ae05362e30"
+				"spark.autotune.trackingId": "10cc918f-cc78-4de7-a16b-7017bea7a702"
 			}
 		},
 		"metadata": {
@@ -157,6 +157,7 @@
 					"    aux_df = pd.concat([aux_df,TopVideos_df], axis=0)\r\n",
 					"mssparkutils.fs.put(ALL_TOP_VIDEOS_FILENAME, aux_df.to_csv(index=False), True)\r\n",
 					"streamers_df = pd.DataFrame(set(tuples),columns=['user_id', 'user_name', 'language'])\r\n",
+					"streamers_df = streamers_df.drop_duplicates(subset=\"user_id\")\r\n",
 					"mssparkutils.fs.put(STREAMERS_FILENAME, streamers_df.to_csv(index=False), True)\r\n",
 					"\r\n",
 					"print(\"--- %s seconds ---\" % (time.time() - start_time))"
