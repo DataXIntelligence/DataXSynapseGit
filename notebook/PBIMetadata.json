@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "1",
 				"spark.dynamicAllocation.maxExecutors": "1",
-				"spark.autotune.trackingId": "2b2d1435-0466-4e1b-8eaf-31450b27372a"
+				"spark.autotune.trackingId": "27937917-d4e6-4751-8de7-d0ae6c4c2307"
 			}
 		},
 		"metadata": {
@@ -83,7 +83,7 @@
 					"import pandas as pd\r\n",
 					"from datetime import datetime, timezone, timedelta"
 				],
-				"execution_count": 50
+				"execution_count": 2
 			},
 			{
 				"cell_type": "code",
@@ -106,7 +106,7 @@
 					"    except:\r\n",
 					"        pass"
 				],
-				"execution_count": 51
+				"execution_count": 3
 			},
 			{
 				"cell_type": "markdown",
@@ -557,7 +557,7 @@
 					"client_id = '95e2c30e-8533-4c18-b3c7-4718847e9f28'\r\n",
 					"tenant_id = '89248974-515e-4d65-9469-ab424abfd2d2'"
 				],
-				"execution_count": 62
+				"execution_count": 21
 			},
 			{
 				"cell_type": "code",
@@ -580,7 +580,7 @@
 					"headers = CaseInsensitiveDict()\r\n",
 					"headers[\"Authorization\"] = \"Bearer \" + access_token"
 				],
-				"execution_count": 63
+				"execution_count": 22
 			},
 			{
 				"cell_type": "markdown",
@@ -668,10 +668,49 @@
 					}
 				},
 				"source": [
-					"print(activity_events_df[activity_events_df[\"Operation\"] == \"ExportActivityEvents\"])\r\n",
+					"dataflowId = [ \"d84fdb9b-1a36-4c49-8aab-549ec2604acf\",\r\n",
+					"\"41f7716b-a773-41be-8ba7-796a101c2c68\",\r\n",
+					"\"ac6a25d0-4faa-4ad8-87a0-f9d8fba0390f\",\r\n",
+					"\"aab3b80e-b621-4b78-8947-1d776f33db52\",\r\n",
+					"\"1372772b-febe-40f7-ae72-f61da1bfc157\",\r\n",
+					"\"9b194b74-0dd9-4c0f-93d9-ef49c252d96c\",\r\n",
+					"\"e334c4a8-b78a-4a69-821e-b90cb4ce4c2c\",\r\n",
+					"\"bb89acc7-3027-495c-be1c-9b6fbd891450\",\r\n",
+					"\"74da137a-f5f2-494d-a9fe-955a2178a742\",\r\n",
+					"\"adc4c88b-8a31-4242-a9f0-85f773db8d0e\",\r\n",
+					"\"57a6789d-4f2a-4c52-b172-9c2f290aec8a\",\r\n",
+					"\"c824d9a8-dafe-4647-b1bb-b282cd657a49\"]\r\n",
+					"\r\n",
+					"datasetId = \"8d8bcca9-5dd6-4b6f-be80-eacc9484d4fb\"\r\n",
+					"\r\n",
+					"url = f\"https://api.powerbi.com/v1.0/myorg/admin/datasets/{datasetId}/users\"\r\n",
+					"\r\n",
+					"resp = requests.get(url, headers=headers)\r\n",
+					"safe_print(resp)\r\n",
+					"obj = resp.json()\r\n",
+					"\r\n",
+					"tmp_df = pd.DataFrame.from_records(obj[\"value\"])\r\n",
+					"# print(tmp_df.keys())"
+				],
+				"execution_count": 24
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
 					""
 				],
-				"execution_count": 79
+				"execution_count": null
 			}
 		]
 	}
