@@ -276,13 +276,19 @@
 				"userProperties": [],
 				"linkedServiceName": {
 					"referenceName": "dataxsynapsedev-WorkspaceDefaultSqlServer",
-					"type": "LinkedServiceReference"
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"DBName": {
+							"value": "@activity('Copy Streams Data').output",
+							"type": "Expression"
+						}
+					}
 				},
 				"typeProperties": {
 					"scripts": [
 						{
 							"type": "Query",
-							"text": "ALTER TABLE [Twitch].[Streams]\nDROP COLUMN type, tag_ids, tags;\n"
+							"text": "ALTER TABLE [Twitch].[Streams]\nDROP COLUMN type, tag_ids, tags;"
 						}
 					],
 					"scriptBlockExecutionTimeout": "02:00:00"
