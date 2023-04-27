@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "1",
 				"spark.dynamicAllocation.maxExecutors": "1",
-				"spark.autotune.trackingId": "27937917-d4e6-4751-8de7-d0ae6c4c2307"
+				"spark.autotune.trackingId": "0f1f2cee-4402-4441-a01c-b0190f6c64a5"
 			}
 		},
 		"metadata": {
@@ -83,7 +83,7 @@
 					"import pandas as pd\r\n",
 					"from datetime import datetime, timezone, timedelta"
 				],
-				"execution_count": 2
+				"execution_count": 3
 			},
 			{
 				"cell_type": "code",
@@ -106,7 +106,7 @@
 					"    except:\r\n",
 					"        pass"
 				],
-				"execution_count": 3
+				"execution_count": 4
 			},
 			{
 				"cell_type": "markdown",
@@ -557,7 +557,7 @@
 					"client_id = '95e2c30e-8533-4c18-b3c7-4718847e9f28'\r\n",
 					"tenant_id = '89248974-515e-4d65-9469-ab424abfd2d2'"
 				],
-				"execution_count": 21
+				"execution_count": 5
 			},
 			{
 				"cell_type": "code",
@@ -580,7 +580,7 @@
 					"headers = CaseInsensitiveDict()\r\n",
 					"headers[\"Authorization\"] = \"Bearer \" + access_token"
 				],
-				"execution_count": 22
+				"execution_count": 6
 			},
 			{
 				"cell_type": "markdown",
@@ -665,7 +665,8 @@
 						"transient": {
 							"deleting": false
 						}
-					}
+					},
+					"collapsed": false
 				},
 				"source": [
 					"dataflowId = [ \"d84fdb9b-1a36-4c49-8aab-549ec2604acf\",\r\n",
@@ -683,16 +684,19 @@
 					"\r\n",
 					"datasetId = \"8d8bcca9-5dd6-4b6f-be80-eacc9484d4fb\"\r\n",
 					"\r\n",
-					"url = f\"https://api.powerbi.com/v1.0/myorg/admin/datasets/{datasetId}/users\"\r\n",
+					"calendarId = \"bb5e2fd6-c97d-4bfe-842e-07a557cc6859\"\r\n",
+					"\r\n",
+					"url = f\"https://api.powerbi.com/v1.0/myorg/admin/reports/{calendarId}/users\"\r\n",
 					"\r\n",
 					"resp = requests.get(url, headers=headers)\r\n",
-					"safe_print(resp)\r\n",
+					"#safe_print(resp)\r\n",
 					"obj = resp.json()\r\n",
 					"\r\n",
 					"tmp_df = pd.DataFrame.from_records(obj[\"value\"])\r\n",
-					"# print(tmp_df.keys())"
+					"tmp_df[\"resource_id\"] = calendarId\r\n",
+					"display(tmp_df)"
 				],
-				"execution_count": 24
+				"execution_count": 13
 			},
 			{
 				"cell_type": "code",
