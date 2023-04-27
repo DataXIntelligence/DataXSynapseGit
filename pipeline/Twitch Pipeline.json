@@ -58,6 +58,11 @@
 						"referenceName": "LoadStreamsData",
 						"type": "NotebookReference"
 					},
+					"parameters": {
+						"": {
+							"value": ""
+						}
+					},
 					"snapshot": true,
 					"sparkPool": {
 						"referenceName": "SparkPool01",
