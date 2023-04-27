@@ -16,6 +16,10 @@
 			"metadata": "Secure string for 'connectionString' of 'AzureSqlDatabase1'",
 			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=dataxserver.database.windows.net;Initial Catalog=LinkTestDatabase"
 		},
+		"AzureTableStorage1_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'AzureTableStorage1'"
+		},
 		"ShiftsMicrosoft_servicePrincipalKey": {
 			"type": "secureString",
 			"metadata": "Secure string for 'servicePrincipalKey' of 'ShiftsMicrosoft'"
@@ -2135,7 +2139,14 @@
 					{
 						"name": "LoadVideoData",
 						"type": "SynapseNotebook",
-						"dependsOn": [],
+						"dependsOn": [
+							{
+								"activity": "Copy Streams Data",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -2150,11 +2161,17 @@
 								"type": "NotebookReference"
 							},
 							"snapshot": true,
+							"sparkPool": {
+								"referenceName": "SparkPool01",
+								"type": "BigDataPoolReference"
+							},
+							"executorSize": "Small",
 							"conf": {
 								"spark.dynamicAllocation.enabled": null,
 								"spark.dynamicAllocation.minExecutors": null,
 								"spark.dynamicAllocation.maxExecutors": null
 							},
+							"driverSize": "Small",
 							"numExecutors": null
 						}
 					},
@@ -2176,109 +2193,22 @@
 								"type": "NotebookReference"
 							},
 							"snapshot": true,
+							"sparkPool": {
+								"referenceName": "SparkPool01",
+								"type": "BigDataPoolReference"
+							},
+							"executorSize": "Small",
 							"conf": {
 								"spark.dynamicAllocation.enabled": null,
 								"spark.dynamicAllocation.minExecutors": null,
 								"spark.dynamicAllocation.maxExecutors": null
 							},
+							"driverSize": "Small",
 							"numExecutors": null
 						}
 					},
 					{
-						"name": "LoadStreamersData",
-						"type": "SynapseNotebook",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"notebook": {
-								"referenceName": "LoadStreamersData",
-								"type": "NotebookReference"
-							},
-							"snapshot": true,
-							"conf": {
-								"spark.dynamicAllocation.enabled": null,
-								"spark.dynamicAllocation.minExecutors": null,
-								"spark.dynamicAllocation.maxExecutors": null
-							},
-							"numExecutors": null
-						}
-					},
-					{
-						"name": "Copy data",
-						"type": "Copy",
-						"dependsOn": [
-							{
-								"activity": "LoadStreamersData",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "DelimitedTextSource",
-								"storeSettings": {
-									"type": "AzureBlobFSReadSettings",
-									"recursive": true,
-									"enablePartitionDiscovery": false
-								},
-								"formatSettings": {
-									"type": "DelimitedTextReadSettings"
-								}
-							},
-							"sink": {
-								"type": "DelimitedTextSink",
-								"storeSettings": {
-									"type": "AzureBlobFSWriteSettings"
-								},
-								"formatSettings": {
-									"type": "DelimitedTextWriteSettings",
-									"quoteAllText": true,
-									"fileExtension": ".txt"
-								}
-							},
-							"enableStaging": false,
-							"translator": {
-								"type": "TabularTranslator",
-								"typeConversion": true,
-								"typeConversionSettings": {
-									"allowDataTruncation": true,
-									"treatBooleanAsNumber": false
-								}
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "DelimitedText1",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "DelimitedText1",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					},
-					{
-						"name": "Copy data1",
+						"name": "Copy Streams Data",
 						"type": "Copy",
 						"dependsOn": [
 							{
@@ -2309,15 +2239,11 @@
 								}
 							},
 							"sink": {
-								"type": "DelimitedTextSink",
-								"storeSettings": {
-									"type": "AzureBlobFSWriteSettings"
-								},
-								"formatSettings": {
-									"type": "DelimitedTextWriteSettings",
-									"quoteAllText": true,
-									"fileExtension": ".txt"
-								}
+								"type": "SqlPoolSink",
+								"preCopyScript": "TRUNCATE TABLE Twitch.Streams",
+								"writeBehavior": "Insert",
+								"sqlWriterUseTableLock": false,
+								"tableOption": "autoCreate"
 							},
 							"enableStaging": false,
 							"translator": {
@@ -2331,21 +2257,21 @@
 						},
 						"inputs": [
 							{
-								"referenceName": "DelimitedText2",
+								"referenceName": "Streams",
 								"type": "DatasetReference",
 								"parameters": {}
 							}
 						],
 						"outputs": [
 							{
-								"referenceName": "DelimitedText1",
+								"referenceName": "StreamsTable",
 								"type": "DatasetReference",
 								"parameters": {}
 							}
 						]
 					},
 					{
-						"name": "Copy data2",
+						"name": "Copy Games Data",
 						"type": "Copy",
 						"dependsOn": [
 							{
@@ -2376,15 +2302,10 @@
 								}
 							},
 							"sink": {
-								"type": "DelimitedTextSink",
-								"storeSettings": {
-									"type": "AzureBlobFSWriteSettings"
-								},
-								"formatSettings": {
-									"type": "DelimitedTextWriteSettings",
-									"quoteAllText": true,
-									"fileExtension": ".txt"
-								}
+								"type": "SqlPoolSink",
+								"preCopyScript": "TRUNCATE TABLE Twitch.Games",
+								"writeBehavior": "Insert",
+								"tableOption": "autoCreate"
 							},
 							"enableStaging": false,
 							"translator": {
@@ -2398,14 +2319,77 @@
 						},
 						"inputs": [
 							{
-								"referenceName": "DelimitedText3",
+								"referenceName": "GamesData",
 								"type": "DatasetReference",
 								"parameters": {}
 							}
 						],
 						"outputs": [
 							{
-								"referenceName": "DelimitedText1",
+								"referenceName": "GamesTable",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "Copy Videos Data",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "LoadVideoData",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "SqlPoolSink",
+								"preCopyScript": "TRUNCATE TABLE Twitch.Videos",
+								"writeBehavior": "Insert",
+								"sqlWriterUseTableLock": false,
+								"tableOption": "autoCreate"
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "VideoDataCSV",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "VideosTable",
 								"type": "DatasetReference",
 								"parameters": {}
 							}
@@ -2416,16 +2400,139 @@
 					"elapsedTimeMetric": {},
 					"cancelAfter": {}
 				},
+				"folder": {
+					"name": "Twitch"
+				},
 				"annotations": [],
 				"lastPublishTime": "2023-04-03T11:02:45Z"
 			},
 			"dependsOn": [
 				"[concat(variables('workspaceId'), '/notebooks/LoadVideoData')]",
+				"[concat(variables('workspaceId'), '/bigDataPools/SparkPool01')]",
 				"[concat(variables('workspaceId'), '/notebooks/LoadStreamsData')]",
+				"[concat(variables('workspaceId'), '/datasets/Streams')]",
+				"[concat(variables('workspaceId'), '/datasets/StreamsTable')]",
+				"[concat(variables('workspaceId'), '/datasets/GamesData')]",
+				"[concat(variables('workspaceId'), '/datasets/GamesTable')]",
+				"[concat(variables('workspaceId'), '/datasets/VideoDataCSV')]",
+				"[concat(variables('workspaceId'), '/datasets/VideosTable')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Twitch Streamer Data Pipeline')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "LoadStreamersData",
+						"type": "SynapseNotebook",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebook": {
+								"referenceName": "LoadStreamersData",
+								"type": "NotebookReference"
+							},
+							"snapshot": true,
+							"sparkPool": {
+								"referenceName": "SparkPool01",
+								"type": "BigDataPoolReference"
+							},
+							"executorSize": "Small",
+							"conf": {
+								"spark.dynamicAllocation.enabled": null,
+								"spark.dynamicAllocation.minExecutors": null,
+								"spark.dynamicAllocation.maxExecutors": null
+							},
+							"driverSize": "Small",
+							"numExecutors": null
+						}
+					},
+					{
+						"name": "Copy Streamers Data",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "LoadStreamersData",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "SqlPoolSink",
+								"preCopyScript": "TRUNCATE TABLE Twitch.Streamers",
+								"writeBehavior": "Insert",
+								"tableOption": "autoCreate"
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "Streamers",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "StreamersTable",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"folder": {
+					"name": "Twitch"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
 				"[concat(variables('workspaceId'), '/notebooks/LoadStreamersData')]",
-				"[concat(variables('workspaceId'), '/datasets/DelimitedText1')]",
-				"[concat(variables('workspaceId'), '/datasets/DelimitedText2')]",
-				"[concat(variables('workspaceId'), '/datasets/DelimitedText3')]"
+				"[concat(variables('workspaceId'), '/bigDataPools/SparkPool01')]",
+				"[concat(variables('workspaceId'), '/datasets/Streamers')]",
+				"[concat(variables('workspaceId'), '/datasets/StreamersTable')]"
 			]
 		},
 		{
@@ -5019,6 +5126,221 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/DelimitedText4')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "dataxsynapsedev-WorkspaceDefaultStorage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "AllTopGames.csv",
+						"folderPath": "Training/Cristian",
+						"fileSystem": "dataxsynapsefs"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "id",
+						"type": "String"
+					},
+					{
+						"name": "stream_id",
+						"type": "String"
+					},
+					{
+						"name": "user_id",
+						"type": "String"
+					},
+					{
+						"name": "user_login",
+						"type": "String"
+					},
+					{
+						"name": "user_name",
+						"type": "String"
+					},
+					{
+						"name": "title",
+						"type": "String"
+					},
+					{
+						"name": "description",
+						"type": "String"
+					},
+					{
+						"name": "created_at",
+						"type": "String"
+					},
+					{
+						"name": "published_at",
+						"type": "String"
+					},
+					{
+						"name": "url",
+						"type": "String"
+					},
+					{
+						"name": "thumbnail_url",
+						"type": "String"
+					},
+					{
+						"name": "viewable",
+						"type": "String"
+					},
+					{
+						"name": "view_count",
+						"type": "String"
+					},
+					{
+						"name": "language",
+						"type": "String"
+					},
+					{
+						"name": "type",
+						"type": "String"
+					},
+					{
+						"name": "duration",
+						"type": "String"
+					},
+					{
+						"name": "muted_segments",
+						"type": "String"
+					},
+					{
+						"name": "game_id",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/dataxsynapsedev-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/GamesData')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "dataxsynapsedev-WorkspaceDefaultStorage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "TopGames.csv",
+						"folderPath": "Training/Cristian",
+						"fileSystem": "dataxsynapsefs"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "id",
+						"type": "String"
+					},
+					{
+						"name": "name",
+						"type": "String"
+					},
+					{
+						"name": "box_art_url",
+						"type": "String"
+					},
+					{
+						"name": "igdb_id",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/dataxsynapsedev-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/GamesDataCSV')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "dataxsynapsedev-WorkspaceDefaultStorage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "TopGames.csv",
+						"folderPath": "Training/Cristian",
+						"fileSystem": "dataxsynapsefs"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "id",
+						"type": "String"
+					},
+					{
+						"name": "name",
+						"type": "String"
+					},
+					{
+						"name": "box_art_url",
+						"type": "String"
+					},
+					{
+						"name": "igdb_id",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/dataxsynapsedev-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/GamesTable')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "SqlPoolTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "Twitch",
+					"table": "Games"
+				},
+				"sqlPool": {
+					"referenceName": "DataXDW",
+					"type": "SqlPoolReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/sqlPools/DataXDW')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/Mario_csv')]",
 			"type": "Microsoft.Synapse/workspaces/datasets",
 			"apiVersion": "2019-06-01-preview",
@@ -5086,6 +5408,90 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/SqlPoolTable2')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "SqlPoolTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "Twitch",
+					"table": "TopVideos"
+				},
+				"sqlPool": {
+					"referenceName": "DataXDW",
+					"type": "SqlPoolReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/sqlPools/DataXDW')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SqlPoolTable3')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "SqlPoolTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "Twitch",
+					"table": "TopGames"
+				},
+				"sqlPool": {
+					"referenceName": "DataXDW",
+					"type": "SqlPoolReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/sqlPools/DataXDW')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SqlPoolTable4')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "SqlPoolTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "Twitch",
+					"table": "Streams"
+				},
+				"sqlPool": {
+					"referenceName": "DataXDW",
+					"type": "SqlPoolReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/sqlPools/DataXDW')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SqlPoolTable5')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "SqlPoolTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "Twitch",
+					"table": "Streamers"
+				},
+				"sqlPool": {
+					"referenceName": "DataXDW",
+					"type": "SqlPoolReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/sqlPools/DataXDW')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/SqlPoolTable_Mario')]",
 			"type": "Microsoft.Synapse/workspaces/datasets",
 			"apiVersion": "2019-06-01-preview",
@@ -5096,6 +5502,378 @@
 				"typeProperties": {
 					"schema": "Mario",
 					"table": "TopGames"
+				},
+				"sqlPool": {
+					"referenceName": "DataXDW",
+					"type": "SqlPoolReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/sqlPools/DataXDW')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Streamers')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "dataxsynapsedev-WorkspaceDefaultStorage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "StreamersData.csv",
+						"folderPath": "Training/Cristian",
+						"fileSystem": "dataxsynapsefs"
+					},
+					"columnDelimiter": ",",
+					"rowDelimiter": "\n",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "id",
+						"type": "String"
+					},
+					{
+						"name": "login",
+						"type": "String"
+					},
+					{
+						"name": "display_name",
+						"type": "String"
+					},
+					{
+						"name": "type",
+						"type": "String"
+					},
+					{
+						"name": "broadcaster_type",
+						"type": "String"
+					},
+					{
+						"name": "description",
+						"type": "String"
+					},
+					{
+						"name": "profile_image_url",
+						"type": "String"
+					},
+					{
+						"name": "offline_image_url",
+						"type": "String"
+					},
+					{
+						"name": "view_count",
+						"type": "String"
+					},
+					{
+						"name": "created_at",
+						"type": "String"
+					},
+					{
+						"name": "language",
+						"type": "String"
+					},
+					{
+						"name": "followers",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/dataxsynapsedev-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/StreamersTable')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "SqlPoolTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "Twitch",
+					"table": "Streamers"
+				},
+				"sqlPool": {
+					"referenceName": "DataXDW",
+					"type": "SqlPoolReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/sqlPools/DataXDW')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Streams')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "dataxsynapsedev-WorkspaceDefaultStorage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "Streams.csv",
+						"folderPath": "Training/Cristian",
+						"fileSystem": "dataxsynapsefs"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "id",
+						"type": "String"
+					},
+					{
+						"name": "user_id",
+						"type": "String"
+					},
+					{
+						"name": "user_login",
+						"type": "String"
+					},
+					{
+						"name": "user_name",
+						"type": "String"
+					},
+					{
+						"name": "game_id",
+						"type": "String"
+					},
+					{
+						"name": "game_name",
+						"type": "String"
+					},
+					{
+						"name": "type",
+						"type": "String"
+					},
+					{
+						"name": "title",
+						"type": "String"
+					},
+					{
+						"name": "viewer_count",
+						"type": "String"
+					},
+					{
+						"name": "started_at",
+						"type": "String"
+					},
+					{
+						"name": "language",
+						"type": "String"
+					},
+					{
+						"name": "thumbnail_url",
+						"type": "String"
+					},
+					{
+						"name": "tag_ids",
+						"type": "String"
+					},
+					{
+						"name": "tags",
+						"type": "String"
+					},
+					{
+						"name": "is_mature",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/dataxsynapsedev-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/StreamsCSV')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "dataxsynapsedev-WorkspaceDefaultStorage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "Streams.csv",
+						"folderPath": "Training/Cristian",
+						"fileSystem": "dataxsynapsefs"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "id",
+						"type": "String"
+					},
+					{
+						"name": "user_id",
+						"type": "String"
+					},
+					{
+						"name": "user_login",
+						"type": "String"
+					},
+					{
+						"name": "user_name",
+						"type": "String"
+					},
+					{
+						"name": "game_id",
+						"type": "String"
+					},
+					{
+						"name": "game_name",
+						"type": "String"
+					},
+					{
+						"name": "type",
+						"type": "String"
+					},
+					{
+						"name": "title",
+						"type": "String"
+					},
+					{
+						"name": "viewer_count",
+						"type": "String"
+					},
+					{
+						"name": "started_at",
+						"type": "String"
+					},
+					{
+						"name": "language",
+						"type": "String"
+					},
+					{
+						"name": "thumbnail_url",
+						"type": "String"
+					},
+					{
+						"name": "tag_ids",
+						"type": "String"
+					},
+					{
+						"name": "tags",
+						"type": "String"
+					},
+					{
+						"name": "is_mature",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/dataxsynapsedev-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/StreamsTable')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "SqlPoolTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "Twitch",
+					"table": "Streams"
+				},
+				"sqlPool": {
+					"referenceName": "DataXDW",
+					"type": "SqlPoolReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/sqlPools/DataXDW')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/TopGames')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "SqlPoolTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "Twitch",
+					"table": "TopGames"
+				},
+				"sqlPool": {
+					"referenceName": "DataXDW",
+					"type": "SqlPoolReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/sqlPools/DataXDW')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/VideoDataCSV')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "dataxsynapsedev-WorkspaceDefaultStorage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "AllTopGames.csv",
+						"folderPath": "Training/Cristian",
+						"fileSystem": "dataxsynapsefs"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/dataxsynapsedev-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/VideosTable')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "SqlPoolTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "Twitch",
+					"table": "Videos"
 				},
 				"sqlPool": {
 					"referenceName": "DataXDW",
@@ -6313,6 +7091,25 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/AzureTableStorage1')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureTableStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('AzureTableStorage1_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/ShiftsMicrosoft')]",
 			"type": "Microsoft.Synapse/workspaces/linkedServices",
 			"apiVersion": "2019-06-01-preview",
@@ -6519,6 +7316,85 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/TwitchGeneralDataTrigger')]",
+			"type": "Microsoft.Synapse/workspaces/triggers",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"description": "Updates the data once a day. Estimate run time = 1 min",
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "Twitch Pipeline",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Day",
+						"interval": 1,
+						"startTime": "2023-04-04T11:01:00Z",
+						"timeZone": "UTC",
+						"schedule": {
+							"minutes": [
+								11
+							],
+							"hours": [
+								11
+							]
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/pipelines/Twitch Pipeline')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/TwitchStreamerDataTrigger')]",
+			"type": "Microsoft.Synapse/workspaces/triggers",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"description": "Updates the data once per week. Estimate run time = 35 - 60 min",
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "Twitch Streamer Data Pipeline",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Week",
+						"interval": 1,
+						"startTime": "2023-04-04T11:06:00Z",
+						"endTime": "2023-04-06T11:55:27Z",
+						"timeZone": "UTC",
+						"schedule": {
+							"hours": [
+								2
+							],
+							"weekDays": [
+								"Sunday"
+							]
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/pipelines/Twitch Streamer Data Pipeline')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/AutoResolveIntegrationRuntime')]",
 			"type": "Microsoft.Synapse/workspaces/integrationRuntimes",
 			"apiVersion": "2019-06-01-preview",
@@ -6564,6 +7440,98 @@
 			"properties": {
 				"content": {
 					"query": "-- CREATE VIEW [0007].[V_Client] AS\n--     SELECT c.*, ct.[ClientTypeName], ct.[ClientTypeGroupID], ctg.[ClientTypeGroupName]\n--     FROM [0007].[Client] c\n--     LEFT JOIN [0007].[ClientType] ct\n--     ON c.[ClientTypeID] = ct.[ClientTypeID]\n--     LEFT JOIN [0007].[ClientTypeGroup] ctg\n--     ON ct.[ClientTypeGroupID] = ctg.[ClientTypeGroupID]\n\n-- CREATE VIEW [0007].[V_Agency] AS\n--     SELECT a.*, d.[DepartmentName], d.[RegionID], r.[RegionName], r.[DRID], dr.[DRName]\n--     FROM [0007].[Agency] a\n--     LEFT JOIN [0007].[Department] d\n--     ON a.[DepartmentID] = d.[DepartmentID]\n--     LEFT JOIN [0007].[Region] r\n--     ON d.[RegionID] = r.[RegionID]\n--     LEFT JOIN [0007].[DR] dr\n--     ON r.[DRID] = dr.[DRID]\n\n-- CREATE VIEW [0007].[V_Publication] AS\n--     SELECT p.*, m.[MediaName], m.[PriorityID]\n--     FROM [0007].[Publication] p\n--     LEFT JOIN [0007].[Media] m\n--     ON CAST(p.[MediaID] AS NUMERIC) = CAST(m.[MediaID] AS NUMERIC)\n\n-- CREATE VIEW [0007].[V_Application] AS\n--     SELECT a.*, c.[CandidateName]\n--     FROM [0007].[Application] a\n--     LEFT JOIN [0007].[Candidate] c\n--     ON CAST(a.[CandidateID] AS NUMERIC) = CAST(c.[CandidateID] AS NUMERIC)",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "DataXDW",
+						"poolName": "DataXDW"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SQL Twitch Games')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Twitch"
+				},
+				"content": {
+					"query": "SELECT *\n,[name]\n,[box_art_url]\n,[igdb_id]\n FROM [Twitch].[Games]",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "DataXDW",
+						"poolName": "DataXDW"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SQL Twitch Streamers')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Twitch"
+				},
+				"content": {
+					"query": "/*SELECT [id], [login], [display_name], [view_count], [created_at], [language], [followers]\nFROM [Twitch].[Streamers]\nWHERE [login] IN (\n  SELECT [login] \n  FROM [Twitch].[Streamers] \n  GROUP BY [login] \n  HAVING COUNT(*) > 1\n);*/\n\nSELECT COUNT(id)\nFROM [Twitch].[Streamers]",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "DataXDW",
+						"poolName": "DataXDW"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SQL Twitch Streams')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Twitch"
+				},
+				"content": {
+					"query": "SELECT TOP (100) [id]\n,[user_id]\n,[user_login]\n,[user_name]\n,[game_id]\n,[game_name]\n,[type]\n,[title]\n,[viewer_count]\n,[started_at]\n,[language]\n,[thumbnail_url]\n,[tag_ids]\n,[tags]\n,[is_mature]\n FROM [Twitch].[Streams]",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "DataXDW",
+						"poolName": "DataXDW"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SQL Twitch Videos')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Twitch"
+				},
+				"content": {
+					"query": "SELECT TOP (100) [id]\n,[stream_id]\n,[user_id]\n,[user_login]\n,[user_name]\n,[title]\n,[description]\n,[created_at]\n,[published_at]\n,[url]\n,[thumbnail_url]\n,[viewable]\n,[view_count]\n,[language]\n,[type]\n,[duration]\n,[muted_segments]\n,[game_id]\n FROM [Twitch].[Videos]",
 					"metadata": {
 						"language": "sql"
 					},
@@ -6664,6 +7632,26 @@
 			"properties": {
 				"content": {
 					"query": "CREATE USER Mario FOR LOGIN Mario\n\nGRANT SELECT ON Mario.v_topgames TO Mario\n\nEXECUTE AS USER='Mario'\n\nSELECT * FROM Mario.topgames",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "DataXDW",
+						"poolName": "DataXDW"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SQL script 7')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "SELECT TOP (100) [id]\n,[stream_id]\n,[user_id]\n,[user_login]\n,[user_name]\n,[title]\n,[description]\n,[created_at]\n,[published_at]\n,[url]\n,[thumbnail_url]\n,[viewable]\n,[view_count]\n,[language]\n,[type]\n,[duration]\n,[muted_segments]\n,[game_id]\n FROM [Twitch].[Videos]",
 					"metadata": {
 						"language": "sql"
 					},
@@ -7942,14 +8930,11 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "1",
 						"spark.dynamicAllocation.maxExecutors": "1",
-						"spark.autotune.trackingId": "aee44b70-50f0-416e-a902-0e2adc43d9ba"
+						"spark.autotune.trackingId": "19ea3f83-34ac-42d7-937d-93f2b2cf146a"
 					}
 				},
 				"metadata": {
 					"saveOutput": true,
-					"synapse_widget": {
-						"version": "0.1"
-					},
 					"enableDebugMode": false,
 					"kernelspec": {
 						"name": "synapse_pyspark",
@@ -7965,14 +8950,12 @@
 						"endpoint": "https://dataxsynapsedev.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/SparkPool01",
 						"auth": {
 							"type": "AAD",
-							"authResource": "https://dev.azuresynapse.net",
-							"authHeader": null
+							"authResource": "https://dev.azuresynapse.net"
 						},
 						"sparkVersion": "3.1",
 						"nodeCount": 10,
 						"cores": 4,
-						"memory": 28,
-						"extraHeader": null
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -8021,14 +9004,14 @@
 							"start_time = time.time()\r\n",
 							"streamersCSV = spark.read.csv(STREAMERS_FILENAME, header=True, inferSchema=True)\r\n",
 							"streamersCSV_df = streamersCSV.toPandas()\r\n",
-							"\r\n",
+							"#streamersCSV_df = streamersCSV.drop_duplicates(subset=\"user_name\")\r\n",
 							"headers = CaseInsensitiveDict()\r\n",
 							"secret = mssparkutils.credentials.getSecretWithLS('ls_keyvault', 'TwitchSecret')\r\n",
 							"headers[\"Authorization\"] = \"Bearer \" + secret\r\n",
 							"headers[\"Client-Id\"] = \"euj1dlm3po5d9e0xi03am76u5jhyz9\""
 						],
 						"outputs": [],
-						"execution_count": 30
+						"execution_count": 2
 					},
 					{
 						"cell_type": "markdown",
@@ -8040,7 +9023,7 @@
 							}
 						},
 						"source": [
-							"Load Streamers data. Iterate the **Streamers_id.csv** table wich stores all the streamers who have been found and returns a **json** with all his public data."
+							"Load Streamers data. Iterate the **Streamers_id.csv** table wich stores all the streamers who have been found and returns a **CSV** with all his public data."
 						]
 					},
 					{
@@ -8070,7 +9053,10 @@
 							"    followers_obj = json.loads(resp.text)\r\n",
 							"    streamers_df[\"language\"] = streamersCSV_df[\"language\"][streamer]\r\n",
 							"    streamers_df[\"followers\"] = followers_obj[\"total\"]\r\n",
-							"   \r\n",
+							"\r\n",
+							"    if 'description' in streamers_df.columns and not streamers_df['description'].isnull().all():\r\n",
+							"        streamers_df[\"description\"] = streamers_df[\"description\"].str.replace('\"', \"'\")\r\n",
+							"        \r\n",
 							"    streamersData = pd.concat([streamersData,streamers_df], axis=0)\r\n",
 							"    followers_obj = json.loads(resp.text)\r\n",
 							"#streamersData.to_csv(FILENAME, index=False)\r\n",
@@ -8079,7 +9065,7 @@
 							"print(\"--- %s seconds ---\" % (time.time() - start_time))"
 						],
 						"outputs": [],
-						"execution_count": 31
+						"execution_count": 3
 					}
 				]
 			},
@@ -8111,14 +9097,11 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "9c5fae65-9e88-4ca5-9ff3-abdbd22c2afb"
+						"spark.autotune.trackingId": "1c9e3f63-b8ac-431d-8eb7-cf57fab35b60"
 					}
 				},
 				"metadata": {
 					"saveOutput": true,
-					"synapse_widget": {
-						"version": "0.1"
-					},
 					"enableDebugMode": false,
 					"kernelspec": {
 						"name": "synapse_pyspark",
@@ -8134,8 +9117,7 @@
 						"endpoint": "https://dataxsynapsedev.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/SparkPool01",
 						"auth": {
 							"type": "AAD",
-							"authResource": "https://dev.azuresynapse.net",
-							"authHeader": null
+							"authResource": "https://dev.azuresynapse.net"
 						},
 						"sparkVersion": "3.1",
 						"nodeCount": 10,
@@ -8235,10 +9217,12 @@
 							"    streams_df = pd.DataFrame.from_records(streams_obj[\"data\"])\r\n",
 							"    for stream in streams_df.index:\r\n",
 							"        tuples.add(tuple([int(streams_df['user_id'][stream]),streams_df['user_name'][stream],streams_df['language'][stream]]))\r\n",
+							"    streams_df[\"title\"] = streams_df[\"title\"].str.replace('\"', \"'\")\r\n",
 							"    aux_df = pd.concat([aux_df,streams_df], axis=0)\r\n",
-							"    \r\n",
+							"\r\n",
 							"mssparkutils.fs.put(STREAMS_FILENAME, aux_df.to_csv(index=False), True)\r\n",
 							"streamers_df = pd.DataFrame(set(tuples),columns=['user_id', 'user_name', 'language'])\r\n",
+							"streamers_df = streamers_df.drop_duplicates(subset=\"user_id\", keep=\"first\")\r\n",
 							"mssparkutils.fs.put(STREAMERS_FILENAME, streamers_df.to_csv(index=False), True)\r\n",
 							"\r\n",
 							"print(\"--- %s seconds ---\" % (time.time() - start_time))"
@@ -8276,14 +9260,11 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "1",
 						"spark.dynamicAllocation.maxExecutors": "1",
-						"spark.autotune.trackingId": "f5f52acd-6366-4bd1-9b5c-416db760d917"
+						"spark.autotune.trackingId": "3976374b-1d04-4408-a73f-ef21899f42f0"
 					}
 				},
 				"metadata": {
 					"saveOutput": true,
-					"synapse_widget": {
-						"version": "0.1"
-					},
 					"enableDebugMode": false,
 					"kernelspec": {
 						"name": "synapse_pyspark",
@@ -8299,14 +9280,12 @@
 						"endpoint": "https://dataxsynapsedev.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/SparkPool01",
 						"auth": {
 							"type": "AAD",
-							"authResource": "https://dev.azuresynapse.net",
-							"authHeader": null
+							"authResource": "https://dev.azuresynapse.net"
 						},
 						"sparkVersion": "3.1",
 						"nodeCount": 10,
 						"cores": 4,
-						"memory": 28,
-						"extraHeader": null
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -8337,7 +9316,7 @@
 							"languages = [\"en\", \"es\", \"fr\", \"pt\", \"de\", \"zh\", \"ja\", \"ar\", \"it\", \"ru\"]"
 						],
 						"outputs": [],
-						"execution_count": 10
+						"execution_count": 22
 					},
 					{
 						"cell_type": "markdown",
@@ -8373,7 +9352,7 @@
 							"mssparkutils.fs.put(TOP_GAMES_FILENAME, TopGames_df.to_csv(index=False), True)"
 						],
 						"outputs": [],
-						"execution_count": 11
+						"execution_count": 26
 					},
 					{
 						"cell_type": "markdown",
@@ -8411,17 +9390,19 @@
 							"    TopVideos_df = pd.DataFrame.from_records(topVideosObj[\"data\"])\r\n",
 							"    for video in TopVideos_df.index:\r\n",
 							"        tuples.add(tuple([int(TopVideos_df['user_id'][video]),TopVideos_df['user_name'][video],TopVideos_df['language'][video]]))\r\n",
+							"    TopVideos_df[\"title\"] = TopVideos_df[\"title\"].str.replace('\"', \"'\")\r\n",
+							"    TopVideos_df[\"description\"] = TopVideos_df[\"description\"].str.replace('\"', \"'\")\r\n",
 							"    TopVideos_df[\"game_id\"] = int(currentGameID)\r\n",
 							"    aux_df = pd.concat([aux_df,TopVideos_df], axis=0)\r\n",
-							"\r\n",
 							"mssparkutils.fs.put(ALL_TOP_VIDEOS_FILENAME, aux_df.to_csv(index=False), True)\r\n",
 							"streamers_df = pd.DataFrame(set(tuples),columns=['user_id', 'user_name', 'language'])\r\n",
+							"streamers_df = streamers_df.drop_duplicates(subset=\"user_id\", keep=\"first\")\r\n",
 							"mssparkutils.fs.put(STREAMERS_FILENAME, streamers_df.to_csv(index=False), True)\r\n",
 							"\r\n",
 							"print(\"--- %s seconds ---\" % (time.time() - start_time))"
 						],
 						"outputs": [],
-						"execution_count": 12
+						"execution_count": 25
 					}
 				]
 			},
@@ -10309,14 +11290,11 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "1",
 						"spark.dynamicAllocation.maxExecutors": "1",
-						"spark.autotune.trackingId": "f0e6a8f7-a615-4131-80c8-b7ac5a5f0956"
+						"spark.autotune.trackingId": "27937917-d4e6-4751-8de7-d0ae6c4c2307"
 					}
 				},
 				"metadata": {
 					"saveOutput": true,
-					"synapse_widget": {
-						"version": "0.1"
-					},
 					"enableDebugMode": false,
 					"kernelspec": {
 						"name": "synapse_pyspark",
@@ -10332,29 +11310,52 @@
 						"endpoint": "https://dataxsynapsedev.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/SparkPool01",
 						"auth": {
 							"type": "AAD",
-							"authResource": "https://dev.azuresynapse.net",
-							"authHeader": null
+							"authResource": "https://dev.azuresynapse.net"
 						},
 						"sparkVersion": "3.1",
 						"nodeCount": 10,
 						"cores": 4,
-						"memory": 28,
-						"extraHeader": null
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# Imports"
+						]
+					},
+					{
 						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
 						"source": [
 							"from notebookutils import mssparkutils\r\n",
 							"import requests \r\n",
 							"from requests.structures import CaseInsensitiveDict\r\n",
 							"import json\r\n",
-							"import pandas as pd"
+							"import pandas as pd\r\n",
+							"from datetime import datetime, timezone, timedelta"
 						],
 						"outputs": [],
-						"execution_count": 37
+						"execution_count": 2
 					},
 					{
 						"cell_type": "code",
@@ -10378,7 +11379,20 @@
 							"        pass"
 						],
 						"outputs": [],
-						"execution_count": 38
+						"execution_count": 3
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# Credentials"
+						]
 					},
 					{
 						"cell_type": "code",
@@ -10400,7 +11414,7 @@
 							"account_password = mssparkutils.credentials.getSecretWithLS('ls_keyvault', 'PBIMetadataClientUserAndPassword')"
 						],
 						"outputs": [],
-						"execution_count": 39
+						"execution_count": 52
 					},
 					{
 						"cell_type": "code",
@@ -10424,7 +11438,7 @@
 							"headers[\"Authorization\"] = \"Bearer \" + access_token"
 						],
 						"outputs": [],
-						"execution_count": 40
+						"execution_count": 53
 					},
 					{
 						"cell_type": "markdown",
@@ -10444,7 +11458,7 @@
 						"metadata": {
 							"jupyter": {
 								"source_hidden": false,
-								"outputs_hidden": true
+								"outputs_hidden": false
 							},
 							"nteract": {
 								"transient": {
@@ -10456,7 +11470,7 @@
 							"url = \"https://api.powerbi.com/v1.0/myorg/groups\"\r\n",
 							"\r\n",
 							"resp = requests.get(url, headers=headers)\r\n",
-							"safe_print(resp)\r\n",
+							"#safe_print(resp)\r\n",
 							"obj = resp.json()\r\n",
 							"\r\n",
 							"groups_df = pd.DataFrame.from_records(obj[\"value\"])\r\n",
@@ -10464,7 +11478,7 @@
 							"print(groups_df.head())"
 						],
 						"outputs": [],
-						"execution_count": 41
+						"execution_count": 54
 					},
 					{
 						"cell_type": "markdown",
@@ -10476,7 +11490,7 @@
 							}
 						},
 						"source": [
-							"# Metadata (Datasets, Dataflows and Reports)"
+							"# Resources (Datasets, Dataflows and Reports)"
 						]
 					},
 					{
@@ -10511,10 +11525,10 @@
 							"        data_df = pd.concat([data_df,new_df],ignore_index=True)\r\n",
 							"\r\n",
 							"print(data_df.shape)\r\n",
-							"mssparkutils.fs.put(\"/PBIMetadata/Metadata.csv\", data_df.to_csv(index=False), True)"
+							"mssparkutils.fs.put(\"/PBIMetadata/Resources.csv\", data_df.to_csv(index=False), True)"
 						],
 						"outputs": [],
-						"execution_count": 42
+						"execution_count": 55
 					},
 					{
 						"cell_type": "markdown",
@@ -10555,10 +11569,11 @@
 							"    new_df[\"report_id\"] = id_\r\n",
 							"    new_df[\"group_id\"] = group\r\n",
 							"    pages_df = pd.concat([pages_df,new_df],ignore_index=True)\r\n",
-							"mssparkutils.fs.put(\"/PBIMetadata/ReportPages.csv\", pages_df.to_csv(index=False), True)"
+							"mssparkutils.fs.put(\"/PBIMetadata/ReportPages.csv\", pages_df.to_csv(index=False), True)\r\n",
+							"print(pages_df.shape)"
 						],
 						"outputs": [],
-						"execution_count": 43
+						"execution_count": 56
 					},
 					{
 						"cell_type": "markdown",
@@ -10590,7 +11605,6 @@
 						},
 						"source": [
 							"datasources_df = pd.DataFrame()\r\n",
-							"resources = [\"datasets\", \"dataflows\", \"reports\"]\r\n",
 							"for id_ in data_df[\"id\"]:\r\n",
 							"    group = data_df[data_df[\"id\"] == id_][\"group_id\"].iloc[0]\r\n",
 							"    resource = data_df[data_df[\"id\"] == id_][\"type\"].iloc[0] + \"s\"\r\n",
@@ -10606,12 +11620,366 @@
 							"            new_df[\"group_id\"] = group\r\n",
 							"            new_df[\"resource_type\"] = resource[:-1]\r\n",
 							"            new_df[\"id\"] = new_df[\"datasourceId\"]\r\n",
+							"            new_df = pd.concat([new_df.drop(['connectionDetails'], axis=1), new_df['connectionDetails'].apply(pd.Series)], axis=1)\r\n",
 							"    datasources_df = pd.concat([datasources_df,new_df],ignore_index=True)\r\n",
 							"mssparkutils.fs.put(\"/PBIMetadata/Datasources.csv\", datasources_df.to_csv(index=False), True)\r\n",
-							"#print(datasources_df.shape)"
+							"print(datasources_df.shape)"
 						],
 						"outputs": [],
-						"execution_count": 85
+						"execution_count": 57
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# Refresh History(dataflows and datasets)"
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"refresh_df = pd.DataFrame()\r\n",
+							"datasets_dataflows = data_df[(data_df['type'] == 'dataset') | (data_df['type'] == 'dataflow')]\r\n",
+							"for id_ in datasets_dataflows[\"id\"]:\r\n",
+							"    group = datasets_dataflows[datasets_dataflows[\"id\"] == id_][\"group_id\"].iloc[0]\r\n",
+							"    type_ = datasets_dataflows[datasets_dataflows[\"id\"] == id_][\"type\"].iloc[0] + \"s\"\r\n",
+							"    url = \"https://api.powerbi.com/v1.0/myorg/groups/\"\r\n",
+							"    url += group + \"/\" + type_ + \"/\" + id_ + \"/\"\r\n",
+							"    if type_ == \"datasets\":\r\n",
+							"        url += \"refreshes\"\r\n",
+							"    else:\r\n",
+							"        url += \"transactions\"\r\n",
+							"    resp = requests.get(url, headers=headers)\r\n",
+							"    obj = resp.json()\r\n",
+							"    new_df = pd.DataFrame()\r\n",
+							"    new_df = pd.DataFrame.from_records(obj[\"value\"])\r\n",
+							"    new_df[\"resource_id\"] = id_\r\n",
+							"    new_df[\"group_id\"] = group\r\n",
+							"    new_df[\"resource_type\"] = type_[:-1]\r\n",
+							"    refresh_df = pd.concat([refresh_df,new_df],ignore_index=True)\r\n",
+							"mssparkutils.fs.put(\"/PBIMetadata/RefreshHistory.csv\", refresh_df.to_csv(index=False), True)\r\n",
+							"print(refresh_df.shape)"
+						],
+						"outputs": [],
+						"execution_count": 58
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# Imports\r\n",
+							"\r\n",
+							"Adding import name to data dataframe for resources created when importing .pbix files"
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"imports_df = pd.DataFrame()\r\n",
+							"for group in groups_df[\"id\"]:\r\n",
+							"    group = str(group)\r\n",
+							"    url = \"https://api.powerbi.com/v1.0/myorg/groups/\"\r\n",
+							"    url += group + \"/\" + \"imports\"\r\n",
+							"    resp = requests.get(url, headers=headers)\r\n",
+							"    obj = resp.json()\r\n",
+							"    if \"value\" in obj.keys():\r\n",
+							"        new_df = pd.DataFrame.from_records(obj[\"value\"])\r\n",
+							"        new_df[\"group_id\"] = group\r\n",
+							"        imports_df = pd.concat([imports_df,new_df],ignore_index=True)\r\n",
+							"\r\n",
+							"data_df[\"import_name\"] = \"\"\r\n",
+							"\r\n",
+							"#mssparkutils.fs.put(\"/PBIMetadata/Imports.csv\", imports_df.to_csv(index=False), True)"
+						],
+						"outputs": [],
+						"execution_count": 59
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"for id_ in imports_df[\"id\"]:\r\n",
+							"    name = imports_df[imports_df[\"id\"] == id_][\"name\"].iloc[0]\r\n",
+							"    datasets = imports_df[imports_df[\"id\"] == id_][\"datasets\"].iloc[0]\r\n",
+							"    reports = imports_df[imports_df[\"id\"] == id_][\"reports\"].iloc[0]\r\n",
+							"    dataflows = imports_df[imports_df[\"id\"] == id_][\"dataflows\"].iloc[0]\r\n",
+							"    for dataset in datasets:\r\n",
+							"        data_df.loc[data_df[\"id\"] == dataset[\"id\"], \"import_name\"] = name\r\n",
+							"        data_df.loc[data_df[\"id\"] == dataset[\"id\"], \"isFromPbix\"] = \"TRUE\"\r\n",
+							"    for report in reports:\r\n",
+							"        data_df.loc[data_df[\"id\"] == report[\"id\"], \"import_name\"] = name\r\n",
+							"        data_df.loc[data_df[\"id\"] == report[\"id\"], \"isFromPbix\"] = \"TRUE\"\r\n",
+							"    for dataflow in dataflows:\r\n",
+							"        data_df.loc[data_df[\"id\"] == dataflow[\"id\"], \"import_name\"] = name\r\n",
+							"        data_df.loc[data_df[\"id\"] == dataflow[\"id\"], \"isFromPbix\"] = \"TRUE\"\r\n",
+							"#print(data_df[data_df[\"import_name\"] != \"\"])\r\n",
+							"data_df.loc[data_df[\"isFromPbix\"] != \"TRUE\", \"isFromPbix\"] = \"FALSE\"\r\n",
+							"mssparkutils.fs.put(\"/PBIMetadata/Resources.csv\", data_df.to_csv(index=False), True)"
+						],
+						"outputs": [],
+						"execution_count": 60
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# Users \r\n",
+							"The number of times a user is in the table is the same as the number of workspaces the user belongs to"
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"users_df = pd.DataFrame()\r\n",
+							"for group in groups_df[\"id\"]:\r\n",
+							"    group = str(group)\r\n",
+							"    url = \"https://api.powerbi.com/v1.0/myorg/groups/\"\r\n",
+							"    url += group + \"/users\"\r\n",
+							"    resp = requests.get(url, headers=headers)\r\n",
+							"    obj = resp.json()\r\n",
+							"    new_df = pd.DataFrame.from_records(obj[\"value\"])\r\n",
+							"    new_df[\"group_id\"] = group\r\n",
+							"    users_df = pd.concat([users_df,new_df],ignore_index=True)\r\n",
+							"\r\n",
+							"print(users_df.shape)\r\n",
+							"#print(users_df)\r\n",
+							"mssparkutils.fs.put(\"/PBIMetadata/Users.csv\", users_df.to_csv(index=False), True)"
+						],
+						"outputs": [],
+						"execution_count": 61
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# Service principal credentials"
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"client_secret = mssparkutils.credentials.getSecretWithLS('ls_keyvault', 'PBIServPrincipalAPISecret')\r\n",
+							"client_id = '95e2c30e-8533-4c18-b3c7-4718847e9f28'\r\n",
+							"tenant_id = '89248974-515e-4d65-9469-ab424abfd2d2'"
+						],
+						"outputs": [],
+						"execution_count": 21
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"body = f'grant_type=client_credentials&resource=https://analysis.windows.net/powerbi/api&client_id={client_id}&client_secret={client_secret}'\r\n",
+							"r = requests.post(f'https://login.microsoftonline.com/{tenant_id}/oauth2/token', data=body)\r\n",
+							"access_token = r.json()['access_token']\r\n",
+							"\r\n",
+							"headers = CaseInsensitiveDict()\r\n",
+							"headers[\"Authorization\"] = \"Bearer \" + access_token"
+						],
+						"outputs": [],
+						"execution_count": 22
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# Activity events\r\n",
+							"The activity events registered in the past 30 days are registered and stored in ActivityEvents.csv. Said file already contains previously retrieved information. To avoid duplicates information must be updated not before 30 days."
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"resourcesId = [\"DataflowId\", \"DatasourceId\", \"DatasetId\", \"ReportId\", \"DashboardId\"]\r\n",
+							"dates = []\r\n",
+							"dates.append(datetime.now())\r\n",
+							"\r\n",
+							"activity_eventsCSV = spark.read.csv('abfss://dataxsynapsefs@adlsdatax01.dfs.core.windows.net/PBIMetadata/ActivityEvents.csv', header=True, inferSchema=True)\r\n",
+							"activity_events_df = activity_eventsCSV.toPandas()\r\n",
+							"#activity_events_df = pd.DataFrame()\r\n",
+							"\r\n",
+							"for i in range(1,29):\r\n",
+							"    dates.append(datetime.now() - timedelta(i))\r\n",
+							"for date in dates:\r\n",
+							"    # print(date.strftime(f\"%Y-%m-%dT00:00:00Z\"))\r\n",
+							"    # print(date.strftime(f\"%Y-%m-%dT23:59:59Z\"))\r\n",
+							"    startTime = date.strftime(f\"%Y-%m-%dT00:00:00Z\")\r\n",
+							"    endTime = date.strftime(f\"%Y-%m-%dT23:59:59Z\")\r\n",
+							"\r\n",
+							"    url = f\"https://api.powerbi.com/v1.0/myorg/admin/activityevents?startDateTime='{startTime}'&endDateTime='{endTime}'\"\r\n",
+							"\r\n",
+							"    resp = requests.get(url, headers=headers)\r\n",
+							"    #safe_print(resp)\r\n",
+							"    obj = resp.json()\r\n",
+							"\r\n",
+							"    new_df = pd.DataFrame.from_records(obj[\"activityEventEntities\"])\r\n",
+							"    for resource in resourcesId:\r\n",
+							"            if resource in new_df.columns:\r\n",
+							"                new_df[\"ResourceId\"] = new_df[resource]\r\n",
+							"\r\n",
+							"    activity_events_df = pd.concat([activity_events_df,new_df],ignore_index=True)\r\n",
+							"\r\n",
+							"    while(not obj[\"lastResultSet\"]):\r\n",
+							"        url = obj[\"continuationUri\"]\r\n",
+							"        resp = requests.get(url, headers=headers)\r\n",
+							"        obj = resp.json()\r\n",
+							"\r\n",
+							"        new_df = pd.DataFrame.from_records(obj[\"activityEventEntities\"])\r\n",
+							"        for resource in resourcesId:\r\n",
+							"            if resource in new_df.columns:\r\n",
+							"                new_df[\"ResourceId\"] = new_df[resource]\r\n",
+							"        activity_events_df = pd.concat([activity_events_df,new_df],ignore_index=True)\r\n",
+							"print(activity_events_df.shape)\r\n",
+							"mssparkutils.fs.put(\"/PBIMetadata/ActivityEvents.csv\", activity_events_df.to_csv(index=False), True)"
+						],
+						"outputs": [],
+						"execution_count": 71
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"dataflowId = [ \"d84fdb9b-1a36-4c49-8aab-549ec2604acf\",\r\n",
+							"\"41f7716b-a773-41be-8ba7-796a101c2c68\",\r\n",
+							"\"ac6a25d0-4faa-4ad8-87a0-f9d8fba0390f\",\r\n",
+							"\"aab3b80e-b621-4b78-8947-1d776f33db52\",\r\n",
+							"\"1372772b-febe-40f7-ae72-f61da1bfc157\",\r\n",
+							"\"9b194b74-0dd9-4c0f-93d9-ef49c252d96c\",\r\n",
+							"\"e334c4a8-b78a-4a69-821e-b90cb4ce4c2c\",\r\n",
+							"\"bb89acc7-3027-495c-be1c-9b6fbd891450\",\r\n",
+							"\"74da137a-f5f2-494d-a9fe-955a2178a742\",\r\n",
+							"\"adc4c88b-8a31-4242-a9f0-85f773db8d0e\",\r\n",
+							"\"57a6789d-4f2a-4c52-b172-9c2f290aec8a\",\r\n",
+							"\"c824d9a8-dafe-4647-b1bb-b282cd657a49\"]\r\n",
+							"\r\n",
+							"datasetId = \"8d8bcca9-5dd6-4b6f-be80-eacc9484d4fb\"\r\n",
+							"\r\n",
+							"url = f\"https://api.powerbi.com/v1.0/myorg/admin/datasets/{datasetId}/users\"\r\n",
+							"\r\n",
+							"resp = requests.get(url, headers=headers)\r\n",
+							"safe_print(resp)\r\n",
+							"obj = resp.json()\r\n",
+							"\r\n",
+							"tmp_df = pd.DataFrame.from_records(obj[\"value\"])\r\n",
+							"# print(tmp_df.keys())"
+						],
+						"outputs": [],
+						"execution_count": 24
 					},
 					{
 						"cell_type": "code",
@@ -10629,25 +11997,8 @@
 						"source": [
 							""
 						],
-						"outputs": []
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							""
-						],
-						"outputs": []
+						"outputs": [],
+						"execution_count": null
 					}
 				]
 			},

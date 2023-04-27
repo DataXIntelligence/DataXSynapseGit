@@ -11,6 +11,9 @@
 		"AzureSqlDatabase1_connectionString": {
 			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=dataxserver.database.windows.net;Initial Catalog=LinkTestDatabase"
 		},
+		"AzureTableStorage1_connectionString": {
+			"value": ""
+		},
 		"ShiftsMicrosoft_servicePrincipalKey": {
 			"value": ""
 		},
