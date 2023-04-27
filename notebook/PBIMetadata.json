@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "1",
 				"spark.dynamicAllocation.maxExecutors": "1",
-				"spark.autotune.trackingId": "0f1f2cee-4402-4441-a01c-b0190f6c64a5"
+				"spark.autotune.trackingId": "bd0daf0e-e467-4b06-a8ff-756da804c42a"
 			}
 		},
 		"metadata": {
@@ -694,7 +694,7 @@
 					"\r\n",
 					"tmp_df = pd.DataFrame.from_records(obj[\"value\"])\r\n",
 					"tmp_df[\"resource_id\"] = calendarId\r\n",
-					"display(tmp_df)"
+					"#display(tmp_df)"
 				],
 				"execution_count": 13
 			},
