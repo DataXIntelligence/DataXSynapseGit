@@ -3,7 +3,7 @@
 	"properties": {
 		"description": "Updates the data once a day. Estimate run time = 1 min",
 		"annotations": [],
-		"runtimeState": "Started",
+		"runtimeState": "Stopped",
 		"pipelines": [
 			{
 				"pipelineReference": {
