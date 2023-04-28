@@ -5,7 +5,7 @@
 			"name": "Twitch"
 		},
 		"content": {
-			"query": "ALTER TABLE [Twitch].[Games]\nDROP COLUMN igdb_id;\n\n\nSELECT *\n FROM [Twitch].[Games]\n\n ",
+			"query": "-- ALTER TABLE [Twitch].[Games]\n-- DROP COLUMN igdb_id;\n\n\nSELECT *\n FROM [Twitch].[Games]\n\n ",
 			"metadata": {
 				"language": "sql"
 			},
