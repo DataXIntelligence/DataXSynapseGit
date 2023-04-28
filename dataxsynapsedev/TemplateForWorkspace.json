@@ -2178,7 +2178,14 @@
 					{
 						"name": "LoadStreamsData",
 						"type": "SynapseNotebook",
-						"dependsOn": [],
+						"dependsOn": [
+							{
+								"activity": "pl_Pause_or_Resume_Pool",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -2240,7 +2247,6 @@
 							},
 							"sink": {
 								"type": "SqlPoolSink",
-								"preCopyScript": "TRUNCATE TABLE Twitch.Streams",
 								"writeBehavior": "Insert",
 								"sqlWriterUseTableLock": false,
 								"tableOption": "autoCreate"
@@ -2248,6 +2254,152 @@
 							"enableStaging": false,
 							"translator": {
 								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "id",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "id",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "user_id",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "user_id",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "user_login",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "user_login",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "user_name",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "user_name",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "game_id",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "game_id",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "game_name",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "game_name",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "title",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "title",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "viewer_count",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "viewer_count",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "started_at",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "started_at",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "language",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "language",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "thumbnail_url",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "thumbnail_url",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "is_mature",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "is_mature",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									}
+								],
 								"typeConversion": true,
 								"typeConversionSettings": {
 									"allowDataTruncation": true,
@@ -2394,6 +2546,50 @@
 								"parameters": {}
 							}
 						]
+					},
+					{
+						"name": "pl_Pause_or_Resume_Pool",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "pl_Pause_or_Resume_Pool",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"PLParAction": "Resume",
+								"PLParWaitTimeUntil": 20
+							}
+						}
+					},
+					{
+						"name": "pl_Pause_or_Resume_Pool1",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Copy Videos Data",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Copy Games Data",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "pl_Pause_or_Resume_Pool",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
 					}
 				],
 				"policy": {
@@ -2415,7 +2611,8 @@
 				"[concat(variables('workspaceId'), '/datasets/GamesData')]",
 				"[concat(variables('workspaceId'), '/datasets/GamesTable')]",
 				"[concat(variables('workspaceId'), '/datasets/VideoDataCSV')]",
-				"[concat(variables('workspaceId'), '/datasets/VideosTable')]"
+				"[concat(variables('workspaceId'), '/datasets/VideosTable')]",
+				"[concat(variables('workspaceId'), '/pipelines/pl_Pause_or_Resume_Pool')]"
 			]
 		},
 		{
@@ -7462,7 +7659,7 @@
 					"name": "Twitch"
 				},
 				"content": {
-					"query": "SELECT *\n,[name]\n,[box_art_url]\n,[igdb_id]\n FROM [Twitch].[Games]",
+					"query": "ALTER TABLE [Twitch].[Games]\nDROP COLUMN igdb_id;\n\n\nSELECT *\n FROM [Twitch].[Games]\n\n ",
 					"metadata": {
 						"language": "sql"
 					},
@@ -7485,7 +7682,7 @@
 					"name": "Twitch"
 				},
 				"content": {
-					"query": "/*SELECT [id], [login], [display_name], [view_count], [created_at], [language], [followers]\nFROM [Twitch].[Streamers]\nWHERE [login] IN (\n  SELECT [login] \n  FROM [Twitch].[Streamers] \n  GROUP BY [login] \n  HAVING COUNT(*) > 1\n);*/\n\nSELECT COUNT(id)\nFROM [Twitch].[Streamers]",
+					"query": "/*SELECT [id], [login], [display_name], [view_count], [created_at], [language], [followers]\nFROM [Twitch].[Streamers]\nWHERE [login] IN (\n  SELECT [login] \n  FROM [Twitch].[Streamers] \n  GROUP BY [login] \n  HAVING COUNT(*) > 1\n);*/\n\nALTER TABLE [Twitch].[Streamers]\nDROP COLUMN type, broadcaster_type;\n\nSELECT *\nFROM [Twitch].[Streamers]\n\n",
 					"metadata": {
 						"language": "sql"
 					},
@@ -7508,7 +7705,7 @@
 					"name": "Twitch"
 				},
 				"content": {
-					"query": "SELECT TOP (100) [id]\n,[user_id]\n,[user_login]\n,[user_name]\n,[game_id]\n,[game_name]\n,[type]\n,[title]\n,[viewer_count]\n,[started_at]\n,[language]\n,[thumbnail_url]\n,[tag_ids]\n,[tags]\n,[is_mature]\n FROM [Twitch].[Streams]",
+					"query": "ALTER TABLE [Twitch].[Streams]\nDROP COLUMN type, tag_ids, tags;\n\n-- ALTER TABLE [Twitch].[Streams] ADD type VARCHAR;\n-- ALTER TABLE [Twitch].[Streams] ADD tags_ids VARCHAR;\n-- ALTER TABLE [Twitch].[Streams] ADD tags VARCHAR;\n\n\nSELECT TOP (100) *\n FROM [Twitch].[Streams]",
 					"metadata": {
 						"language": "sql"
 					},
@@ -7531,7 +7728,7 @@
 					"name": "Twitch"
 				},
 				"content": {
-					"query": "SELECT TOP (100) [id]\n,[stream_id]\n,[user_id]\n,[user_login]\n,[user_name]\n,[title]\n,[description]\n,[created_at]\n,[published_at]\n,[url]\n,[thumbnail_url]\n,[viewable]\n,[view_count]\n,[language]\n,[type]\n,[duration]\n,[muted_segments]\n,[game_id]\n FROM [Twitch].[Videos]",
+					"query": "ALTER TABLE [Twitch].[Videos]\nDROP COLUMN viewable, type, muted_segments;\n\nSELECT TOP (100) [id]\n,[stream_id]\n,[user_id]\n,[user_login]\n,[user_name]\n,[title]\n,[description]\n,[created_at]\n,[published_at]\n,[url]\n,[thumbnail_url]\n,[viewable]\n,[view_count]\n,[language]\n,[type]\n,[duration]\n,[muted_segments]\n,[game_id]\n FROM [Twitch].[Videos]",
 					"metadata": {
 						"language": "sql"
 					},
@@ -11290,7 +11487,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "1",
 						"spark.dynamicAllocation.maxExecutors": "1",
-						"spark.autotune.trackingId": "27937917-d4e6-4751-8de7-d0ae6c4c2307"
+						"spark.autotune.trackingId": "17c52917-38bf-4f2d-ac2a-8965d5d0637f"
 					}
 				},
 				"metadata": {
@@ -11355,7 +11552,7 @@
 							"from datetime import datetime, timezone, timedelta"
 						],
 						"outputs": [],
-						"execution_count": 2
+						"execution_count": 3
 					},
 					{
 						"cell_type": "code",
@@ -11379,7 +11576,7 @@
 							"        pass"
 						],
 						"outputs": [],
-						"execution_count": 3
+						"execution_count": 4
 					},
 					{
 						"cell_type": "markdown",
@@ -11475,7 +11672,7 @@
 							"\r\n",
 							"groups_df = pd.DataFrame.from_records(obj[\"value\"])\r\n",
 							"mssparkutils.fs.put(\"/PBIMetadata/Groups.csv\", groups_df.to_csv(index=False), True)\r\n",
-							"print(groups_df.head())"
+							"#print(groups_df.head())"
 						],
 						"outputs": [],
 						"execution_count": 54
@@ -11524,7 +11721,7 @@
 							"                new_df[\"id\"] = new_df[\"objectId\"]\r\n",
 							"        data_df = pd.concat([data_df,new_df],ignore_index=True)\r\n",
 							"\r\n",
-							"print(data_df.shape)\r\n",
+							"#print(data_df.shape)\r\n",
 							"mssparkutils.fs.put(\"/PBIMetadata/Resources.csv\", data_df.to_csv(index=False), True)"
 						],
 						"outputs": [],
@@ -11570,7 +11767,7 @@
 							"    new_df[\"group_id\"] = group\r\n",
 							"    pages_df = pd.concat([pages_df,new_df],ignore_index=True)\r\n",
 							"mssparkutils.fs.put(\"/PBIMetadata/ReportPages.csv\", pages_df.to_csv(index=False), True)\r\n",
-							"print(pages_df.shape)"
+							"#print(pages_df.shape)"
 						],
 						"outputs": [],
 						"execution_count": 56
@@ -11623,7 +11820,7 @@
 							"            new_df = pd.concat([new_df.drop(['connectionDetails'], axis=1), new_df['connectionDetails'].apply(pd.Series)], axis=1)\r\n",
 							"    datasources_df = pd.concat([datasources_df,new_df],ignore_index=True)\r\n",
 							"mssparkutils.fs.put(\"/PBIMetadata/Datasources.csv\", datasources_df.to_csv(index=False), True)\r\n",
-							"print(datasources_df.shape)"
+							"#print(datasources_df.shape)"
 						],
 						"outputs": [],
 						"execution_count": 57
@@ -11675,7 +11872,7 @@
 							"    new_df[\"resource_type\"] = type_[:-1]\r\n",
 							"    refresh_df = pd.concat([refresh_df,new_df],ignore_index=True)\r\n",
 							"mssparkutils.fs.put(\"/PBIMetadata/RefreshHistory.csv\", refresh_df.to_csv(index=False), True)\r\n",
-							"print(refresh_df.shape)"
+							"#print(refresh_df.shape)"
 						],
 						"outputs": [],
 						"execution_count": 58
@@ -11802,7 +11999,7 @@
 							"    new_df[\"group_id\"] = group\r\n",
 							"    users_df = pd.concat([users_df,new_df],ignore_index=True)\r\n",
 							"\r\n",
-							"print(users_df.shape)\r\n",
+							"#print(users_df.shape)\r\n",
 							"#print(users_df)\r\n",
 							"mssparkutils.fs.put(\"/PBIMetadata/Users.csv\", users_df.to_csv(index=False), True)"
 						],
@@ -11841,7 +12038,7 @@
 							"tenant_id = '89248974-515e-4d65-9469-ab424abfd2d2'"
 						],
 						"outputs": [],
-						"execution_count": 21
+						"execution_count": 5
 					},
 					{
 						"cell_type": "code",
@@ -11865,7 +12062,7 @@
 							"headers[\"Authorization\"] = \"Bearer \" + access_token"
 						],
 						"outputs": [],
-						"execution_count": 22
+						"execution_count": 6
 					},
 					{
 						"cell_type": "markdown",
@@ -11934,71 +12131,11 @@
 							"            if resource in new_df.columns:\r\n",
 							"                new_df[\"ResourceId\"] = new_df[resource]\r\n",
 							"        activity_events_df = pd.concat([activity_events_df,new_df],ignore_index=True)\r\n",
-							"print(activity_events_df.shape)\r\n",
+							"#print(activity_events_df.shape)\r\n",
 							"mssparkutils.fs.put(\"/PBIMetadata/ActivityEvents.csv\", activity_events_df.to_csv(index=False), True)"
 						],
 						"outputs": [],
 						"execution_count": 71
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							"dataflowId = [ \"d84fdb9b-1a36-4c49-8aab-549ec2604acf\",\r\n",
-							"\"41f7716b-a773-41be-8ba7-796a101c2c68\",\r\n",
-							"\"ac6a25d0-4faa-4ad8-87a0-f9d8fba0390f\",\r\n",
-							"\"aab3b80e-b621-4b78-8947-1d776f33db52\",\r\n",
-							"\"1372772b-febe-40f7-ae72-f61da1bfc157\",\r\n",
-							"\"9b194b74-0dd9-4c0f-93d9-ef49c252d96c\",\r\n",
-							"\"e334c4a8-b78a-4a69-821e-b90cb4ce4c2c\",\r\n",
-							"\"bb89acc7-3027-495c-be1c-9b6fbd891450\",\r\n",
-							"\"74da137a-f5f2-494d-a9fe-955a2178a742\",\r\n",
-							"\"adc4c88b-8a31-4242-a9f0-85f773db8d0e\",\r\n",
-							"\"57a6789d-4f2a-4c52-b172-9c2f290aec8a\",\r\n",
-							"\"c824d9a8-dafe-4647-b1bb-b282cd657a49\"]\r\n",
-							"\r\n",
-							"datasetId = \"8d8bcca9-5dd6-4b6f-be80-eacc9484d4fb\"\r\n",
-							"\r\n",
-							"url = f\"https://api.powerbi.com/v1.0/myorg/admin/datasets/{datasetId}/users\"\r\n",
-							"\r\n",
-							"resp = requests.get(url, headers=headers)\r\n",
-							"safe_print(resp)\r\n",
-							"obj = resp.json()\r\n",
-							"\r\n",
-							"tmp_df = pd.DataFrame.from_records(obj[\"value\"])\r\n",
-							"# print(tmp_df.keys())"
-						],
-						"outputs": [],
-						"execution_count": 24
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							""
-						],
-						"outputs": [],
-						"execution_count": null
 					}
 				]
 			},
@@ -13638,6 +13775,27 @@
 			},
 			"dependsOn": [],
 			"location": "westeurope"
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/StreamsTable2')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "SqlPoolTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "Twitch",
+					"table": "Streams"
+				},
+				"sqlPool": {
+					"referenceName": "DataXDW",
+					"type": "SqlPoolReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/sqlPools/DataXDW')]"
+			]
 		}
 	]
 }
