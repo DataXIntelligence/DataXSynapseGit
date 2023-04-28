@@ -130,7 +130,7 @@
 								"sink": {
 									"name": "id",
 									"type": "String",
-									"physicalType": "String"
+									"physicalType": "nvarchar"
 								}
 							},
 							{
@@ -142,7 +142,7 @@
 								"sink": {
 									"name": "user_id",
 									"type": "String",
-									"physicalType": "String"
+									"physicalType": "nvarchar"
 								}
 							},
 							{
@@ -154,7 +154,7 @@
 								"sink": {
 									"name": "user_login",
 									"type": "String",
-									"physicalType": "String"
+									"physicalType": "nvarchar"
 								}
 							},
 							{
@@ -166,7 +166,7 @@
 								"sink": {
 									"name": "user_name",
 									"type": "String",
-									"physicalType": "String"
+									"physicalType": "nvarchar"
 								}
 							},
 							{
@@ -178,7 +178,7 @@
 								"sink": {
 									"name": "game_id",
 									"type": "String",
-									"physicalType": "String"
+									"physicalType": "nvarchar"
 								}
 							},
 							{
@@ -190,19 +190,7 @@
 								"sink": {
 									"name": "game_name",
 									"type": "String",
-									"physicalType": "String"
-								}
-							},
-							{
-								"source": {
-									"name": "type",
-									"type": "String",
-									"physicalType": "String"
-								},
-								"sink": {
-									"name": "type",
-									"type": "String",
-									"physicalType": "String"
+									"physicalType": "nvarchar"
 								}
 							},
 							{
@@ -214,7 +202,7 @@
 								"sink": {
 									"name": "title",
 									"type": "String",
-									"physicalType": "String"
+									"physicalType": "nvarchar"
 								}
 							},
 							{
@@ -226,7 +214,7 @@
 								"sink": {
 									"name": "viewer_count",
 									"type": "String",
-									"physicalType": "String"
+									"physicalType": "nvarchar"
 								}
 							},
 							{
@@ -238,7 +226,7 @@
 								"sink": {
 									"name": "started_at",
 									"type": "String",
-									"physicalType": "String"
+									"physicalType": "nvarchar"
 								}
 							},
 							{
@@ -250,7 +238,7 @@
 								"sink": {
 									"name": "language",
 									"type": "String",
-									"physicalType": "String"
+									"physicalType": "nvarchar"
 								}
 							},
 							{
@@ -262,31 +250,7 @@
 								"sink": {
 									"name": "thumbnail_url",
 									"type": "String",
-									"physicalType": "String"
-								}
-							},
-							{
-								"source": {
-									"name": "tag_ids",
-									"type": "String",
-									"physicalType": "String"
-								},
-								"sink": {
-									"name": "tag_ids",
-									"type": "String",
-									"physicalType": "String"
-								}
-							},
-							{
-								"source": {
-									"name": "tags",
-									"type": "String",
-									"physicalType": "String"
-								},
-								"sink": {
-									"name": "tags",
-									"type": "String",
-									"physicalType": "String"
+									"physicalType": "nvarchar"
 								}
 							},
 							{
@@ -298,7 +262,7 @@
 								"sink": {
 									"name": "is_mature",
 									"type": "String",
-									"physicalType": "String"
+									"physicalType": "nvarchar"
 								}
 							}
 						],

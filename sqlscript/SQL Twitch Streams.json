@@ -5,7 +5,7 @@
 			"name": "Twitch"
 		},
 		"content": {
-			"query": "-- ALTER TABLE [Twitch].[Streams]\n-- DROP COLUMN type, tag_ids, tags;\n\n-- ALTER TABLE [Twitch].[Streams] ADD type VARCHAR;\n-- ALTER TABLE [Twitch].[Streams] ADD tags_ids VARCHAR;\n-- ALTER TABLE [Twitch].[Streams] ADD tags VARCHAR;\n\n\nSELECT TOP (100) *\n FROM [Twitch].[Streams]",
+			"query": "ALTER TABLE [Twitch].[Streams]\nDROP COLUMN type, tag_ids, tags;\n\n-- ALTER TABLE [Twitch].[Streams] ADD type VARCHAR;\n-- ALTER TABLE [Twitch].[Streams] ADD tags_ids VARCHAR;\n-- ALTER TABLE [Twitch].[Streams] ADD tags VARCHAR;\n\n\nSELECT TOP (100) *\n FROM [Twitch].[Streams]",
 			"metadata": {
 				"language": "sql"
 			},
