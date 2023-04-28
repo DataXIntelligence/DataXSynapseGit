@@ -2845,7 +2845,14 @@
 					{
 						"name": "LoadStreamersData",
 						"type": "SynapseNotebook",
-						"dependsOn": [],
+						"dependsOn": [
+							{
+								"activity": "pl_Pause_or_Resume_Pool",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -2935,6 +2942,44 @@
 								"parameters": {}
 							}
 						]
+					},
+					{
+						"name": "pl_Pause_or_Resume_Pool",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "pl_Pause_or_Resume_Pool",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"PLParAction": "Resume",
+								"PLParWaitTimeUntil": 20
+							}
+						}
+					},
+					{
+						"name": "pl_Pause_or_Resume_Pool1",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Copy Streamers Data",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "pl_Pause_or_Resume_Pool",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
 					}
 				],
 				"policy": {
@@ -2950,7 +2995,8 @@
 				"[concat(variables('workspaceId'), '/notebooks/LoadStreamersData')]",
 				"[concat(variables('workspaceId'), '/bigDataPools/SparkPool01')]",
 				"[concat(variables('workspaceId'), '/datasets/Streamers')]",
-				"[concat(variables('workspaceId'), '/datasets/StreamersTable')]"
+				"[concat(variables('workspaceId'), '/datasets/StreamersTable')]",
+				"[concat(variables('workspaceId'), '/pipelines/pl_Pause_or_Resume_Pool')]"
 			]
 		},
 		{
