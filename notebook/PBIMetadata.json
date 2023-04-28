@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "1",
 				"spark.dynamicAllocation.maxExecutors": "1",
-				"spark.autotune.trackingId": "bd0daf0e-e467-4b06-a8ff-756da804c42a"
+				"spark.autotune.trackingId": "17c52917-38bf-4f2d-ac2a-8965d5d0637f"
 			}
 		},
 		"metadata": {
@@ -200,7 +200,7 @@
 					"\r\n",
 					"groups_df = pd.DataFrame.from_records(obj[\"value\"])\r\n",
 					"mssparkutils.fs.put(\"/PBIMetadata/Groups.csv\", groups_df.to_csv(index=False), True)\r\n",
-					"print(groups_df.head())"
+					"#print(groups_df.head())"
 				],
 				"execution_count": 54
 			},
@@ -248,7 +248,7 @@
 					"                new_df[\"id\"] = new_df[\"objectId\"]\r\n",
 					"        data_df = pd.concat([data_df,new_df],ignore_index=True)\r\n",
 					"\r\n",
-					"print(data_df.shape)\r\n",
+					"#print(data_df.shape)\r\n",
 					"mssparkutils.fs.put(\"/PBIMetadata/Resources.csv\", data_df.to_csv(index=False), True)"
 				],
 				"execution_count": 55
@@ -293,7 +293,7 @@
 					"    new_df[\"group_id\"] = group\r\n",
 					"    pages_df = pd.concat([pages_df,new_df],ignore_index=True)\r\n",
 					"mssparkutils.fs.put(\"/PBIMetadata/ReportPages.csv\", pages_df.to_csv(index=False), True)\r\n",
-					"print(pages_df.shape)"
+					"#print(pages_df.shape)"
 				],
 				"execution_count": 56
 			},
@@ -345,7 +345,7 @@
 					"            new_df = pd.concat([new_df.drop(['connectionDetails'], axis=1), new_df['connectionDetails'].apply(pd.Series)], axis=1)\r\n",
 					"    datasources_df = pd.concat([datasources_df,new_df],ignore_index=True)\r\n",
 					"mssparkutils.fs.put(\"/PBIMetadata/Datasources.csv\", datasources_df.to_csv(index=False), True)\r\n",
-					"print(datasources_df.shape)"
+					"#print(datasources_df.shape)"
 				],
 				"execution_count": 57
 			},
@@ -396,7 +396,7 @@
 					"    new_df[\"resource_type\"] = type_[:-1]\r\n",
 					"    refresh_df = pd.concat([refresh_df,new_df],ignore_index=True)\r\n",
 					"mssparkutils.fs.put(\"/PBIMetadata/RefreshHistory.csv\", refresh_df.to_csv(index=False), True)\r\n",
-					"print(refresh_df.shape)"
+					"#print(refresh_df.shape)"
 				],
 				"execution_count": 58
 			},
@@ -520,7 +520,7 @@
 					"    new_df[\"group_id\"] = group\r\n",
 					"    users_df = pd.concat([users_df,new_df],ignore_index=True)\r\n",
 					"\r\n",
-					"print(users_df.shape)\r\n",
+					"#print(users_df.shape)\r\n",
 					"#print(users_df)\r\n",
 					"mssparkutils.fs.put(\"/PBIMetadata/Users.csv\", users_df.to_csv(index=False), True)"
 				],
@@ -649,72 +649,10 @@
 					"            if resource in new_df.columns:\r\n",
 					"                new_df[\"ResourceId\"] = new_df[resource]\r\n",
 					"        activity_events_df = pd.concat([activity_events_df,new_df],ignore_index=True)\r\n",
-					"print(activity_events_df.shape)\r\n",
+					"#print(activity_events_df.shape)\r\n",
 					"mssparkutils.fs.put(\"/PBIMetadata/ActivityEvents.csv\", activity_events_df.to_csv(index=False), True)"
 				],
 				"execution_count": 71
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					},
-					"collapsed": false
-				},
-				"source": [
-					"dataflowId = [ \"d84fdb9b-1a36-4c49-8aab-549ec2604acf\",\r\n",
-					"\"41f7716b-a773-41be-8ba7-796a101c2c68\",\r\n",
-					"\"ac6a25d0-4faa-4ad8-87a0-f9d8fba0390f\",\r\n",
-					"\"aab3b80e-b621-4b78-8947-1d776f33db52\",\r\n",
-					"\"1372772b-febe-40f7-ae72-f61da1bfc157\",\r\n",
-					"\"9b194b74-0dd9-4c0f-93d9-ef49c252d96c\",\r\n",
-					"\"e334c4a8-b78a-4a69-821e-b90cb4ce4c2c\",\r\n",
-					"\"bb89acc7-3027-495c-be1c-9b6fbd891450\",\r\n",
-					"\"74da137a-f5f2-494d-a9fe-955a2178a742\",\r\n",
-					"\"adc4c88b-8a31-4242-a9f0-85f773db8d0e\",\r\n",
-					"\"57a6789d-4f2a-4c52-b172-9c2f290aec8a\",\r\n",
-					"\"c824d9a8-dafe-4647-b1bb-b282cd657a49\"]\r\n",
-					"\r\n",
-					"datasetId = \"8d8bcca9-5dd6-4b6f-be80-eacc9484d4fb\"\r\n",
-					"\r\n",
-					"calendarId = \"bb5e2fd6-c97d-4bfe-842e-07a557cc6859\"\r\n",
-					"\r\n",
-					"url = f\"https://api.powerbi.com/v1.0/myorg/admin/reports/{calendarId}/users\"\r\n",
-					"\r\n",
-					"resp = requests.get(url, headers=headers)\r\n",
-					"#safe_print(resp)\r\n",
-					"obj = resp.json()\r\n",
-					"\r\n",
-					"tmp_df = pd.DataFrame.from_records(obj[\"value\"])\r\n",
-					"tmp_df[\"resource_id\"] = calendarId\r\n",
-					"#display(tmp_df)"
-				],
-				"execution_count": 13
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
-					""
-				],
-				"execution_count": null
 			}
 		]
 	}
