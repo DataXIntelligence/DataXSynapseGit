@@ -44,7 +44,14 @@
 			{
 				"name": "LoadStreamsData",
 				"type": "SynapseNotebook",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "pl_Pause_or_Resume_Pool",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -106,7 +113,6 @@
 					},
 					"sink": {
 						"type": "SqlPoolSink",
-						"preCopyScript": "TRUNCATE TABLE Twitch.Streams",
 						"writeBehavior": "Insert",
 						"sqlWriterUseTableLock": false,
 						"tableOption": "autoCreate"
@@ -114,6 +120,188 @@
 					"enableStaging": false,
 					"translator": {
 						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "id",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "id",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "user_id",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "user_id",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "user_login",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "user_login",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "user_name",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "user_name",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "game_id",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "game_id",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "game_name",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "game_name",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "type",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "type",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "title",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "title",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "viewer_count",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "viewer_count",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "started_at",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "started_at",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "language",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "language",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "thumbnail_url",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "thumbnail_url",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "tag_ids",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "tag_ids",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "tags",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "tags",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "is_mature",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "is_mature",
+									"type": "String",
+									"physicalType": "String"
+								}
+							}
+						],
 						"typeConversion": true,
 						"typeConversionSettings": {
 							"allowDataTruncation": true,
@@ -256,42 +444,46 @@
 				]
 			},
 			{
-				"name": "Streams SQL script",
-				"type": "Script",
+				"name": "pl_Pause_or_Resume_Pool",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_Pause_or_Resume_Pool",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"PLParAction": "Resume",
+						"PLParWaitTimeUntil": 20
+					}
+				}
+			},
+			{
+				"name": "pl_Pause_or_Resume_Pool1",
+				"type": "ExecutePipeline",
 				"dependsOn": [
 					{
-						"activity": "Copy Streams Data",
+						"activity": "Copy Videos Data",
 						"dependencyConditions": [
-							"Succeeded"
+							"Completed"
+						]
+					},
+					{
+						"activity": "Copy Games Data",
+						"dependencyConditions": [
+							"Completed"
 						]
 					}
 				],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
 				"userProperties": [],
-				"linkedServiceName": {
-					"referenceName": "dataxsynapsedev-WorkspaceDefaultSqlServer",
-					"type": "LinkedServiceReference",
-					"parameters": {
-						"DBName": {
-							"value": "@activity('Copy Streams Data').output",
-							"type": "Expression"
-						}
-					}
-				},
 				"typeProperties": {
-					"scripts": [
-						{
-							"type": "Query",
-							"text": "ALTER TABLE [Twitch].[Streams]\nDROP COLUMN type, tag_ids, tags;"
-						}
-					],
-					"scriptBlockExecutionTimeout": "02:00:00"
+					"pipeline": {
+						"referenceName": "pl_Pause_or_Resume_Pool",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
 				}
 			}
 		],
