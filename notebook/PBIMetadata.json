@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "1",
 				"spark.dynamicAllocation.maxExecutors": "1",
-				"spark.autotune.trackingId": "17c52917-38bf-4f2d-ac2a-8965d5d0637f"
+				"spark.autotune.trackingId": "e207ac59-7ad8-4a67-ab49-8b1b1266bb60"
 			}
 		},
 		"metadata": {
@@ -140,7 +140,7 @@
 					"client_secret = mssparkutils.credentials.getSecretWithLS('ls_keyvault', 'PBIMetadataClientSecret')\r\n",
 					"account_password = mssparkutils.credentials.getSecretWithLS('ls_keyvault', 'PBIMetadataClientUserAndPassword')"
 				],
-				"execution_count": 52
+				"execution_count": 5
 			},
 			{
 				"cell_type": "code",
@@ -163,7 +163,7 @@
 					"headers = CaseInsensitiveDict()\r\n",
 					"headers[\"Authorization\"] = \"Bearer \" + access_token"
 				],
-				"execution_count": 53
+				"execution_count": 6
 			},
 			{
 				"cell_type": "markdown",
@@ -202,7 +202,7 @@
 					"mssparkutils.fs.put(\"/PBIMetadata/Groups.csv\", groups_df.to_csv(index=False), True)\r\n",
 					"#print(groups_df.head())"
 				],
-				"execution_count": 54
+				"execution_count": 8
 			},
 			{
 				"cell_type": "markdown",
@@ -251,7 +251,7 @@
 					"#print(data_df.shape)\r\n",
 					"mssparkutils.fs.put(\"/PBIMetadata/Resources.csv\", data_df.to_csv(index=False), True)"
 				],
-				"execution_count": 55
+				"execution_count": 9
 			},
 			{
 				"cell_type": "markdown",
@@ -295,7 +295,7 @@
 					"mssparkutils.fs.put(\"/PBIMetadata/ReportPages.csv\", pages_df.to_csv(index=False), True)\r\n",
 					"#print(pages_df.shape)"
 				],
-				"execution_count": 56
+				"execution_count": 10
 			},
 			{
 				"cell_type": "markdown",
@@ -347,7 +347,7 @@
 					"mssparkutils.fs.put(\"/PBIMetadata/Datasources.csv\", datasources_df.to_csv(index=False), True)\r\n",
 					"#print(datasources_df.shape)"
 				],
-				"execution_count": 57
+				"execution_count": 11
 			},
 			{
 				"cell_type": "markdown",
@@ -389,16 +389,17 @@
 					"        url += \"transactions\"\r\n",
 					"    resp = requests.get(url, headers=headers)\r\n",
 					"    obj = resp.json()\r\n",
-					"    new_df = pd.DataFrame()\r\n",
-					"    new_df = pd.DataFrame.from_records(obj[\"value\"])\r\n",
-					"    new_df[\"resource_id\"] = id_\r\n",
-					"    new_df[\"group_id\"] = group\r\n",
-					"    new_df[\"resource_type\"] = type_[:-1]\r\n",
-					"    refresh_df = pd.concat([refresh_df,new_df],ignore_index=True)\r\n",
+					"    if \"value\" in obj.keys(): #Direct query or live-connection based datasets will return error.\r\n",
+					"        new_df = pd.DataFrame()\r\n",
+					"        new_df = pd.DataFrame.from_records(obj[\"value\"])\r\n",
+					"        new_df[\"resource_id\"] = id_\r\n",
+					"        new_df[\"group_id\"] = group\r\n",
+					"        new_df[\"resource_type\"] = type_[:-1]\r\n",
+					"        refresh_df = pd.concat([refresh_df,new_df],ignore_index=True)\r\n",
 					"mssparkutils.fs.put(\"/PBIMetadata/RefreshHistory.csv\", refresh_df.to_csv(index=False), True)\r\n",
 					"#print(refresh_df.shape)"
 				],
-				"execution_count": 58
+				"execution_count": 16
 			},
 			{
 				"cell_type": "markdown",
@@ -445,7 +446,7 @@
 					"\r\n",
 					"#mssparkutils.fs.put(\"/PBIMetadata/Imports.csv\", imports_df.to_csv(index=False), True)"
 				],
-				"execution_count": 59
+				"execution_count": 17
 			},
 			{
 				"cell_type": "code",
@@ -479,7 +480,7 @@
 					"data_df.loc[data_df[\"isFromPbix\"] != \"TRUE\", \"isFromPbix\"] = \"FALSE\"\r\n",
 					"mssparkutils.fs.put(\"/PBIMetadata/Resources.csv\", data_df.to_csv(index=False), True)"
 				],
-				"execution_count": 60
+				"execution_count": 18
 			},
 			{
 				"cell_type": "markdown",
@@ -524,7 +525,7 @@
 					"#print(users_df)\r\n",
 					"mssparkutils.fs.put(\"/PBIMetadata/Users.csv\", users_df.to_csv(index=False), True)"
 				],
-				"execution_count": 61
+				"execution_count": 19
 			},
 			{
 				"cell_type": "markdown",
