@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "1",
 				"spark.dynamicAllocation.maxExecutors": "1",
-				"spark.autotune.trackingId": "e207ac59-7ad8-4a67-ab49-8b1b1266bb60"
+				"spark.autotune.trackingId": "d90c280d-68d8-4f0e-ae33-2bd5872829fc"
 			}
 		},
 		"metadata": {
@@ -389,7 +389,7 @@
 					"        url += \"transactions\"\r\n",
 					"    resp = requests.get(url, headers=headers)\r\n",
 					"    obj = resp.json()\r\n",
-					"    if \"value\" in obj.keys(): #Direct query or live-connection based datasets will return error.\r\n",
+					"    if \"value\" in obj.keys(): # Direct query or live-connection based datasets will return error.\r\n",
 					"        new_df = pd.DataFrame()\r\n",
 					"        new_df = pd.DataFrame.from_records(obj[\"value\"])\r\n",
 					"        new_df[\"resource_id\"] = id_\r\n",
