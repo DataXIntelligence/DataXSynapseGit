@@ -2083,6 +2083,56 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/PowerBI Metadata')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "PowerBI Metadata",
+						"type": "SynapseNotebook",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebook": {
+								"referenceName": "PBIMetadata",
+								"type": "NotebookReference"
+							},
+							"snapshot": true,
+							"sparkPool": {
+								"referenceName": "SparkPool01",
+								"type": "BigDataPoolReference"
+							},
+							"executorSize": "Small",
+							"conf": {
+								"spark.dynamicAllocation.enabled": null,
+								"spark.dynamicAllocation.minExecutors": null,
+								"spark.dynamicAllocation.maxExecutors": null
+							},
+							"driverSize": "Small",
+							"numExecutors": null
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/notebooks/PBIMetadata')]",
+				"[concat(variables('workspaceId'), '/bigDataPools/SparkPool01')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/Shifts')]",
 			"type": "Microsoft.Synapse/workspaces/pipelines",
 			"apiVersion": "2019-06-01-preview",
@@ -7763,6 +7813,44 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/Power BI Metadata')]",
+			"type": "Microsoft.Synapse/workspaces/triggers",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "PowerBI Metadata",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Day",
+						"interval": 30,
+						"startTime": "2023-05-12T23:50:00Z",
+						"timeZone": "UTC",
+						"schedule": {
+							"minutes": [
+								50
+							],
+							"hours": [
+								23
+							]
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/pipelines/PowerBI Metadata')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/Trigger_m')]",
 			"type": "Microsoft.Synapse/workspaces/triggers",
 			"apiVersion": "2019-06-01-preview",
@@ -7970,7 +8058,7 @@
 					"name": "Twitch"
 				},
 				"content": {
-					"query": "/*SELECT [id], [login], [display_name], [view_count], [created_at], [language], [followers]\nFROM [Twitch].[Streamers]\nWHERE [login] IN (\n  SELECT [login] \n  FROM [Twitch].[Streamers] \n  GROUP BY [login] \n  HAVING COUNT(*) > 1\n);*/\n\nALTER TABLE [Twitch].[Streamers]\nDROP COLUMN type, broadcaster_type;\n\nSELECT *\nFROM [Twitch].[Streamers]\n\n",
+					"query": "/*SELECT [id], [login], [display_name], [view_count], [created_at], [language], [followers]\nFROM [Twitch].[Streamers]\nWHERE [login] IN (\n  SELECT [login] \n  FROM [Twitch].[Streamers] \n  GROUP BY [login] \n  HAVING COUNT(*) > 1\n);*/\n\n-- ALTER TABLE [Twitch].[Streamers]\n-- DROP COLUMN type, broadcaster_type;\n\nSELECT *\nFROM [Twitch].[Streamers]\n\n",
 					"metadata": {
 						"language": "sql"
 					},
@@ -11775,7 +11863,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "1",
 						"spark.dynamicAllocation.maxExecutors": "1",
-						"spark.autotune.trackingId": "17c52917-38bf-4f2d-ac2a-8965d5d0637f"
+						"spark.autotune.trackingId": "75198b02-1e46-4098-a1fd-47afcf1c5148"
 					}
 				},
 				"metadata": {
@@ -11840,7 +11928,7 @@
 							"from datetime import datetime, timezone, timedelta"
 						],
 						"outputs": [],
-						"execution_count": 3
+						"execution_count": 14
 					},
 					{
 						"cell_type": "code",
@@ -11864,7 +11952,7 @@
 							"        pass"
 						],
 						"outputs": [],
-						"execution_count": 4
+						"execution_count": 15
 					},
 					{
 						"cell_type": "markdown",
@@ -11899,7 +11987,7 @@
 							"account_password = mssparkutils.credentials.getSecretWithLS('ls_keyvault', 'PBIMetadataClientUserAndPassword')"
 						],
 						"outputs": [],
-						"execution_count": 52
+						"execution_count": 16
 					},
 					{
 						"cell_type": "code",
@@ -11923,7 +12011,7 @@
 							"headers[\"Authorization\"] = \"Bearer \" + access_token"
 						],
 						"outputs": [],
-						"execution_count": 53
+						"execution_count": 17
 					},
 					{
 						"cell_type": "markdown",
@@ -11963,7 +12051,7 @@
 							"#print(groups_df.head())"
 						],
 						"outputs": [],
-						"execution_count": 54
+						"execution_count": 18
 					},
 					{
 						"cell_type": "markdown",
@@ -12013,7 +12101,7 @@
 							"mssparkutils.fs.put(\"/PBIMetadata/Resources.csv\", data_df.to_csv(index=False), True)"
 						],
 						"outputs": [],
-						"execution_count": 55
+						"execution_count": 19
 					},
 					{
 						"cell_type": "markdown",
@@ -12058,7 +12146,7 @@
 							"#print(pages_df.shape)"
 						],
 						"outputs": [],
-						"execution_count": 56
+						"execution_count": 20
 					},
 					{
 						"cell_type": "markdown",
@@ -12111,7 +12199,7 @@
 							"#print(datasources_df.shape)"
 						],
 						"outputs": [],
-						"execution_count": 57
+						"execution_count": 21
 					},
 					{
 						"cell_type": "markdown",
@@ -12153,17 +12241,18 @@
 							"        url += \"transactions\"\r\n",
 							"    resp = requests.get(url, headers=headers)\r\n",
 							"    obj = resp.json()\r\n",
-							"    new_df = pd.DataFrame()\r\n",
-							"    new_df = pd.DataFrame.from_records(obj[\"value\"])\r\n",
-							"    new_df[\"resource_id\"] = id_\r\n",
-							"    new_df[\"group_id\"] = group\r\n",
-							"    new_df[\"resource_type\"] = type_[:-1]\r\n",
-							"    refresh_df = pd.concat([refresh_df,new_df],ignore_index=True)\r\n",
+							"    if \"value\" in obj.keys(): # Direct query or live-connection based datasets will return error.\r\n",
+							"        new_df = pd.DataFrame()\r\n",
+							"        new_df = pd.DataFrame.from_records(obj[\"value\"])\r\n",
+							"        new_df[\"resource_id\"] = id_\r\n",
+							"        new_df[\"group_id\"] = group\r\n",
+							"        new_df[\"resource_type\"] = type_[:-1]\r\n",
+							"        refresh_df = pd.concat([refresh_df,new_df],ignore_index=True)\r\n",
 							"mssparkutils.fs.put(\"/PBIMetadata/RefreshHistory.csv\", refresh_df.to_csv(index=False), True)\r\n",
 							"#print(refresh_df.shape)"
 						],
 						"outputs": [],
-						"execution_count": 58
+						"execution_count": 22
 					},
 					{
 						"cell_type": "markdown",
@@ -12211,7 +12300,7 @@
 							"#mssparkutils.fs.put(\"/PBIMetadata/Imports.csv\", imports_df.to_csv(index=False), True)"
 						],
 						"outputs": [],
-						"execution_count": 59
+						"execution_count": 23
 					},
 					{
 						"cell_type": "code",
@@ -12246,7 +12335,7 @@
 							"mssparkutils.fs.put(\"/PBIMetadata/Resources.csv\", data_df.to_csv(index=False), True)"
 						],
 						"outputs": [],
-						"execution_count": 60
+						"execution_count": 24
 					},
 					{
 						"cell_type": "markdown",
@@ -12292,7 +12381,7 @@
 							"mssparkutils.fs.put(\"/PBIMetadata/Users.csv\", users_df.to_csv(index=False), True)"
 						],
 						"outputs": [],
-						"execution_count": 61
+						"execution_count": 25
 					},
 					{
 						"cell_type": "markdown",
