@@ -1,0 +1,24 @@
+{
+	"name": "tr_PauseDW",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "pl_Pause_or_Resume_Pool",
+					"type": "PipelineReference"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Hour",
+				"interval": 6,
+				"startTime": "2023-05-11T09:56:00Z",
+				"timeZone": "UTC"
+			}
+		}
+	}
+}
