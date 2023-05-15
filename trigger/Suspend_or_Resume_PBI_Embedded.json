@@ -1,0 +1,33 @@
+{
+	"name": "Suspend_or_Resume_PBI_Embedded",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "pl_Pause_or_Resume_PowerBI_Embedded",
+					"type": "PipelineReference"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Day",
+				"interval": 1,
+				"startTime": "2023-05-15T13:25:00Z",
+				"timeZone": "UTC",
+				"schedule": {
+					"minutes": [
+						0
+					],
+					"hours": [
+						9,
+						17
+					]
+				}
+			}
+		}
+	}
+}
