@@ -45,7 +45,7 @@
 				"typeProperties": {
 					"variableName": "Action",
 					"value": {
-						"value": "@if(\n    equals(\n        activity('GetCapacityDetails').output, \n        'Succeded'\n    ),   \n    'Pause', \n    'Resume'\n)",
+						"value": "@if(\n    equals(\n        activity('GetCapacityDetails').output, \n        'Succeeded'\n    ),   \n    'Pause', \n    'Resume'\n)",
 						"type": "Expression"
 					}
 				}
