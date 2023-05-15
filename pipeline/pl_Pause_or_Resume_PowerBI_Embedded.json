@@ -29,6 +29,105 @@
 						"resource": "https://management.azure.com/"
 					}
 				}
+			},
+			{
+				"name": "Set action",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "GetCapacityDetails",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Action",
+					"value": {
+						"value": "@if(\n    equals(\n        activity('GetCapacityDetails').output, \n        'Succeded'\n    ),   \n    'Pause', \n    'Resume'\n)",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Pause or Resume",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "Set action",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@if(\n    equals(\n        variables('Action'), \n        'Pause'\n    ), \n    true , \n    false\n)",
+						"type": "Expression"
+					},
+					"ifFalseActivities": [
+						{
+							"name": "Resume Capacity",
+							"type": "WebActivity",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"url": {
+									"value": "https://management.azure.com/subscriptions/@{pipeline().parameters.SubscriptionId}/resourceGroups/@{pipeline().parameters.resourceGroupName}/providers/Microsoft.PowerBIDedicated/capacities/@{pipeline().parameters.dedicatedCapacityName}/resume?api-version=2021-01-01",
+									"type": "Expression"
+								},
+								"connectVia": {
+									"referenceName": "AutoResolveIntegrationRuntime",
+									"type": "IntegrationRuntimeReference"
+								},
+								"method": "POST",
+								"authentication": {
+									"type": "MSI",
+									"resource": "https://management.azure.com/"
+								}
+							}
+						}
+					],
+					"ifTrueActivities": [
+						{
+							"name": "Pause Capacity",
+							"type": "WebActivity",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"url": {
+									"value": "https://management.azure.com/subscriptions/@{pipeline().parameters.SubscriptionId}/resourceGroups/@{pipeline().parameters.resourceGroupName}/providers/Microsoft.PowerBIDedicated/capacities/@{pipeline().parameters.dedicatedCapacityName}/suspend?api-version=2021-01-01",
+									"type": "Expression"
+								},
+								"connectVia": {
+									"referenceName": "AutoResolveIntegrationRuntime",
+									"type": "IntegrationRuntimeReference"
+								},
+								"method": "POST",
+								"authentication": {
+									"type": "MSI",
+									"resource": "https://management.azure.com/"
+								}
+							}
+						}
+					]
+				}
 			}
 		],
 		"parameters": {
@@ -43,6 +142,12 @@
 			"dedicatedCapacityName": {
 				"type": "string",
 				"defaultValue": "pbimbeddedpowerpages"
+			}
+		},
+		"variables": {
+			"Action": {
+				"type": "String",
+				"defaultValue": "Suspend"
 			}
 		},
 		"folder": {
