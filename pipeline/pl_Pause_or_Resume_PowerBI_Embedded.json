@@ -31,8 +31,8 @@
 				}
 			},
 			{
-				"name": "Set action",
-				"type": "SetVariable",
+				"name": "Pause or Resume",
+				"type": "IfCondition",
 				"dependsOn": [
 					{
 						"activity": "GetCapacityDetails",
@@ -43,28 +43,8 @@
 				],
 				"userProperties": [],
 				"typeProperties": {
-					"variableName": "Action",
-					"value": {
-						"value": "@if(\n    equals(\n        activity('GetCapacityDetails').output.Properties.state, \n        'Succeeded'\n    ),   \n    'Pause', \n    'Resume'\n)",
-						"type": "Expression"
-					}
-				}
-			},
-			{
-				"name": "Pause or Resume",
-				"type": "IfCondition",
-				"dependsOn": [
-					{
-						"activity": "Set action",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"userProperties": [],
-				"typeProperties": {
 					"expression": {
-						"value": "@if(\n    equals(\n        variables('Action'), \n        'Pause'\n    ), \n    true , \n    false\n)",
+						"value": "@if(\n    equals(\n        activity('GetCapacityDetails').output.Properties.state, \n        'Succeeded'\n    ), \n    true , \n    false\n)",
 						"type": "Expression"
 					},
 					"ifFalseActivities": [
@@ -142,12 +122,6 @@
 			"dedicatedCapacityName": {
 				"type": "string",
 				"defaultValue": "pbimbeddedpowerpages"
-			}
-		},
-		"variables": {
-			"Action": {
-				"type": "String",
-				"defaultValue": "Suspend"
 			}
 		},
 		"folder": {
