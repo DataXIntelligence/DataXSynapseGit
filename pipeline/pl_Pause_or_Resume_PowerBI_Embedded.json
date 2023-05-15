@@ -15,16 +15,34 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
+					"url": {
+						"value": "https://management.azure.com/subscriptions/pipeline().parameters.SubscriptionId/resourceGroups/pipeline().parameters.resourceGroupName/providers/Microsoft.PowerBIDedicated/capacities/pipeline().parameters.dedicatedCapacityName?api-version=2021-01-01",
+						"type": "Expression"
+					},
 					"connectVia": {
 						"referenceName": "AutoResolveIntegrationRuntime",
 						"type": "IntegrationRuntimeReference"
+					},
+					"method": "GET",
+					"authentication": {
+						"type": "MSI",
+						"resource": "https://management.azure.com/"
 					}
 				}
 			}
 		],
 		"parameters": {
 			"SubscriptionId": {
-				"type": "string"
+				"type": "string",
+				"defaultValue": "b2c447f4-0f0b-471d-a130-0c72330f08f2"
+			},
+			"resourceGroupName": {
+				"type": "string",
+				"defaultValue": "DataX-ResGroup"
+			},
+			"dedicatedCapacityName": {
+				"type": "string",
+				"defaultValue": "pbimbeddedpowerpages"
 			}
 		},
 		"folder": {
