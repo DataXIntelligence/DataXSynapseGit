@@ -16,7 +16,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"url": {
-						"value": "https://management.azure.com/subscriptions/pipeline().parameters.SubscriptionId/resourceGroups/pipeline().parameters.resourceGroupName/providers/Microsoft.PowerBIDedicated/capacities/pipeline().parameters.dedicatedCapacityName?api-version=2021-01-01",
+						"value": "https://management.azure.com/subscriptions/@{pipeline().parameters.SubscriptionId}/resourceGroups/@{pipeline().parameters.resourceGroupName}/providers/Microsoft.PowerBIDedicated/capacities/@{pipeline().parameters.dedicatedCapacityName}?api-version=2021-01-01",
 						"type": "Expression"
 					},
 					"connectVia": {
