@@ -40,7 +40,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"expression": {
-						"value": "@if(\n    equals(activity('GetCurrentTime').output.hour, 9),\n    true , \n    false\n)",
+						"value": "@if(\n    equals(\n        activity('GetCurrentTime').output.hour, \n        pipeline().parameters.UpTime\n    ),\n    true , \n    false\n)",
 						"type": "Expression"
 					},
 					"ifFalseActivities": [
@@ -92,6 +92,10 @@
 			"TimeZone": {
 				"type": "string",
 				"defaultValue": "Etc/UTC"
+			},
+			"UpTime": {
+				"type": "int",
+				"defaultValue": 9
 			}
 		},
 		"variables": {
