@@ -3490,6 +3490,152 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/pl_Pause_or_Resume_PowerBI_Embedded')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "GetCapacityDetails",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"url": {
+								"value": "https://management.azure.com/subscriptions/@{pipeline().parameters.SubscriptionId}/resourceGroups/@{pipeline().parameters.resourceGroupName}/providers/Microsoft.PowerBIDedicated/capacities/@{pipeline().parameters.dedicatedCapacityName}?api-version=2021-01-01",
+								"type": "Expression"
+							},
+							"connectVia": {
+								"referenceName": "AutoResolveIntegrationRuntime",
+								"type": "IntegrationRuntimeReference"
+							},
+							"method": "GET",
+							"headers": {},
+							"authentication": {
+								"type": "MSI",
+								"resource": "https://management.azure.com/"
+							}
+						}
+					},
+					{
+						"name": "Pause or Resume",
+						"type": "IfCondition",
+						"dependsOn": [
+							{
+								"activity": "GetCapacityDetails",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"expression": {
+								"value": "@if(\n    equals(\n        activity('GetCapacityDetails').output.Properties.state, \n        'Succeeded'\n    ), \n    true , \n    false\n)",
+								"type": "Expression"
+							},
+							"ifFalseActivities": [
+								{
+									"name": "Resume Capacity",
+									"type": "WebActivity",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"url": {
+											"value": "https://management.azure.com/subscriptions/@{pipeline().parameters.SubscriptionId}/resourceGroups/@{pipeline().parameters.resourceGroupName}/providers/Microsoft.PowerBIDedicated/capacities/@{pipeline().parameters.dedicatedCapacityName}/resume?api-version=2021-01-01",
+											"type": "Expression"
+										},
+										"connectVia": {
+											"referenceName": "AutoResolveIntegrationRuntime",
+											"type": "IntegrationRuntimeReference"
+										},
+										"method": "POST",
+										"headers": {},
+										"body": {},
+										"authentication": {
+											"type": "MSI",
+											"resource": "https://management.azure.com/"
+										}
+									}
+								}
+							],
+							"ifTrueActivities": [
+								{
+									"name": "Pause Capacity",
+									"type": "WebActivity",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"url": {
+											"value": "https://management.azure.com/subscriptions/@{pipeline().parameters.SubscriptionId}/resourceGroups/@{pipeline().parameters.resourceGroupName}/providers/Microsoft.PowerBIDedicated/capacities/@{pipeline().parameters.dedicatedCapacityName}/suspend?api-version=2021-01-01",
+											"type": "Expression"
+										},
+										"connectVia": {
+											"referenceName": "AutoResolveIntegrationRuntime",
+											"type": "IntegrationRuntimeReference"
+										},
+										"method": "POST",
+										"headers": {},
+										"body": {},
+										"authentication": {
+											"type": "MSI",
+											"resource": "https://management.azure.com/"
+										}
+									}
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"SubscriptionId": {
+						"type": "string",
+						"defaultValue": "b2c447f4-0f0b-471d-a130-0c72330f08f2"
+					},
+					"resourceGroupName": {
+						"type": "string",
+						"defaultValue": "DataX-ResGroup"
+					},
+					"dedicatedCapacityName": {
+						"type": "string",
+						"defaultValue": "pbimbeddedpowerpages"
+					}
+				},
+				"folder": {
+					"name": "Other"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/pl_anonymize_excel_and_upload_to_DW')]",
 			"type": "Microsoft.Synapse/workspaces/pipelines",
 			"apiVersion": "2019-06-01-preview",
@@ -7851,6 +7997,45 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/Suspend_or_Resume_PBI_Embedded')]",
+			"type": "Microsoft.Synapse/workspaces/triggers",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "pl_Pause_or_Resume_PowerBI_Embedded",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Day",
+						"interval": 1,
+						"startTime": "2023-05-15T13:25:00Z",
+						"timeZone": "UTC",
+						"schedule": {
+							"minutes": [
+								0
+							],
+							"hours": [
+								9,
+								17
+							]
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/pipelines/pl_Pause_or_Resume_PowerBI_Embedded')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/Trigger_m')]",
 			"type": "Microsoft.Synapse/workspaces/triggers",
 			"apiVersion": "2019-06-01-preview",
@@ -7965,6 +8150,36 @@
 			},
 			"dependsOn": [
 				"[concat(variables('workspaceId'), '/pipelines/Twitch Streamer Data Pipeline')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/tr_PauseDW')]",
+			"type": "Microsoft.Synapse/workspaces/triggers",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "pl_Pause_or_Resume_Pool",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Hour",
+						"interval": 6,
+						"startTime": "2023-05-11T09:56:00Z",
+						"timeZone": "UTC"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/pipelines/pl_Pause_or_Resume_Pool')]"
 			]
 		},
 		{
@@ -14121,18 +14336,18 @@
 					"delayInMinutes": 15
 				},
 				"autoScale": {
-					"enabled": true,
+					"enabled": false,
 					"maxNodeCount": 5,
 					"minNodeCount": 3
 				},
-				"nodeCount": 10,
+				"nodeCount": 3,
 				"nodeSize": "Small",
 				"nodeSizeFamily": "MemoryOptimized",
 				"sparkVersion": "3.1",
 				"libraryRequirements": {
 					"content": "azure-storage-file-datalake\r\ngoogle-api-python-client\r\ngoogle-cloud-bigquery-storage\r\ngoogle-cloud-bigquery==1.25.0\r\nfacebook-business==12.0.0\r\ngoogle-cloud-storage\r\ngoogle-auth-httplib2\r\npandas\r\npython-adjust\r\noauth2client\r\ngoogle-auth\r\ngoogleads\r\nhttplib2\r\ncertifi\r\nadjusty\r\ngoogle\r\nrauth\r\nxlrd\r\ngspread\r\ngoogle-ads",
 					"filename": "requirementsDataX (1) (1) (1).txt",
-					"time": "2022-05-13T14:37:57.9300786Z"
+					"time": "2023-05-11T09:58:42.8841462Z"
 				},
 				"isComputeIsolationEnabled": false,
 				"sessionLevelPackagesEnabled": true,
