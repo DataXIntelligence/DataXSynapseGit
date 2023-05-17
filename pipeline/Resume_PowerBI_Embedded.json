@@ -1,0 +1,102 @@
+{
+	"name": "Resume_PowerBI_Embedded",
+	"properties": {
+		"activities": [
+			{
+				"name": "GetCapacityDetails",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": {
+						"value": "https://management.azure.com/subscriptions/@{pipeline().parameters.SubscriptionId}/resourceGroups/@{pipeline().parameters.resourceGroupName}/providers/Microsoft.PowerBIDedicated/capacities/@{pipeline().parameters.dedicatedCapacityName}?api-version=2021-01-01",
+						"type": "Expression"
+					},
+					"connectVia": {
+						"referenceName": "AutoResolveIntegrationRuntime",
+						"type": "IntegrationRuntimeReference"
+					},
+					"method": "GET",
+					"authentication": {
+						"type": "MSI",
+						"resource": "https://management.azure.com/"
+					}
+				}
+			},
+			{
+				"name": "Check if capacity is Paused",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "GetCapacityDetails",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@if(\n    equals(\n        activity('GetCapacityDetails').output.Properties.state, \n        'Paused'\n    ), \n    true , \n    false\n)",
+						"type": "Expression"
+					},
+					"ifTrueActivities": [
+						{
+							"name": "Resume Capacity",
+							"type": "WebActivity",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"url": {
+									"value": "https://management.azure.com/subscriptions/@{pipeline().parameters.SubscriptionId}/resourceGroups/@{pipeline().parameters.resourceGroupName}/providers/Microsoft.PowerBIDedicated/capacities/@{pipeline().parameters.dedicatedCapacityName}/resume?api-version=2021-01-01",
+									"type": "Expression"
+								},
+								"connectVia": {
+									"referenceName": "AutoResolveIntegrationRuntime",
+									"type": "IntegrationRuntimeReference"
+								},
+								"method": "POST",
+								"authentication": {
+									"type": "MSI",
+									"resource": "https://management.azure.com/"
+								}
+							}
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"SubscriptionId": {
+				"type": "string",
+				"defaultValue": "b2c447f4-0f0b-471d-a130-0c72330f08f2"
+			},
+			"resourceGroupName": {
+				"type": "string",
+				"defaultValue": "DataX-ResGroup"
+			},
+			"dedicatedCapacityName": {
+				"type": "string",
+				"defaultValue": "pbimbeddedpowerpages"
+			}
+		},
+		"folder": {
+			"name": "PowerBI"
+		},
+		"annotations": []
+	}
+}

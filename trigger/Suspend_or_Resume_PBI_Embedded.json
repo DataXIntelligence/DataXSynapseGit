@@ -6,7 +6,7 @@
 		"pipelines": [
 			{
 				"pipelineReference": {
-					"referenceName": "pl_Pause_or_Resume_PowerBI_Embedded",
+					"referenceName": "Pause_or_Resume_PowerBI_Embedded",
 					"type": "PipelineReference"
 				}
 			}

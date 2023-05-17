@@ -1,9 +1,9 @@
 {
-	"name": "pl_Pause_or_Resume_PowerBI_Embedded",
+	"name": "Pause_or_Resume_PowerBI_Embedded",
 	"properties": {
 		"activities": [
 			{
-				"name": "GetCapacityDetails",
+				"name": "GetCurrentTime",
 				"type": "WebActivity",
 				"dependsOn": [],
 				"policy": {
@@ -16,26 +16,22 @@
 				"userProperties": [],
 				"typeProperties": {
 					"url": {
-						"value": "https://management.azure.com/subscriptions/@{pipeline().parameters.SubscriptionId}/resourceGroups/@{pipeline().parameters.resourceGroupName}/providers/Microsoft.PowerBIDedicated/capacities/@{pipeline().parameters.dedicatedCapacityName}?api-version=2021-01-01",
+						"value": "https://www.timeapi.io/api/Time/current/zone?timeZone=@{pipeline().parameters.TimeZone}",
 						"type": "Expression"
 					},
 					"connectVia": {
 						"referenceName": "AutoResolveIntegrationRuntime",
 						"type": "IntegrationRuntimeReference"
 					},
-					"method": "GET",
-					"authentication": {
-						"type": "MSI",
-						"resource": "https://management.azure.com/"
-					}
+					"method": "GET"
 				}
 			},
 			{
-				"name": "Pause or Resume",
+				"name": "Check current time",
 				"type": "IfCondition",
 				"dependsOn": [
 					{
-						"activity": "GetCapacityDetails",
+						"activity": "GetCurrentTime",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -44,66 +40,36 @@
 				"userProperties": [],
 				"typeProperties": {
 					"expression": {
-						"value": "@if(\n    equals(\n        activity('GetCapacityDetails').output.Properties.state, \n        'Succeeded'\n    ), \n    true , \n    false\n)",
+						"value": "@if(\n    equals(activity('GetCurrentTime').output.hour, 9),\n    true , \n    false\n)",
 						"type": "Expression"
 					},
 					"ifFalseActivities": [
 						{
-							"name": "Resume Capacity",
-							"type": "WebActivity",
+							"name": "Pause Pipeline",
+							"type": "ExecutePipeline",
 							"dependsOn": [],
-							"policy": {
-								"timeout": "0.12:00:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
-							},
 							"userProperties": [],
 							"typeProperties": {
-								"url": {
-									"value": "https://management.azure.com/subscriptions/@{pipeline().parameters.SubscriptionId}/resourceGroups/@{pipeline().parameters.resourceGroupName}/providers/Microsoft.PowerBIDedicated/capacities/@{pipeline().parameters.dedicatedCapacityName}/resume?api-version=2021-01-01",
-									"type": "Expression"
+								"pipeline": {
+									"referenceName": "Pause_PowerBI_Embedded",
+									"type": "PipelineReference"
 								},
-								"connectVia": {
-									"referenceName": "AutoResolveIntegrationRuntime",
-									"type": "IntegrationRuntimeReference"
-								},
-								"method": "POST",
-								"authentication": {
-									"type": "MSI",
-									"resource": "https://management.azure.com/"
-								}
+								"waitOnCompletion": true
 							}
 						}
 					],
 					"ifTrueActivities": [
 						{
-							"name": "Pause Capacity",
-							"type": "WebActivity",
+							"name": "Resume Pipeline",
+							"type": "ExecutePipeline",
 							"dependsOn": [],
-							"policy": {
-								"timeout": "0.12:00:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
-							},
 							"userProperties": [],
 							"typeProperties": {
-								"url": {
-									"value": "https://management.azure.com/subscriptions/@{pipeline().parameters.SubscriptionId}/resourceGroups/@{pipeline().parameters.resourceGroupName}/providers/Microsoft.PowerBIDedicated/capacities/@{pipeline().parameters.dedicatedCapacityName}/suspend?api-version=2021-01-01",
-									"type": "Expression"
+								"pipeline": {
+									"referenceName": "Resume_PowerBI_Embedded",
+									"type": "PipelineReference"
 								},
-								"connectVia": {
-									"referenceName": "AutoResolveIntegrationRuntime",
-									"type": "IntegrationRuntimeReference"
-								},
-								"method": "POST",
-								"authentication": {
-									"type": "MSI",
-									"resource": "https://management.azure.com/"
-								}
+								"waitOnCompletion": true
 							}
 						}
 					]
@@ -122,10 +88,19 @@
 			"dedicatedCapacityName": {
 				"type": "string",
 				"defaultValue": "pbimbeddedpowerpages"
+			},
+			"TimeZone": {
+				"type": "string",
+				"defaultValue": "Etc/UTC"
+			}
+		},
+		"variables": {
+			"Time": {
+				"type": "String"
 			}
 		},
 		"folder": {
-			"name": "Other"
+			"name": "PowerBI"
 		},
 		"annotations": []
 	}
