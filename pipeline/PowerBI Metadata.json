@@ -7,7 +7,7 @@
 				"type": "SynapseNotebook",
 				"dependsOn": [
 					{
-						"activity": "Copy groups",
+						"activity": "Copy Groups",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -42,7 +42,7 @@
 				}
 			},
 			{
-				"name": "Copy groups",
+				"name": "Copy Groups",
 				"type": "Copy",
 				"dependsOn": [],
 				"policy": {
@@ -76,13 +76,24 @@
 						"mappings": [
 							{
 								"source": {
-									"name": "capacityId",
+									"name": "id",
 									"type": "String",
 									"physicalType": "String"
 								},
 								"sink": {
-									"name": "cr64d_capacityid",
+									"name": "cr64d_id",
 									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "isReadOnly",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_isreadonly",
+									"type": "Boolean"
 								}
 							},
 							{
@@ -94,15 +105,6 @@
 								"sink": {
 									"name": "cr64d_isondedicatedcapacity",
 									"type": "Boolean"
-								}
-							},
-							{
-								"source": {
-									"name": "id",
-									"physicalType": "String"
-								},
-								"sink": {
-									"name": "cr64d_GroupsId"
 								}
 							},
 							{
@@ -129,24 +131,24 @@
 							},
 							{
 								"source": {
-									"name": "id",
+									"name": "capacityId",
 									"type": "String",
 									"physicalType": "String"
 								},
 								"sink": {
-									"name": "cr64d_id",
+									"name": "cr64d_capacityid",
 									"type": "String"
 								}
 							},
 							{
 								"source": {
-									"name": "isReadOnly",
+									"name": "id_duplicate",
 									"type": "String",
 									"physicalType": "String"
 								},
 								"sink": {
-									"name": "cr64d_isreadonly",
-									"type": "Boolean"
+									"name": "cr64d_groupsid",
+									"type": "Guid"
 								}
 							}
 						],
