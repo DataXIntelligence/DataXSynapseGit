@@ -9,21 +9,52 @@
 						"referenceName": "Groups",
 						"type": "DatasetReference"
 					},
-					"name": "source1"
+					"name": "GroupsSource"
+				},
+				{
+					"dataset": {
+						"referenceName": "Users",
+						"type": "DatasetReference"
+					},
+					"name": "UsersSource"
+				},
+				{
+					"dataset": {
+						"referenceName": "Activity_Events",
+						"type": "DatasetReference"
+					},
+					"name": "ActivityEventsSource"
 				}
 			],
 			"sinks": [
 				{
 					"dataset": {
-						"referenceName": "DataverseGroups",
+						"referenceName": "GroupsDataverse",
 						"type": "DatasetReference"
 					},
-					"name": "sink1"
+					"name": "GroupsSink"
+				},
+				{
+					"dataset": {
+						"referenceName": "UsersDataverse",
+						"type": "DatasetReference"
+					},
+					"name": "UsersSink"
+				},
+				{
+					"dataset": {
+						"referenceName": "ActivityEventsDataverse",
+						"type": "DatasetReference"
+					},
+					"name": "ActivityEventsSink"
 				}
 			],
 			"transformations": [
 				{
-					"name": "AlterRow1"
+					"name": "AlterRowGroups"
+				},
+				{
+					"name": "AlterRowUsers"
 				}
 			],
 			"scriptLines": [
@@ -39,9 +70,107 @@
 				"     ),",
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     ignoreNoFilesFound: false) ~> source1",
-				"source1 alterRow(deleteIf(true())) ~> AlterRow1",
-				"AlterRow1 sink(allowSchemaDrift: true,",
+				"     ignoreNoFilesFound: false) ~> GroupsSource",
+				"source(output(",
+				"          emailAddress as string,",
+				"          groupUserAccessRight as string,",
+				"          displayName as string,",
+				"          identifier as string,",
+				"          principalType as string,",
+				"          group_id as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> UsersSource",
+				"source(output(",
+				"          Id as string,",
+				"          RecordType as string,",
+				"          CreationTime as string,",
+				"          Operation as string,",
+				"          OrganizationId as string,",
+				"          UserType as string,",
+				"          UserKey as string,",
+				"          Workload as string,",
+				"          UserId as string,",
+				"          ClientIP as string,",
+				"          UserAgent as string,",
+				"          Activity as string,",
+				"          ItemName as string,",
+				"          WorkSpaceName as string,",
+				"          CapacityId as string,",
+				"          CapacityName as string,",
+				"          WorkspaceId as string,",
+				"          ObjectId as string,",
+				"          DataflowId as string,",
+				"          DataflowName as string,",
+				"          DataflowAccessTokenRequestParameters as string,",
+				"          IsSuccess as string,",
+				"          DataflowType as string,",
+				"          RequestId as string,",
+				"          ActivityId as string,",
+				"          ResourceId as string,",
+				"          ExportEventStartDateTimeParameter as string,",
+				"          ExportEventEndDateTimeParameter as string,",
+				"          DatasetName as string,",
+				"          ReportName as string,",
+				"          DatasetId as string,",
+				"          ReportId as string,",
+				"          ArtifactId as string,",
+				"          ArtifactName as string,",
+				"          ReportType as string,",
+				"          DistributionMethod as string,",
+				"          ConsumptionMethod as string,",
+				"          ArtifactKind as string,",
+				"          ModelsSnapshots as string,",
+				"          HasFullReportAttachment as string,",
+				"          GatewayId as string,",
+				"          DatasourceId as string,",
+				"          DataflowRefreshScheduleType as string,",
+				"          DataConnectivityMode as string,",
+				"          RefreshType as string,",
+				"          LastRefreshTime as string,",
+				"          ExportEventActivityTypeParameter as string,",
+				"          DashboardName as string,",
+				"          DashboardId as string,",
+				"          Datasets as string,",
+				"          ImportId as string,",
+				"          ImportSource as string,",
+				"          ImportType as string,",
+				"          ImportDisplayName as string,",
+				"          FolderObjectId as string,",
+				"          FolderDisplayName as string,",
+				"          FolderAccessRequests as string,",
+				"          AppName as string,",
+				"          AppReportId as string,",
+				"          AppId as string,",
+				"          TemplateAppObjectId as string,",
+				"          TemplatePackageName as string,",
+				"          TemplateAppVersion as string,",
+				"          TemplateAppOwnerTenantObjectId as string,",
+				"          TemplateAppFolderObjectId as string,",
+				"          IsUpdateAppActivity as string,",
+				"          IsTemplateAppFromMarketplace as string,",
+				"          TemplateAppIsInstalledWithAutomation as string,",
+				"          Schedules as string,",
+				"          CustomVisualAccessTokenResourceId as string,",
+				"          CustomVisualAccessTokenSiteUri as string,",
+				"          EmbedTokenId as string,",
+				"          ArtifactObjectId as string,",
+				"          ResultStatus as string,",
+				"          ObjectType as string,",
+				"          ObjectDisplayName as string,",
+				"          Experience as string,",
+				"          AggregatedWorkspaceInformation as string,",
+				"          InPlaceSharingEnabled as string,",
+				"          IsTenantAdminApi as string,",
+				"          GatewayClusters as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> ActivityEventsSource",
+				"GroupsSource alterRow(deleteIf(true())) ~> AlterRowGroups",
+				"UsersSource alterRow(deleteIf(true())) ~> AlterRowUsers",
+				"AlterRowGroups sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     deletable:true,",
 				"     insertable:false,",
@@ -58,7 +187,23 @@
 				"          cr64d_name = name,",
 				"          cr64d_capacityId = capacityId,",
 				"          cr64d_groupsid = id_duplicate",
-				"     )) ~> sink1"
+				"     )) ~> GroupsSink",
+				"AlterRowUsers sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:true,",
+				"     insertable:false,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> UsersSink",
+				"ActivityEventsSource sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> ActivityEventsSink"
 			]
 		}
 	}

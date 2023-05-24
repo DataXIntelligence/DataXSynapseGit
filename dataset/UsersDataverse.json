@@ -1,5 +1,5 @@
 {
-	"name": "GroupsDataverse",
+	"name": "UsersDataverse",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "ls_Dataverse",
@@ -9,7 +9,7 @@
 		"type": "CommonDataServiceForAppsEntity",
 		"schema": [],
 		"typeProperties": {
-			"entityName": "cr64d_groups"
+			"entityName": "cr64d_users"
 		}
 	}
 }
