@@ -1,0 +1,133 @@
+{
+	"name": "Resources",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "dataxsynapsedev-WorkspaceDefaultStorage",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "Resources.csv",
+				"folderPath": "PBIMetadata",
+				"fileSystem": "dataxsynapsefs"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "id",
+				"type": "String"
+			},
+			{
+				"name": "name",
+				"type": "String"
+			},
+			{
+				"name": "webUrl",
+				"type": "String"
+			},
+			{
+				"name": "addRowsAPIEnabled",
+				"type": "String"
+			},
+			{
+				"name": "configuredBy",
+				"type": "String"
+			},
+			{
+				"name": "isRefreshable",
+				"type": "String"
+			},
+			{
+				"name": "isEffectiveIdentityRequired",
+				"type": "String"
+			},
+			{
+				"name": "isEffectiveIdentityRolesRequired",
+				"type": "String"
+			},
+			{
+				"name": "targetStorageMode",
+				"type": "String"
+			},
+			{
+				"name": "createdDate",
+				"type": "String"
+			},
+			{
+				"name": "createReportEmbedURL",
+				"type": "String"
+			},
+			{
+				"name": "qnaEmbedURL",
+				"type": "String"
+			},
+			{
+				"name": "upstreamDatasets",
+				"type": "String"
+			},
+			{
+				"name": "users",
+				"type": "String"
+			},
+			{
+				"name": "queryScaleOutSettings",
+				"type": "String"
+			},
+			{
+				"name": "group_id",
+				"type": "String"
+			},
+			{
+				"name": "type",
+				"type": "String"
+			},
+			{
+				"name": "objectId",
+				"type": "String"
+			},
+			{
+				"name": "description",
+				"type": "String"
+			},
+			{
+				"name": "reportType",
+				"type": "String"
+			},
+			{
+				"name": "embedUrl",
+				"type": "String"
+			},
+			{
+				"name": "isFromPbix",
+				"type": "String"
+			},
+			{
+				"name": "isOwnedByMe",
+				"type": "String"
+			},
+			{
+				"name": "datasetId",
+				"type": "String"
+			},
+			{
+				"name": "datasetWorkspaceId",
+				"type": "String"
+			},
+			{
+				"name": "subscriptions",
+				"type": "String"
+			},
+			{
+				"name": "isOnPremGatewayRequired",
+				"type": "String"
+			}
+		]
+	}
+}
