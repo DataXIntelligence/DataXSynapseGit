@@ -47,6 +47,10 @@
 			{
 				"name": "defaultDatasetStorageFormat",
 				"type": "String"
+			},
+			{
+				"name": "id_duplicate",
+				"type": "String"
 			}
 		]
 	}
