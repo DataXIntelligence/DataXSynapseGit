@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "1",
 				"spark.dynamicAllocation.maxExecutors": "1",
-				"spark.autotune.trackingId": "75198b02-1e46-4098-a1fd-47afcf1c5148"
+				"spark.autotune.trackingId": "ec6ffb03-2855-4b90-9e32-196d7fda751f"
 			}
 		},
 		"metadata": {
@@ -41,7 +41,7 @@
 					"authResource": "https://dev.azuresynapse.net"
 				},
 				"sparkVersion": "3.1",
-				"nodeCount": 10,
+				"nodeCount": 3,
 				"cores": 4,
 				"memory": 28,
 				"automaticScaleJobs": false
@@ -83,7 +83,7 @@
 					"import pandas as pd\r\n",
 					"from datetime import datetime, timezone, timedelta"
 				],
-				"execution_count": 14
+				"execution_count": 2
 			},
 			{
 				"cell_type": "code",
@@ -106,7 +106,7 @@
 					"    except:\r\n",
 					"        pass"
 				],
-				"execution_count": 15
+				"execution_count": 3
 			},
 			{
 				"cell_type": "markdown",
@@ -140,7 +140,7 @@
 					"client_secret = mssparkutils.credentials.getSecretWithLS('ls_keyvault', 'PBIMetadataClientSecret')\r\n",
 					"account_password = mssparkutils.credentials.getSecretWithLS('ls_keyvault', 'PBIMetadataClientUserAndPassword')"
 				],
-				"execution_count": 16
+				"execution_count": 4
 			},
 			{
 				"cell_type": "code",
@@ -163,7 +163,7 @@
 					"headers = CaseInsensitiveDict()\r\n",
 					"headers[\"Authorization\"] = \"Bearer \" + access_token"
 				],
-				"execution_count": 17
+				"execution_count": 5
 			},
 			{
 				"cell_type": "markdown",
@@ -202,7 +202,7 @@
 					"mssparkutils.fs.put(\"/PBIMetadata/Groups.csv\", groups_df.to_csv(index=False), True)\r\n",
 					"#print(groups_df.head())"
 				],
-				"execution_count": 18
+				"execution_count": 6
 			},
 			{
 				"cell_type": "markdown",
@@ -251,7 +251,7 @@
 					"#print(data_df.shape)\r\n",
 					"mssparkutils.fs.put(\"/PBIMetadata/Resources.csv\", data_df.to_csv(index=False), True)"
 				],
-				"execution_count": 19
+				"execution_count": 7
 			},
 			{
 				"cell_type": "markdown",
@@ -277,7 +277,8 @@
 						"transient": {
 							"deleting": false
 						}
-					}
+					},
+					"collapsed": false
 				},
 				"source": [
 					"report_df = data_df[data_df[\"type\"] == \"report\"]\r\n",
@@ -291,11 +292,12 @@
 					"    new_df = pd.DataFrame.from_records(obj[\"value\"])\r\n",
 					"    new_df[\"report_id\"] = id_\r\n",
 					"    new_df[\"group_id\"] = group\r\n",
+					"    new_df[\"Id\"] = new_df.report_id.map(str) + new_df.name\r\n",
 					"    pages_df = pd.concat([pages_df,new_df],ignore_index=True)\r\n",
 					"mssparkutils.fs.put(\"/PBIMetadata/ReportPages.csv\", pages_df.to_csv(index=False), True)\r\n",
 					"#print(pages_df.shape)"
 				],
-				"execution_count": 20
+				"execution_count": 15
 			},
 			{
 				"cell_type": "markdown",
