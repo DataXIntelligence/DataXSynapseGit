@@ -1,0 +1,49 @@
+{
+	"name": "Users",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "dataxsynapsedev-WorkspaceDefaultStorage",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "Users.csv",
+				"folderPath": "PBIMetadata",
+				"fileSystem": "dataxsynapsefs"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "emailAddress",
+				"type": "String"
+			},
+			{
+				"name": "groupUserAccessRight",
+				"type": "String"
+			},
+			{
+				"name": "displayName",
+				"type": "String"
+			},
+			{
+				"name": "identifier",
+				"type": "String"
+			},
+			{
+				"name": "principalType",
+				"type": "String"
+			},
+			{
+				"name": "group_id",
+				"type": "String"
+			}
+		]
+	}
+}
