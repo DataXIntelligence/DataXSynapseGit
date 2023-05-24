@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "1",
 				"spark.dynamicAllocation.maxExecutors": "1",
-				"spark.autotune.trackingId": "ec6ffb03-2855-4b90-9e32-196d7fda751f"
+				"spark.autotune.trackingId": "76203906-4757-43f1-946c-101f8fc03e54"
 			}
 		},
 		"metadata": {
@@ -83,7 +83,7 @@
 					"import pandas as pd\r\n",
 					"from datetime import datetime, timezone, timedelta"
 				],
-				"execution_count": 2
+				"execution_count": 24
 			},
 			{
 				"cell_type": "code",
@@ -106,7 +106,7 @@
 					"    except:\r\n",
 					"        pass"
 				],
-				"execution_count": 3
+				"execution_count": 25
 			},
 			{
 				"cell_type": "markdown",
@@ -140,7 +140,7 @@
 					"client_secret = mssparkutils.credentials.getSecretWithLS('ls_keyvault', 'PBIMetadataClientSecret')\r\n",
 					"account_password = mssparkutils.credentials.getSecretWithLS('ls_keyvault', 'PBIMetadataClientUserAndPassword')"
 				],
-				"execution_count": 4
+				"execution_count": 26
 			},
 			{
 				"cell_type": "code",
@@ -163,7 +163,7 @@
 					"headers = CaseInsensitiveDict()\r\n",
 					"headers[\"Authorization\"] = \"Bearer \" + access_token"
 				],
-				"execution_count": 5
+				"execution_count": 27
 			},
 			{
 				"cell_type": "markdown",
@@ -199,10 +199,11 @@
 					"obj = resp.json()\r\n",
 					"\r\n",
 					"groups_df = pd.DataFrame.from_records(obj[\"value\"])\r\n",
+					"groups_df[\"id_duplicate\"] = groups_df[\"id\"]\r\n",
 					"mssparkutils.fs.put(\"/PBIMetadata/Groups.csv\", groups_df.to_csv(index=False), True)\r\n",
 					"#print(groups_df.head())"
 				],
-				"execution_count": 6
+				"execution_count": 28
 			},
 			{
 				"cell_type": "markdown",
@@ -249,9 +250,10 @@
 					"        data_df = pd.concat([data_df,new_df],ignore_index=True)\r\n",
 					"\r\n",
 					"#print(data_df.shape)\r\n",
+					"data_df[\"id_duplicate\"] = data_df[\"id\"]\r\n",
 					"mssparkutils.fs.put(\"/PBIMetadata/Resources.csv\", data_df.to_csv(index=False), True)"
 				],
-				"execution_count": 7
+				"execution_count": 31
 			},
 			{
 				"cell_type": "markdown",
@@ -293,11 +295,12 @@
 					"    new_df[\"report_id\"] = id_\r\n",
 					"    new_df[\"group_id\"] = group\r\n",
 					"    new_df[\"Id\"] = new_df.report_id.map(str) + new_df.name\r\n",
+					"    new_df[\"Id_duplicate\"] = new_df[\"Id\"]\r\n",
 					"    pages_df = pd.concat([pages_df,new_df],ignore_index=True)\r\n",
 					"mssparkutils.fs.put(\"/PBIMetadata/ReportPages.csv\", pages_df.to_csv(index=False), True)\r\n",
 					"#print(pages_df.shape)"
 				],
-				"execution_count": 15
+				"execution_count": 32
 			},
 			{
 				"cell_type": "markdown",
@@ -344,12 +347,13 @@
 					"            new_df[\"group_id\"] = group\r\n",
 					"            new_df[\"resource_type\"] = resource[:-1]\r\n",
 					"            new_df[\"id\"] = new_df[\"datasourceId\"]\r\n",
+					"            new_df[\"id_duplicate\"] = new_df[\"id\"]\r\n",
 					"            new_df = pd.concat([new_df.drop(['connectionDetails'], axis=1), new_df['connectionDetails'].apply(pd.Series)], axis=1)\r\n",
 					"    datasources_df = pd.concat([datasources_df,new_df],ignore_index=True)\r\n",
 					"mssparkutils.fs.put(\"/PBIMetadata/Datasources.csv\", datasources_df.to_csv(index=False), True)\r\n",
 					"#print(datasources_df.shape)"
 				],
-				"execution_count": 21
+				"execution_count": 33
 			},
 			{
 				"cell_type": "markdown",
@@ -398,10 +402,11 @@
 					"        new_df[\"group_id\"] = group\r\n",
 					"        new_df[\"resource_type\"] = type_[:-1]\r\n",
 					"        refresh_df = pd.concat([refresh_df,new_df],ignore_index=True)\r\n",
+					"refresh_df[\"id_duplicate\"] = refresh_df[\"id\"]\r\n",
 					"mssparkutils.fs.put(\"/PBIMetadata/RefreshHistory.csv\", refresh_df.to_csv(index=False), True)\r\n",
 					"#print(refresh_df.shape)"
 				],
-				"execution_count": 22
+				"execution_count": 35
 			},
 			{
 				"cell_type": "markdown",
@@ -448,7 +453,7 @@
 					"\r\n",
 					"#mssparkutils.fs.put(\"/PBIMetadata/Imports.csv\", imports_df.to_csv(index=False), True)"
 				],
-				"execution_count": 23
+				"execution_count": 36
 			},
 			{
 				"cell_type": "code",
@@ -482,7 +487,7 @@
 					"data_df.loc[data_df[\"isFromPbix\"] != \"TRUE\", \"isFromPbix\"] = \"FALSE\"\r\n",
 					"mssparkutils.fs.put(\"/PBIMetadata/Resources.csv\", data_df.to_csv(index=False), True)"
 				],
-				"execution_count": 24
+				"execution_count": 37
 			},
 			{
 				"cell_type": "markdown",
@@ -521,13 +526,14 @@
 					"    obj = resp.json()\r\n",
 					"    new_df = pd.DataFrame.from_records(obj[\"value\"])\r\n",
 					"    new_df[\"group_id\"] = group\r\n",
+					"    new_df[\"id_duplicate\"] = new_df[\"identifier\"]\r\n",
 					"    users_df = pd.concat([users_df,new_df],ignore_index=True)\r\n",
 					"\r\n",
 					"#print(users_df.shape)\r\n",
 					"#print(users_df)\r\n",
 					"mssparkutils.fs.put(\"/PBIMetadata/Users.csv\", users_df.to_csv(index=False), True)"
 				],
-				"execution_count": 25
+				"execution_count": 38
 			},
 			{
 				"cell_type": "markdown",
@@ -560,7 +566,7 @@
 					"client_id = '95e2c30e-8533-4c18-b3c7-4718847e9f28'\r\n",
 					"tenant_id = '89248974-515e-4d65-9469-ab424abfd2d2'"
 				],
-				"execution_count": 5
+				"execution_count": 39
 			},
 			{
 				"cell_type": "code",
@@ -583,7 +589,7 @@
 					"headers = CaseInsensitiveDict()\r\n",
 					"headers[\"Authorization\"] = \"Bearer \" + access_token"
 				],
-				"execution_count": 6
+				"execution_count": 40
 			},
 			{
 				"cell_type": "markdown",
@@ -651,11 +657,12 @@
 					"        for resource in resourcesId:\r\n",
 					"            if resource in new_df.columns:\r\n",
 					"                new_df[\"ResourceId\"] = new_df[resource]\r\n",
+					"        new_df[\"id_duplicate\"] = new_df[\"Id\"]\r\n",
 					"        activity_events_df = pd.concat([activity_events_df,new_df],ignore_index=True)\r\n",
 					"#print(activity_events_df.shape)\r\n",
 					"mssparkutils.fs.put(\"/PBIMetadata/ActivityEvents.csv\", activity_events_df.to_csv(index=False), True)"
 				],
-				"execution_count": 71
+				"execution_count": 41
 			}
 		]
 	}
