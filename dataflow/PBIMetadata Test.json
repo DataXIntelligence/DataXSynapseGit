@@ -1,0 +1,65 @@
+{
+	"name": "PBIMetadata Test",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "Groups",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "DataverseGroups",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "AlterRow1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          id as string,",
+				"          isReadOnly as string,",
+				"          isOnDedicatedCapacity as string,",
+				"          type as string,",
+				"          name as string,",
+				"          capacityId as string,",
+				"          defaultDatasetStorageFormat as string,",
+				"          id_duplicate as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source1",
+				"source1 alterRow(deleteIf(true())) ~> AlterRow1",
+				"AlterRow1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:true,",
+				"     insertable:false,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     saveOrder: 1,",
+				"     mapColumn(",
+				"          cr64d_id = id,",
+				"          cr64d_isReadOnly = isReadOnly,",
+				"          cr64d_isOnDedicatedCapacity = isOnDedicatedCapacity,",
+				"          cr64d_type = type,",
+				"          cr64d_name = name,",
+				"          cr64d_capacityId = capacityId,",
+				"          cr64d_GroupsId = id_duplicate",
+				"     )) ~> sink1"
+			]
+		}
+	}
+}
