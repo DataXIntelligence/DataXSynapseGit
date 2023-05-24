@@ -57,7 +57,7 @@
 				"          cr64d_type = type,",
 				"          cr64d_name = name,",
 				"          cr64d_capacityId = capacityId,",
-				"          cr64d_GroupsId = id_duplicate",
+				"          cr64d_groupsid = id_duplicate",
 				"     )) ~> sink1"
 			]
 		}
