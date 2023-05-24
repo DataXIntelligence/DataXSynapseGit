@@ -1,0 +1,89 @@
+{
+	"name": "Datasources",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "dataxsynapsedev-WorkspaceDefaultStorage",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "Datasources.csv",
+				"folderPath": "PBIMetadata",
+				"fileSystem": "dataxsynapsefs"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "datasourceType",
+				"type": "String"
+			},
+			{
+				"name": "datasourceId",
+				"type": "String"
+			},
+			{
+				"name": "gatewayId",
+				"type": "String"
+			},
+			{
+				"name": "resource_id",
+				"type": "String"
+			},
+			{
+				"name": "group_id",
+				"type": "String"
+			},
+			{
+				"name": "resource_type",
+				"type": "String"
+			},
+			{
+				"name": "id",
+				"type": "String"
+			},
+			{
+				"name": "emailAddress",
+				"type": "String"
+			},
+			{
+				"name": "server",
+				"type": "String"
+			},
+			{
+				"name": "path",
+				"type": "String"
+			},
+			{
+				"name": "sharePointSiteUrl",
+				"type": "String"
+			},
+			{
+				"name": "url",
+				"type": "String"
+			},
+			{
+				"name": "extensionDataSourceKind",
+				"type": "String"
+			},
+			{
+				"name": "extensionDataSourcePath",
+				"type": "String"
+			},
+			{
+				"name": "database",
+				"type": "String"
+			},
+			{
+				"name": "kind",
+				"type": "String"
+			}
+		]
+	}
+}

@@ -1,0 +1,349 @@
+{
+	"name": "Activity_Events",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "dataxsynapsedev-WorkspaceDefaultStorage",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "ActivityEvents.csv",
+				"folderPath": "PBIMetadata",
+				"fileSystem": "dataxsynapsefs"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "Id",
+				"type": "String"
+			},
+			{
+				"name": "RecordType",
+				"type": "String"
+			},
+			{
+				"name": "CreationTime",
+				"type": "String"
+			},
+			{
+				"name": "Operation",
+				"type": "String"
+			},
+			{
+				"name": "OrganizationId",
+				"type": "String"
+			},
+			{
+				"name": "UserType",
+				"type": "String"
+			},
+			{
+				"name": "UserKey",
+				"type": "String"
+			},
+			{
+				"name": "Workload",
+				"type": "String"
+			},
+			{
+				"name": "UserId",
+				"type": "String"
+			},
+			{
+				"name": "ClientIP",
+				"type": "String"
+			},
+			{
+				"name": "UserAgent",
+				"type": "String"
+			},
+			{
+				"name": "Activity",
+				"type": "String"
+			},
+			{
+				"name": "ItemName",
+				"type": "String"
+			},
+			{
+				"name": "WorkSpaceName",
+				"type": "String"
+			},
+			{
+				"name": "CapacityId",
+				"type": "String"
+			},
+			{
+				"name": "CapacityName",
+				"type": "String"
+			},
+			{
+				"name": "WorkspaceId",
+				"type": "String"
+			},
+			{
+				"name": "ObjectId",
+				"type": "String"
+			},
+			{
+				"name": "DataflowId",
+				"type": "String"
+			},
+			{
+				"name": "DataflowName",
+				"type": "String"
+			},
+			{
+				"name": "DataflowAccessTokenRequestParameters",
+				"type": "String"
+			},
+			{
+				"name": "IsSuccess",
+				"type": "String"
+			},
+			{
+				"name": "DataflowType",
+				"type": "String"
+			},
+			{
+				"name": "RequestId",
+				"type": "String"
+			},
+			{
+				"name": "ActivityId",
+				"type": "String"
+			},
+			{
+				"name": "ResourceId",
+				"type": "String"
+			},
+			{
+				"name": "ExportEventStartDateTimeParameter",
+				"type": "String"
+			},
+			{
+				"name": "ExportEventEndDateTimeParameter",
+				"type": "String"
+			},
+			{
+				"name": "DatasetName",
+				"type": "String"
+			},
+			{
+				"name": "ReportName",
+				"type": "String"
+			},
+			{
+				"name": "DatasetId",
+				"type": "String"
+			},
+			{
+				"name": "ReportId",
+				"type": "String"
+			},
+			{
+				"name": "ArtifactId",
+				"type": "String"
+			},
+			{
+				"name": "ArtifactName",
+				"type": "String"
+			},
+			{
+				"name": "ReportType",
+				"type": "String"
+			},
+			{
+				"name": "DistributionMethod",
+				"type": "String"
+			},
+			{
+				"name": "ConsumptionMethod",
+				"type": "String"
+			},
+			{
+				"name": "ArtifactKind",
+				"type": "String"
+			},
+			{
+				"name": "ModelsSnapshots",
+				"type": "String"
+			},
+			{
+				"name": "HasFullReportAttachment",
+				"type": "String"
+			},
+			{
+				"name": "GatewayId",
+				"type": "String"
+			},
+			{
+				"name": "DatasourceId",
+				"type": "String"
+			},
+			{
+				"name": "DataflowRefreshScheduleType",
+				"type": "String"
+			},
+			{
+				"name": "DataConnectivityMode",
+				"type": "String"
+			},
+			{
+				"name": "RefreshType",
+				"type": "String"
+			},
+			{
+				"name": "LastRefreshTime",
+				"type": "String"
+			},
+			{
+				"name": "ExportEventActivityTypeParameter",
+				"type": "String"
+			},
+			{
+				"name": "DashboardName",
+				"type": "String"
+			},
+			{
+				"name": "DashboardId",
+				"type": "String"
+			},
+			{
+				"name": "Datasets",
+				"type": "String"
+			},
+			{
+				"name": "ImportId",
+				"type": "String"
+			},
+			{
+				"name": "ImportSource",
+				"type": "String"
+			},
+			{
+				"name": "ImportType",
+				"type": "String"
+			},
+			{
+				"name": "ImportDisplayName",
+				"type": "String"
+			},
+			{
+				"name": "FolderObjectId",
+				"type": "String"
+			},
+			{
+				"name": "FolderDisplayName",
+				"type": "String"
+			},
+			{
+				"name": "FolderAccessRequests",
+				"type": "String"
+			},
+			{
+				"name": "AppName",
+				"type": "String"
+			},
+			{
+				"name": "AppReportId",
+				"type": "String"
+			},
+			{
+				"name": "AppId",
+				"type": "String"
+			},
+			{
+				"name": "TemplateAppObjectId",
+				"type": "String"
+			},
+			{
+				"name": "TemplatePackageName",
+				"type": "String"
+			},
+			{
+				"name": "TemplateAppVersion",
+				"type": "String"
+			},
+			{
+				"name": "TemplateAppOwnerTenantObjectId",
+				"type": "String"
+			},
+			{
+				"name": "TemplateAppFolderObjectId",
+				"type": "String"
+			},
+			{
+				"name": "IsUpdateAppActivity",
+				"type": "String"
+			},
+			{
+				"name": "IsTemplateAppFromMarketplace",
+				"type": "String"
+			},
+			{
+				"name": "TemplateAppIsInstalledWithAutomation",
+				"type": "String"
+			},
+			{
+				"name": "Schedules",
+				"type": "String"
+			},
+			{
+				"name": "CustomVisualAccessTokenResourceId",
+				"type": "String"
+			},
+			{
+				"name": "CustomVisualAccessTokenSiteUri",
+				"type": "String"
+			},
+			{
+				"name": "EmbedTokenId",
+				"type": "String"
+			},
+			{
+				"name": "ArtifactObjectId",
+				"type": "String"
+			},
+			{
+				"name": "ResultStatus",
+				"type": "String"
+			},
+			{
+				"name": "ObjectType",
+				"type": "String"
+			},
+			{
+				"name": "ObjectDisplayName",
+				"type": "String"
+			},
+			{
+				"name": "Experience",
+				"type": "String"
+			},
+			{
+				"name": "AggregatedWorkspaceInformation",
+				"type": "String"
+			},
+			{
+				"name": "InPlaceSharingEnabled",
+				"type": "String"
+			},
+			{
+				"name": "IsTenantAdminApi",
+				"type": "String"
+			},
+			{
+				"name": "GatewayClusters",
+				"type": "String"
+			}
+		]
+	}
+}
