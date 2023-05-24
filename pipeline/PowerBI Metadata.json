@@ -98,6 +98,15 @@
 							},
 							{
 								"source": {
+									"name": "id",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_GroupsId"
+								}
+							},
+							{
+								"source": {
 									"name": "type",
 									"type": "String",
 									"physicalType": "String"
@@ -139,8 +148,7 @@
 									"name": "cr64d_isreadonly",
 									"type": "Boolean"
 								}
-							},
-							null
+							}
 						],
 						"typeConversion": true,
 						"typeConversionSettings": {
