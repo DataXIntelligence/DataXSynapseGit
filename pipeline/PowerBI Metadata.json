@@ -183,7 +183,14 @@
 			{
 				"name": "Delete Records",
 				"type": "ExecuteDataFlow",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "Copy Groups_copy1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -203,6 +210,138 @@
 					},
 					"traceLevel": "Fine"
 				}
+			},
+			{
+				"name": "Copy Groups_copy1",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "CommonDataServiceForAppsSink",
+						"writeBatchSize": 10,
+						"writeBehavior": "upsert",
+						"ignoreNullValues": false
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "id",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_id",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "isReadOnly",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_isreadonly",
+									"type": "Boolean"
+								}
+							},
+							{
+								"source": {
+									"name": "isOnDedicatedCapacity",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_isondedicatedcapacity",
+									"type": "Boolean"
+								}
+							},
+							{
+								"source": {
+									"name": "type",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_type",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "name",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_name",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "capacityId",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_capacityid",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "id_duplicate",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_groupsid",
+									"type": "Guid"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "Groups",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "GroupsDataverse",
+						"type": "DatasetReference"
+					}
+				]
 			}
 		],
 		"annotations": []
