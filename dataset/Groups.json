@@ -1,0 +1,53 @@
+{
+	"name": "Groups",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "dataxsynapsedev-WorkspaceDefaultStorage",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "Groups.csv",
+				"folderPath": "PBIMetadata",
+				"fileSystem": "dataxsynapsefs"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "id",
+				"type": "String"
+			},
+			{
+				"name": "isReadOnly",
+				"type": "String"
+			},
+			{
+				"name": "isOnDedicatedCapacity",
+				"type": "String"
+			},
+			{
+				"name": "type",
+				"type": "String"
+			},
+			{
+				"name": "name",
+				"type": "String"
+			},
+			{
+				"name": "capacityId",
+				"type": "String"
+			},
+			{
+				"name": "defaultDatasetStorageFormat",
+				"type": "String"
+			}
+		]
+	}
+}
