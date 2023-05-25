@@ -5,14 +5,7 @@
 			{
 				"name": "PowerBI Metadata",
 				"type": "SynapseNotebook",
-				"dependsOn": [
-					{
-						"activity": "Copy Groups",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -39,6 +32,37 @@
 					},
 					"driverSize": "Small",
 					"numExecutors": null
+				}
+			},
+			{
+				"name": "Delete Records",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "PowerBI Metadata",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "PBIMetadata Test",
+						"type": "DataFlowReference"
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
 				}
 			},
 			{
@@ -75,8 +99,7 @@
 					"sink": {
 						"type": "CommonDataServiceForAppsSink",
 						"writeBatchSize": 10,
-						"writeBehavior": "upsert",
-						"ignoreNullValues": false
+						"writeBehavior": "upsert"
 					},
 					"enableStaging": false,
 					"translator": {
@@ -181,9 +204,16 @@
 				]
 			},
 			{
-				"name": "Delete Records",
-				"type": "ExecuteDataFlow",
-				"dependsOn": [],
+				"name": "Copy ActivityEvemts",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "Delete Records",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -193,16 +223,992 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"dataflow": {
-						"referenceName": "PBIMetadata Test",
-						"type": "DataFlowReference"
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
 					},
-					"compute": {
-						"coreCount": 8,
-						"computeType": "General"
+					"sink": {
+						"type": "CommonDataServiceForAppsSink",
+						"writeBatchSize": 10,
+						"writeBehavior": "upsert"
 					},
-					"traceLevel": "Fine"
-				}
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "Activity_Events",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ActivityEventsDataverse",
+						"type": "DatasetReference"
+					}
+				]
+			},
+			{
+				"name": "Copy Datasources",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "Delete Records",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "CommonDataServiceForAppsSink",
+						"writeBatchSize": 10,
+						"writeBehavior": "upsert"
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "Datasources",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DatasourcesDataverse",
+						"type": "DatasetReference"
+					}
+				]
+			},
+			{
+				"name": "Copy RefreshHistory",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "Delete Records",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "CommonDataServiceForAppsSink",
+						"writeBatchSize": 10,
+						"writeBehavior": "upsert"
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "RefreshHistory",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "RefreshHistoryDataverse",
+						"type": "DatasetReference"
+					}
+				]
+			},
+			{
+				"name": "Copy ReportPages",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "Delete Records",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "CommonDataServiceForAppsSink",
+						"writeBatchSize": 10,
+						"writeBehavior": "upsert"
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "name",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_displayname",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "displayName",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_group_id",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "order",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_id",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "report_id",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_name",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "group_id",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_order",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"name": "Id",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_report_id",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Id_duplicate",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_reportpagesid",
+									"type": "Guid"
+								}
+							},
+							{
+								"sink": {
+									"name": "createdby",
+									"type": "Guid"
+								}
+							},
+							{
+								"sink": {
+									"name": "createdbyname",
+									"type": "String"
+								}
+							},
+							{
+								"sink": {
+									"name": "createdbyyominame",
+									"type": "String"
+								}
+							},
+							{
+								"sink": {
+									"name": "createdon",
+									"type": "DateTime"
+								}
+							},
+							{
+								"sink": {
+									"name": "createdonbehalfby",
+									"type": "Guid"
+								}
+							},
+							{
+								"sink": {
+									"name": "createdonbehalfbyname",
+									"type": "String"
+								}
+							},
+							{
+								"sink": {
+									"name": "createdonbehalfbyyominame",
+									"type": "String"
+								}
+							},
+							{
+								"sink": {
+									"name": "importsequencenumber",
+									"type": "Int32"
+								}
+							},
+							{
+								"sink": {
+									"name": "modifiedby",
+									"type": "Guid"
+								}
+							},
+							{
+								"sink": {
+									"name": "modifiedbyname",
+									"type": "String"
+								}
+							},
+							{
+								"sink": {
+									"name": "modifiedbyyominame",
+									"type": "String"
+								}
+							},
+							{
+								"sink": {
+									"name": "modifiedon",
+									"type": "DateTime"
+								}
+							},
+							{
+								"sink": {
+									"name": "modifiedonbehalfby",
+									"type": "Guid"
+								}
+							},
+							{
+								"sink": {
+									"name": "modifiedonbehalfbyname",
+									"type": "String"
+								}
+							},
+							{
+								"sink": {
+									"name": "modifiedonbehalfbyyominame",
+									"type": "String"
+								}
+							},
+							{
+								"sink": {
+									"name": "overriddencreatedon",
+									"type": "DateTime"
+								}
+							},
+							{
+								"sink": {
+									"name": "ownerid",
+									"type": "Guid"
+								}
+							},
+							{
+								"sink": {
+									"name": "owneridname",
+									"type": "String"
+								}
+							},
+							{
+								"sink": {
+									"name": "owneridtype",
+									"type": "String"
+								}
+							},
+							{
+								"sink": {
+									"name": "owneridyominame",
+									"type": "String"
+								}
+							},
+							{
+								"sink": {
+									"name": "owningbusinessunit",
+									"type": "Guid"
+								}
+							},
+							{
+								"sink": {
+									"name": "owningbusinessunitname",
+									"type": "String"
+								}
+							},
+							{
+								"sink": {
+									"name": "owningteam",
+									"type": "Guid"
+								}
+							},
+							{
+								"sink": {
+									"name": "owninguser",
+									"type": "Guid"
+								}
+							},
+							{
+								"sink": {
+									"name": "statecode",
+									"type": "Int32"
+								}
+							},
+							{
+								"sink": {
+									"name": "statuscode",
+									"type": "Int32"
+								}
+							},
+							{
+								"sink": {
+									"name": "timezoneruleversionnumber",
+									"type": "Int32"
+								}
+							},
+							{
+								"sink": {
+									"name": "utcconversiontimezonecode",
+									"type": "Int32"
+								}
+							},
+							{
+								"sink": {
+									"name": "versionnumber",
+									"type": "Int64"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ReportPages",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ReportPagesDataverse",
+						"type": "DatasetReference"
+					}
+				]
+			},
+			{
+				"name": "Copy Resources",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "Delete Records",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "CommonDataServiceForAppsSink",
+						"writeBatchSize": 10,
+						"writeBehavior": "upsert"
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "id",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_id",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "name",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_name",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "webUrl",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_weburl",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "addRowsAPIEnabled",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_addrowsapienabled",
+									"type": "Boolean"
+								}
+							},
+							{
+								"source": {
+									"name": "configuredBy",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_configuredby",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "isRefreshable",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_isrefreshable",
+									"type": "Boolean"
+								}
+							},
+							{
+								"source": {
+									"name": "isEffectiveIdentityRequired",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_iseffectiveidentityrequired",
+									"type": "Boolean"
+								}
+							},
+							{
+								"source": {
+									"name": "isEffectiveIdentityRolesRequired",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_iseffectiveidentityrolesrequired",
+									"type": "Boolean"
+								}
+							},
+							{
+								"source": {
+									"name": "targetStorageMode",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_targetstoragemode",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "createdDate",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_createddate",
+									"type": "DateTime"
+								}
+							},
+							{
+								"source": {
+									"name": "createReportEmbedURL",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_createreportembedurl",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "qnaEmbedURL",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_qnaembedurl",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "upstreamDatasets",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_upstreamdatasets",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "users",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_users",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "queryScaleOutSettings",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_queryscaleoutsettings",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "group_id",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_group_id",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "type",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_type",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "objectId",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_objectid",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "description",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_description",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "reportType",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_reporttype",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "embedUrl",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_embedurl",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "isFromPbix",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_isfrompbix",
+									"type": "Boolean"
+								}
+							},
+							{
+								"source": {
+									"name": "isOwnedByMe",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_isownedbyme",
+									"type": "Boolean"
+								}
+							},
+							{
+								"source": {
+									"name": "datasetId",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_datasetid",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "datasetWorkspaceId",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_datasetworkspaceid",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "subscriptions",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_subscriptions",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "isOnPremGatewayRequired",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_isonpremgatewayrequired",
+									"type": "Boolean"
+								}
+							},
+							{
+								"source": {
+									"name": "id_duplicate",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_resourcesid",
+									"type": "Guid"
+								}
+							},
+							{
+								"source": {
+									"name": "import_name",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_import_name",
+									"type": "String"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "Resources",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ResourcesDataverse",
+						"type": "DatasetReference"
+					}
+				]
+			},
+			{
+				"name": "Copy Users",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "Delete Records",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "CommonDataServiceForAppsSink",
+						"writeBatchSize": 10,
+						"writeBehavior": "upsert"
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "emailAddress",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_emailaddress",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "groupUserAccessRight",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_groupuseraccessright",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "displayName",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_displayname",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "identifier",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_identifier",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "principalType",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_principaltype",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "group_id",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_group_id",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "id_duplicate",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_usersid",
+									"type": "Guid"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "Users",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "UsersDataverse",
+						"type": "DatasetReference"
+					}
+				]
 			}
 		],
 		"annotations": []
