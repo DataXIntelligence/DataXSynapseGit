@@ -3,40 +3,9 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Delete Records",
-				"type": "ExecuteDataFlow",
-				"dependsOn": [],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"dataflow": {
-						"referenceName": "PBIMetadata Test",
-						"type": "DataFlowReference"
-					},
-					"compute": {
-						"coreCount": 8,
-						"computeType": "General"
-					},
-					"traceLevel": "Fine"
-				}
-			},
-			{
 				"name": "Copy Groups",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "Delete Records",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -167,14 +136,7 @@
 			{
 				"name": "Copy ActivityEvemts",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "Delete Records",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -739,7 +701,7 @@
 									"physicalType": "String"
 								},
 								"sink": {
-									"name": "cr64d_dashboardname",
+									"name": "cr64d_dashboardid",
 									"type": "String"
 								}
 							},
@@ -1130,14 +1092,7 @@
 			{
 				"name": "Copy Datasources",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "Delete Records",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -1378,14 +1333,7 @@
 			{
 				"name": "Copy RefreshHistory",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "Delete Records",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -1560,14 +1508,7 @@
 			{
 				"name": "Copy ReportPages",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "Delete Records",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -1698,14 +1639,7 @@
 			{
 				"name": "Copy Resources",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "Delete Records",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -2078,14 +2012,7 @@
 			{
 				"name": "Copy Users",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "Delete Records",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -2212,45 +2139,6 @@
 						"type": "DatasetReference"
 					}
 				]
-			},
-			{
-				"name": "PowerBI Metadata",
-				"type": "SynapseNotebook",
-				"dependsOn": [
-					{
-						"activity": "Set variable1",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"notebook": {
-						"referenceName": "PBIMetadata",
-						"type": "NotebookReference"
-					},
-					"snapshot": true,
-					"sparkPool": {
-						"referenceName": "SparkPool01",
-						"type": "BigDataPoolReference"
-					},
-					"executorSize": "Small",
-					"conf": {
-						"spark.dynamicAllocation.enabled": null,
-						"spark.dynamicAllocation.minExecutors": null,
-						"spark.dynamicAllocation.maxExecutors": null
-					},
-					"driverSize": "Small",
-					"numExecutors": null
-				}
 			},
 			{
 				"name": "Set variable1",
