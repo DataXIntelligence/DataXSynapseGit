@@ -563,7 +563,7 @@
 									"physicalType": "String"
 								},
 								"sink": {
-									"name": "cr64d_artifactkind",
+									"name": "cr64d_artifactid",
 									"type": "String"
 								}
 							},
