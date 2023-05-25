@@ -15,7 +15,7 @@
 				"fileSystem": "dataxsynapsefs"
 			},
 			"columnDelimiter": ",",
-			"escapeChar": "\\",
+			"escapeChar": "\"",
 			"firstRowAsHeader": true,
 			"quoteChar": "\""
 		},
