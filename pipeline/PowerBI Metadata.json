@@ -3,48 +3,9 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "PowerBI Metadata",
-				"type": "SynapseNotebook",
-				"dependsOn": [],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"notebook": {
-						"referenceName": "PBIMetadata",
-						"type": "NotebookReference"
-					},
-					"snapshot": true,
-					"sparkPool": {
-						"referenceName": "SparkPool01",
-						"type": "BigDataPoolReference"
-					},
-					"executorSize": "Small",
-					"conf": {
-						"spark.dynamicAllocation.enabled": null,
-						"spark.dynamicAllocation.minExecutors": null,
-						"spark.dynamicAllocation.maxExecutors": null
-					},
-					"driverSize": "Small",
-					"numExecutors": null
-				}
-			},
-			{
 				"name": "Delete Records",
 				"type": "ExecuteDataFlow",
-				"dependsOn": [
-					{
-						"activity": "PowerBI Metadata",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -242,6 +203,910 @@
 					"enableStaging": false,
 					"translator": {
 						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "Id",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_id",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "RecordType",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_recordtype",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"name": "CreationTime",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_creationtime",
+									"type": "DateTime"
+								}
+							},
+							{
+								"source": {
+									"name": "Operation",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_operation",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "OrganizationId",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_organizationid",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "UserType",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_usertype",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"name": "UserKey",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_userkey",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Workload",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_workload",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "UserId",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_userid",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "ClientIP",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_clientip",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "UserAgent",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_useragent",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Activity",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_activity",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "ItemName",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_itemname",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "WorkSpaceName",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_workspacename",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "CapacityId",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_capacityid",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "CapacityName",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_capacityname",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "WorkspaceId",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_workspaceid",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "ObjectId",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_objectid",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "DataflowId",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_dataflowid",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "DataflowName",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_dataflowname",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "DataflowAccessTokenRequestParameters",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_dataflowaccesstokenrequestparameters",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "IsSuccess",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_issuccess",
+									"type": "Boolean"
+								}
+							},
+							{
+								"source": {
+									"name": "DataflowType",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_dataflowtype",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "RequestId",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_requestid",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "ActivityId",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_activityid",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "ResourceId",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_resourceid",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "ExportEventStartDateTimeParameter",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_exporteventstartdatetimeparameter",
+									"type": "DateTime"
+								}
+							},
+							{
+								"source": {
+									"name": "ExportEventEndDateTimeParameter",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_exporteventenddatetimeparameter",
+									"type": "DateTime"
+								}
+							},
+							{
+								"source": {
+									"name": "DatasetName",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_datasetname",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "ReportName",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_reportname",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "DatasetId",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_datasetid",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "ReportId",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_reportid",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "ArtifactId",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_artifactid",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "ArtifactName",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_artifactname",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "ReportType",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_reporttype",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "DistributionMethod",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_distributionmethod",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "ConsumptionMethod",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_consumptionmethod",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "ArtifactKind",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_artifactkind",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "ModelsSnapshots",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_modelssnapshots",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "HasFullReportAttachment",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_hasfullreportattachment",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "GatewayId",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_gatewayid",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "DatasourceId",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_datasourceid",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "DataflowRefreshScheduleType",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_dataflowrefreshscheduletype",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "DataConnectivityMode",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_dataconnectivitymode",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "RefreshType",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_refreshtype",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "LastRefreshTime",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_lastrefreshtime",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "ExportEventActivityTypeParameter",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_exporteventactivitytypeparameter",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "DashboardName",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_dashboardname",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "DashboardId",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_dashboardname",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Datasets",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_datasets",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "ImportId",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_importid",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "ImportSource",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_importsource",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "ImportType",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_importtype",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "ImportDisplayName",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_importdisplayname",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "FolderObjectId",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_folderobjectid",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "FolderDisplayName",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_folderdisplayname",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "FolderAccessRequests",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_folderaccessrequests",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "AppName",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_appname",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "AppReportId",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_appreportid",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "AppId",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_appid",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "TemplateAppObjectId",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_templateappobjectid",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "TemplatePackageName",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_templatepackagename",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "TemplateAppVersion",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_templateappversion",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "TemplateAppOwnerTenantObjectId",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_templateappownertenantobjectid",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "TemplateAppFolderObjectId",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_templateappfolderobjectid",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "IsUpdateAppActivity",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_isupdateappactivity",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "IsTemplateAppFromMarketplace",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_istemplateappfrommarketplace",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "TemplateAppIsInstalledWithAutomation",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_templateappisinstalledwithautomation",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Schedules",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_schedules",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "CustomVisualAccessTokenResourceId",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_customvisualaccesstokenresourceid",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "CustomVisualAccessTokenSiteUri",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_customvisualaccesstokensiteuri",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "EmbedTokenId",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_embedtokenid",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "ArtifactObjectId",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_artifactobjectid",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "ResultStatus",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_resultstatus",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "ObjectType",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_objecttype",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "ObjectDisplayName",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_objectdisplayname",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Experience",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_experience",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "AggregatedWorkspaceInformation",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_aggregatedworkspaceinformation",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "InPlaceSharingEnabled",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_inplacesharingenabled",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "IsTenantAdminApi",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_istenantadminapi",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "GatewayClusters",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_gatewayclusters",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "id_duplicate",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_activityeventsid",
+									"type": "Guid"
+								}
+							}
+						],
 						"typeConversion": true,
 						"typeConversionSettings": {
 							"allowDataTruncation": true,
@@ -301,6 +1166,195 @@
 					"enableStaging": false,
 					"translator": {
 						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "datasourceType",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_datasourcetype",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "datasourceId",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_datasourceid",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "gatewayId",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_gatewayid",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "resource_id",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_resource_id",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "group_id",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_group_id",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "resource_type",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_resource_type",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "id",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_id",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "id_duplicate",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_datasourcesid",
+									"type": "Guid"
+								}
+							},
+							{
+								"source": {
+									"name": "emailAddress",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_emailaddress",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "server",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_server",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "path",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_path",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "sharePointSiteUrl",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_sharepointsiteurl",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "url",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_url",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "extensionDataSourceKind",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_extensiondatasourcekind",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "extensionDataSourcePath",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_extensiondatasourcepath",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "database",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_database",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "kind",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_kind",
+									"type": "String"
+								}
+							}
+						],
 						"typeConversion": true,
 						"typeConversionSettings": {
 							"allowDataTruncation": true,
@@ -360,6 +1414,129 @@
 					"enableStaging": false,
 					"translator": {
 						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "requestId",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_requestid",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "id",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_id",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "refreshType",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_refreshtype",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "startTime",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_starttime",
+									"type": "DateTime"
+								}
+							},
+							{
+								"source": {
+									"name": "endTime",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_endtime",
+									"type": "DateTime"
+								}
+							},
+							{
+								"source": {
+									"name": "status",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_status",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "resource_id",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_resource_id",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "group_id",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_group_id",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "resource_type",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_resource_type",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "serviceExceptionJson",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_serviceexceptionjson",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "id_duplicate",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_refreshhistoryid",
+									"type": "Guid"
+								}
+							}
+						],
 						"typeConversion": true,
 						"typeConversionSettings": {
 							"allowDataTruncation": true,
@@ -427,7 +1604,7 @@
 									"physicalType": "String"
 								},
 								"sink": {
-									"name": "cr64d_displayname",
+									"name": "cr64d_name",
 									"type": "String"
 								}
 							},
@@ -438,7 +1615,7 @@
 									"physicalType": "String"
 								},
 								"sink": {
-									"name": "cr64d_group_id",
+									"name": "cr64d_displayname",
 									"type": "String"
 								}
 							},
@@ -449,8 +1626,8 @@
 									"physicalType": "String"
 								},
 								"sink": {
-									"name": "cr64d_id",
-									"type": "String"
+									"name": "cr64d_order",
+									"type": "Int32"
 								}
 							},
 							{
@@ -460,7 +1637,7 @@
 									"physicalType": "String"
 								},
 								"sink": {
-									"name": "cr64d_name",
+									"name": "cr64d_report_id",
 									"type": "String"
 								}
 							},
@@ -471,8 +1648,8 @@
 									"physicalType": "String"
 								},
 								"sink": {
-									"name": "cr64d_order",
-									"type": "Int32"
+									"name": "cr64d_group_id",
+									"type": "String"
 								}
 							},
 							{
@@ -482,7 +1659,7 @@
 									"physicalType": "String"
 								},
 								"sink": {
-									"name": "cr64d_report_id",
+									"name": "cr64d_id",
 									"type": "String"
 								}
 							},
@@ -495,180 +1672,6 @@
 								"sink": {
 									"name": "cr64d_reportpagesid",
 									"type": "Guid"
-								}
-							},
-							{
-								"sink": {
-									"name": "createdby",
-									"type": "Guid"
-								}
-							},
-							{
-								"sink": {
-									"name": "createdbyname",
-									"type": "String"
-								}
-							},
-							{
-								"sink": {
-									"name": "createdbyyominame",
-									"type": "String"
-								}
-							},
-							{
-								"sink": {
-									"name": "createdon",
-									"type": "DateTime"
-								}
-							},
-							{
-								"sink": {
-									"name": "createdonbehalfby",
-									"type": "Guid"
-								}
-							},
-							{
-								"sink": {
-									"name": "createdonbehalfbyname",
-									"type": "String"
-								}
-							},
-							{
-								"sink": {
-									"name": "createdonbehalfbyyominame",
-									"type": "String"
-								}
-							},
-							{
-								"sink": {
-									"name": "importsequencenumber",
-									"type": "Int32"
-								}
-							},
-							{
-								"sink": {
-									"name": "modifiedby",
-									"type": "Guid"
-								}
-							},
-							{
-								"sink": {
-									"name": "modifiedbyname",
-									"type": "String"
-								}
-							},
-							{
-								"sink": {
-									"name": "modifiedbyyominame",
-									"type": "String"
-								}
-							},
-							{
-								"sink": {
-									"name": "modifiedon",
-									"type": "DateTime"
-								}
-							},
-							{
-								"sink": {
-									"name": "modifiedonbehalfby",
-									"type": "Guid"
-								}
-							},
-							{
-								"sink": {
-									"name": "modifiedonbehalfbyname",
-									"type": "String"
-								}
-							},
-							{
-								"sink": {
-									"name": "modifiedonbehalfbyyominame",
-									"type": "String"
-								}
-							},
-							{
-								"sink": {
-									"name": "overriddencreatedon",
-									"type": "DateTime"
-								}
-							},
-							{
-								"sink": {
-									"name": "ownerid",
-									"type": "Guid"
-								}
-							},
-							{
-								"sink": {
-									"name": "owneridname",
-									"type": "String"
-								}
-							},
-							{
-								"sink": {
-									"name": "owneridtype",
-									"type": "String"
-								}
-							},
-							{
-								"sink": {
-									"name": "owneridyominame",
-									"type": "String"
-								}
-							},
-							{
-								"sink": {
-									"name": "owningbusinessunit",
-									"type": "Guid"
-								}
-							},
-							{
-								"sink": {
-									"name": "owningbusinessunitname",
-									"type": "String"
-								}
-							},
-							{
-								"sink": {
-									"name": "owningteam",
-									"type": "Guid"
-								}
-							},
-							{
-								"sink": {
-									"name": "owninguser",
-									"type": "Guid"
-								}
-							},
-							{
-								"sink": {
-									"name": "statecode",
-									"type": "Int32"
-								}
-							},
-							{
-								"sink": {
-									"name": "statuscode",
-									"type": "Int32"
-								}
-							},
-							{
-								"sink": {
-									"name": "timezoneruleversionnumber",
-									"type": "Int32"
-								}
-							},
-							{
-								"sink": {
-									"name": "utcconversiontimezonecode",
-									"type": "Int32"
-								}
-							},
-							{
-								"sink": {
-									"name": "versionnumber",
-									"type": "Int64"
 								}
 							}
 						],
@@ -1209,8 +2212,106 @@
 						"type": "DatasetReference"
 					}
 				]
+			},
+			{
+				"name": "PowerBI Metadata",
+				"type": "SynapseNotebook",
+				"dependsOn": [
+					{
+						"activity": "Set variable1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebook": {
+						"referenceName": "PBIMetadata",
+						"type": "NotebookReference"
+					},
+					"snapshot": true,
+					"sparkPool": {
+						"referenceName": "SparkPool01",
+						"type": "BigDataPoolReference"
+					},
+					"executorSize": "Small",
+					"conf": {
+						"spark.dynamicAllocation.enabled": null,
+						"spark.dynamicAllocation.minExecutors": null,
+						"spark.dynamicAllocation.maxExecutors": null
+					},
+					"driverSize": "Small",
+					"numExecutors": null
+				}
+			},
+			{
+				"name": "Set variable1",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Copy ActivityEvemts",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Copy Datasources",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Copy RefreshHistory",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Copy ReportPages",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Copy Resources",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Copy Users",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Copy Groups",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "test",
+					"value": "test1"
+				}
 			}
 		],
+		"variables": {
+			"test": {
+				"type": "String",
+				"defaultValue": "test"
+			}
+		},
 		"annotations": []
 	}
 }
