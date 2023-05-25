@@ -1,0 +1,15 @@
+{
+	"name": "RefreshHistoryDataverse",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_Dataverse",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "CommonDataServiceForAppsEntity",
+		"schema": [],
+		"typeProperties": {
+			"entityName": "cr64d_refreshhistory"
+		}
+	}
+}
