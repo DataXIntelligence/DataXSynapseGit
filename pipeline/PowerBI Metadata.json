@@ -2190,48 +2190,9 @@
 				]
 			},
 			{
-				"name": "PowerBI Metadata",
-				"type": "SynapseNotebook",
-				"dependsOn": [],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"notebook": {
-						"referenceName": "PBIMetadata",
-						"type": "NotebookReference"
-					},
-					"snapshot": true,
-					"sparkPool": {
-						"referenceName": "SparkPool01",
-						"type": "BigDataPoolReference"
-					},
-					"executorSize": "Small",
-					"conf": {
-						"spark.dynamicAllocation.enabled": null,
-						"spark.dynamicAllocation.minExecutors": null,
-						"spark.dynamicAllocation.maxExecutors": null
-					},
-					"driverSize": "Small",
-					"numExecutors": null
-				}
-			},
-			{
 				"name": "Delete Records",
 				"type": "ExecuteDataFlow",
-				"dependsOn": [
-					{
-						"activity": "PowerBI Metadata",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
