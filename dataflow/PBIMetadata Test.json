@@ -10,6 +10,48 @@
 						"type": "DatasetReference"
 					},
 					"name": "GroupsSource"
+				},
+				{
+					"dataset": {
+						"referenceName": "ActivityEventsDataverse",
+						"type": "DatasetReference"
+					},
+					"name": "ActivityEventsSource"
+				},
+				{
+					"dataset": {
+						"referenceName": "DatasourcesDataverse",
+						"type": "DatasetReference"
+					},
+					"name": "DatasourcesSource"
+				},
+				{
+					"dataset": {
+						"referenceName": "RefreshHistoryDataverse",
+						"type": "DatasetReference"
+					},
+					"name": "RefreshHistorySource"
+				},
+				{
+					"dataset": {
+						"referenceName": "ReportPagesDataverse",
+						"type": "DatasetReference"
+					},
+					"name": "ReportPagesSource"
+				},
+				{
+					"dataset": {
+						"referenceName": "ResourcesDataverse",
+						"type": "DatasetReference"
+					},
+					"name": "ResourcesSource"
+				},
+				{
+					"dataset": {
+						"referenceName": "UsersDataverse",
+						"type": "DatasetReference"
+					},
+					"name": "UsersSource"
 				}
 			],
 			"sinks": [
@@ -19,17 +61,95 @@
 						"type": "DatasetReference"
 					},
 					"name": "GroupsSink"
+				},
+				{
+					"dataset": {
+						"referenceName": "ActivityEventsDataverse",
+						"type": "DatasetReference"
+					},
+					"name": "ActivityEventsSink"
+				},
+				{
+					"dataset": {
+						"referenceName": "DatasourcesDataverse",
+						"type": "DatasetReference"
+					},
+					"name": "DatasourcesSink"
+				},
+				{
+					"dataset": {
+						"referenceName": "RefreshHistoryDataverse",
+						"type": "DatasetReference"
+					},
+					"name": "RefreshHistorySink"
+				},
+				{
+					"dataset": {
+						"referenceName": "ReportPagesDataverse",
+						"type": "DatasetReference"
+					},
+					"name": "ReportPagesSink"
+				},
+				{
+					"dataset": {
+						"referenceName": "ResourcesDataverse",
+						"type": "DatasetReference"
+					},
+					"name": "ResourcesSink"
+				},
+				{
+					"dataset": {
+						"referenceName": "UsersDataverse",
+						"type": "DatasetReference"
+					},
+					"name": "UsersSink"
 				}
 			],
 			"transformations": [
 				{
 					"name": "AlterRowGroups"
+				},
+				{
+					"name": "AlterRowActivityEvents"
+				},
+				{
+					"name": "AlterRowDatasources"
+				},
+				{
+					"name": "AlterRowRefreshHistory"
+				},
+				{
+					"name": "AlterRowReportPages"
+				},
+				{
+					"name": "AlterRowResources"
+				},
+				{
+					"name": "AlterRowUsers"
 				}
 			],
 			"scriptLines": [
 				"source(allowSchemaDrift: true,",
 				"     validateSchema: false) ~> GroupsSource",
+				"source(allowSchemaDrift: true,",
+				"     validateSchema: false) ~> ActivityEventsSource",
+				"source(allowSchemaDrift: true,",
+				"     validateSchema: false) ~> DatasourcesSource",
+				"source(allowSchemaDrift: true,",
+				"     validateSchema: false) ~> RefreshHistorySource",
+				"source(allowSchemaDrift: true,",
+				"     validateSchema: false) ~> ReportPagesSource",
+				"source(allowSchemaDrift: true,",
+				"     validateSchema: false) ~> ResourcesSource",
+				"source(allowSchemaDrift: true,",
+				"     validateSchema: false) ~> UsersSource",
 				"GroupsSource alterRow(deleteIf(true())) ~> AlterRowGroups",
+				"ActivityEventsSource alterRow(deleteIf(true())) ~> AlterRowActivityEvents",
+				"DatasourcesSource alterRow(deleteIf(true())) ~> AlterRowDatasources",
+				"RefreshHistorySource alterRow(deleteIf(true())) ~> AlterRowRefreshHistory",
+				"ReportPagesSource alterRow(deleteIf(true())) ~> AlterRowReportPages",
+				"ResourcesSource alterRow(deleteIf(true())) ~> AlterRowResources",
+				"UsersSource alterRow(deleteIf(true())) ~> AlterRowUsers",
 				"AlterRowGroups sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     deletable:true,",
@@ -38,7 +158,55 @@
 				"     upsertable:false,",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
-				"     saveOrder: 0) ~> GroupsSink"
+				"     saveOrder: 0) ~> GroupsSink",
+				"AlterRowActivityEvents sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:true,",
+				"     insertable:false,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> ActivityEventsSink",
+				"AlterRowDatasources sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:true,",
+				"     insertable:false,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> DatasourcesSink",
+				"AlterRowRefreshHistory sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:true,",
+				"     insertable:false,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> RefreshHistorySink",
+				"AlterRowReportPages sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:true,",
+				"     insertable:false,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> ReportPagesSink",
+				"AlterRowResources sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:true,",
+				"     insertable:false,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> ResourcesSink",
+				"AlterRowUsers sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:true,",
+				"     insertable:false,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> UsersSink"
 			]
 		}
 	}
