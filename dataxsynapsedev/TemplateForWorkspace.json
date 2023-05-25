@@ -33,6 +33,10 @@
 			"metadata": "Secure string for 'connectionString' of 'dataxsynapsedev-WorkspaceDefaultSqlServer'",
 			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:dataxsynapsedev.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
 		},
+		"ls_Dataverse_servicePrincipalCredential": {
+			"type": "secureString",
+			"metadata": "Secure string for 'servicePrincipalCredential' of 'ls_Dataverse'"
+		},
 		"ls_github_credential": {
 			"type": "secureString",
 			"metadata": "Secure string for 'credential' of 'ls_github'"
@@ -57,6 +61,10 @@
 			"type": "string",
 			"defaultValue": "https://adlsdatax01.dfs.core.windows.net"
 		},
+		"ls_Dataverse_properties_typeProperties_servicePrincipalId": {
+			"type": "string",
+			"defaultValue": "b47b7e20-2e2e-48d3-916e-7ffe88a71407"
+		},
 		"ls_github_properties_typeProperties_username": {
 			"type": "string",
 			"defaultValue": "alejandroperezdatax"
@@ -70,6 +78,245 @@
 		"workspaceId": "[concat('Microsoft.Synapse/workspaces/', parameters('workspaceName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('workspaceName'), '/Pause_PowerBI_Embedded')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "GetCapacityDetails",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"url": {
+								"value": "https://management.azure.com/subscriptions/@{pipeline().parameters.SubscriptionId}/resourceGroups/@{pipeline().parameters.resourceGroupName}/providers/Microsoft.PowerBIDedicated/capacities/@{pipeline().parameters.dedicatedCapacityName}?api-version=2021-01-01",
+								"type": "Expression"
+							},
+							"connectVia": {
+								"referenceName": "AutoResolveIntegrationRuntime",
+								"type": "IntegrationRuntimeReference"
+							},
+							"method": "GET",
+							"headers": {},
+							"authentication": {
+								"type": "MSI",
+								"resource": "https://management.azure.com/"
+							}
+						}
+					},
+					{
+						"name": "Check if capacity is Active",
+						"type": "IfCondition",
+						"dependsOn": [
+							{
+								"activity": "GetCapacityDetails",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"expression": {
+								"value": "@if(\n    equals(\n        activity('GetCapacityDetails').output.Properties.state, \n        'Succeeded'\n    ), \n    true , \n    false\n)",
+								"type": "Expression"
+							},
+							"ifTrueActivities": [
+								{
+									"name": "Pause Capacity",
+									"type": "WebActivity",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"url": {
+											"value": "https://management.azure.com/subscriptions/@{pipeline().parameters.SubscriptionId}/resourceGroups/@{pipeline().parameters.resourceGroupName}/providers/Microsoft.PowerBIDedicated/capacities/@{pipeline().parameters.dedicatedCapacityName}/suspend?api-version=2021-01-01",
+											"type": "Expression"
+										},
+										"connectVia": {
+											"referenceName": "AutoResolveIntegrationRuntime",
+											"type": "IntegrationRuntimeReference"
+										},
+										"method": "POST",
+										"headers": {},
+										"body": {},
+										"authentication": {
+											"type": "MSI",
+											"resource": "https://management.azure.com/"
+										}
+									}
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"SubscriptionId": {
+						"type": "string",
+						"defaultValue": "b2c447f4-0f0b-471d-a130-0c72330f08f2"
+					},
+					"resourceGroupName": {
+						"type": "string",
+						"defaultValue": "DataX-ResGroup"
+					},
+					"dedicatedCapacityName": {
+						"type": "string",
+						"defaultValue": "pbimbeddedpowerpages"
+					}
+				},
+				"folder": {
+					"name": "PowerBI"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Pause_or_Resume_PowerBI_Embedded')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "GetCurrentTime",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"url": {
+								"value": "https://www.timeapi.io/api/Time/current/zone?timeZone=@{pipeline().parameters.TimeZone}",
+								"type": "Expression"
+							},
+							"connectVia": {
+								"referenceName": "AutoResolveIntegrationRuntime",
+								"type": "IntegrationRuntimeReference"
+							},
+							"method": "GET",
+							"headers": {}
+						}
+					},
+					{
+						"name": "Check current time",
+						"type": "IfCondition",
+						"dependsOn": [
+							{
+								"activity": "GetCurrentTime",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"expression": {
+								"value": "@if(\n    equals(\n        activity('GetCurrentTime').output.hour, \n        pipeline().parameters.UpTime\n    ),\n    true , \n    false\n)",
+								"type": "Expression"
+							},
+							"ifFalseActivities": [
+								{
+									"name": "Pause Pipeline",
+									"type": "ExecutePipeline",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "Pause_PowerBI_Embedded",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {}
+									}
+								}
+							],
+							"ifTrueActivities": [
+								{
+									"name": "Resume Pipeline",
+									"type": "ExecutePipeline",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "Resume_PowerBI_Embedded",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {}
+									}
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"SubscriptionId": {
+						"type": "string",
+						"defaultValue": "b2c447f4-0f0b-471d-a130-0c72330f08f2"
+					},
+					"resourceGroupName": {
+						"type": "string",
+						"defaultValue": "DataX-ResGroup"
+					},
+					"dedicatedCapacityName": {
+						"type": "string",
+						"defaultValue": "pbimbeddedpowerpages"
+					},
+					"TimeZone": {
+						"type": "string",
+						"defaultValue": "Etc/UTC"
+					},
+					"UpTime": {
+						"type": "int",
+						"defaultValue": 9
+					}
+				},
+				"variables": {
+					"Time": {
+						"type": "String"
+					}
+				},
+				"folder": {
+					"name": "PowerBI"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]",
+				"[concat(variables('workspaceId'), '/pipelines/Pause_PowerBI_Embedded')]",
+				"[concat(variables('workspaceId'), '/pipelines/Resume_PowerBI_Embedded')]"
+			]
+		},
 		{
 			"name": "[concat(parameters('workspaceName'), '/Pipeline 1')]",
 			"type": "Microsoft.Synapse/workspaces/pipelines",
@@ -2089,8 +2336,2209 @@
 			"properties": {
 				"activities": [
 					{
-						"name": "PowerBI Metadata",
-						"type": "SynapseNotebook",
+						"name": "Copy Groups",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Delete Records",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "CommonDataServiceForAppsSink",
+								"writeBatchSize": 10,
+								"writeBehavior": "upsert"
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "id",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "isReadOnly",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_isreadonly",
+											"type": "Boolean"
+										}
+									},
+									{
+										"source": {
+											"name": "isOnDedicatedCapacity",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_isondedicatedcapacity",
+											"type": "Boolean"
+										}
+									},
+									{
+										"source": {
+											"name": "type",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_type",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "name",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_name",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "capacityId",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_capacityid",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "id_duplicate",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_groupsid",
+											"type": "Guid"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "Groups",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "GroupsDataverse",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "Copy ActivityEvemts",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Delete Records",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "CommonDataServiceForAppsSink",
+								"writeBatchSize": 10,
+								"writeBehavior": "upsert"
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "Id",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "RecordType",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_recordtype",
+											"type": "Int32"
+										}
+									},
+									{
+										"source": {
+											"name": "CreationTime",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_creationtime",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "Operation",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_operation",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "OrganizationId",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_organizationid",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "UserType",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_usertype",
+											"type": "Int32"
+										}
+									},
+									{
+										"source": {
+											"name": "UserKey",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_userkey",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "Workload",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_workload",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "UserId",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_userid",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "ClientIP",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_clientip",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "UserAgent",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_useragent",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "Activity",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_activity",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "ItemName",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_itemname",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "WorkSpaceName",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_workspacename",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "CapacityId",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_capacityid",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "CapacityName",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_capacityname",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "WorkspaceId",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_workspaceid",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "ObjectId",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_objectid",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "DataflowId",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_dataflowid",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "DataflowName",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_dataflowname",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "DataflowAccessTokenRequestParameters",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_dataflowaccesstokenrequestparameters",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "IsSuccess",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_issuccess",
+											"type": "Boolean"
+										}
+									},
+									{
+										"source": {
+											"name": "DataflowType",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_dataflowtype",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "RequestId",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_requestid",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "ActivityId",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_activityid",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "ResourceId",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_resourceid",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "ExportEventStartDateTimeParameter",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_exporteventstartdatetimeparameter",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "ExportEventEndDateTimeParameter",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_exporteventenddatetimeparameter",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "DatasetName",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_datasetname",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "ReportName",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_reportname",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "DatasetId",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_datasetid",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "ReportId",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_reportid",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "ArtifactId",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_artifactid",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "ArtifactName",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_artifactname",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "ReportType",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_reporttype",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "DistributionMethod",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_distributionmethod",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "ConsumptionMethod",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_consumptionmethod",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "ArtifactKind",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_artifactkind",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "ModelsSnapshots",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_modelssnapshots",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "HasFullReportAttachment",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_hasfullreportattachment",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "GatewayId",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_gatewayid",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "DatasourceId",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_datasourceid",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "DataflowRefreshScheduleType",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_dataflowrefreshscheduletype",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "DataConnectivityMode",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_dataconnectivitymode",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "RefreshType",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_refreshtype",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "LastRefreshTime",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_lastrefreshtime",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "ExportEventActivityTypeParameter",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_exporteventactivitytypeparameter",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "DashboardName",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_dashboardname",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "DashboardId",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_dashboardid",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "Datasets",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_datasets",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "ImportId",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_importid",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "ImportSource",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_importsource",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "ImportType",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_importtype",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "ImportDisplayName",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_importdisplayname",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "FolderObjectId",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_folderobjectid",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "FolderDisplayName",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_folderdisplayname",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "FolderAccessRequests",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_folderaccessrequests",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "AppName",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_appname",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "AppReportId",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_appreportid",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "AppId",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_appid",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "TemplateAppObjectId",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_templateappobjectid",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "TemplatePackageName",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_templatepackagename",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "TemplateAppVersion",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_templateappversion",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "TemplateAppOwnerTenantObjectId",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_templateappownertenantobjectid",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "TemplateAppFolderObjectId",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_templateappfolderobjectid",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "IsUpdateAppActivity",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_isupdateappactivity",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "IsTemplateAppFromMarketplace",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_istemplateappfrommarketplace",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "TemplateAppIsInstalledWithAutomation",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_templateappisinstalledwithautomation",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "Schedules",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_schedules",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "CustomVisualAccessTokenResourceId",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_customvisualaccesstokenresourceid",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "CustomVisualAccessTokenSiteUri",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_customvisualaccesstokensiteuri",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "EmbedTokenId",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_embedtokenid",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "ArtifactObjectId",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_artifactobjectid",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "ResultStatus",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_resultstatus",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "ObjectType",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_objecttype",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "ObjectDisplayName",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_objectdisplayname",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "Experience",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_experience",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "AggregatedWorkspaceInformation",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_aggregatedworkspaceinformation",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "InPlaceSharingEnabled",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_inplacesharingenabled",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "IsTenantAdminApi",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_istenantadminapi",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "GatewayClusters",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_gatewayclusters",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "id_duplicate",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_activityeventsid",
+											"type": "Guid"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "Activity_Events",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "ActivityEventsDataverse",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "Copy Datasources",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Delete Records",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "CommonDataServiceForAppsSink",
+								"writeBatchSize": 10,
+								"writeBehavior": "upsert"
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "datasourceType",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_datasourcetype",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "datasourceId",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_datasourceid",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "gatewayId",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_gatewayid",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "resource_id",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_resource_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "group_id",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_group_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "resource_type",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_resource_type",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "id",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "id_duplicate",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_datasourcesid",
+											"type": "Guid"
+										}
+									},
+									{
+										"source": {
+											"name": "emailAddress",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_emailaddress",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "server",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_server",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "path",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_path",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "sharePointSiteUrl",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_sharepointsiteurl",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "url",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_url",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "extensionDataSourceKind",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_extensiondatasourcekind",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "extensionDataSourcePath",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_extensiondatasourcepath",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "database",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_database",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "kind",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_kind",
+											"type": "String"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "Datasources",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DatasourcesDataverse",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "Copy RefreshHistory",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Delete Records",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "CommonDataServiceForAppsSink",
+								"writeBatchSize": 10,
+								"writeBehavior": "upsert"
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "requestId",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_requestid",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "id",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "refreshType",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_refreshtype",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "startTime",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_starttime",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "endTime",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_endtime",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "status",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_status",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "resource_id",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_resource_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "group_id",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_group_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "resource_type",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_resource_type",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "serviceExceptionJson",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_serviceexceptionjson",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "id_duplicate",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_refreshhistoryid",
+											"type": "Guid"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "RefreshHistory",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "RefreshHistoryDataverse",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "Copy ReportPages",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Delete Records",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "CommonDataServiceForAppsSink",
+								"writeBatchSize": 10,
+								"writeBehavior": "upsert"
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "name",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_name",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "displayName",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_displayname",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "order",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_order",
+											"type": "Int32"
+										}
+									},
+									{
+										"source": {
+											"name": "report_id",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_report_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "group_id",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_group_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "Id",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "Id_duplicate",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_reportpagesid",
+											"type": "Guid"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "ReportPages",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "ReportPagesDataverse",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "Copy Resources",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Delete Records",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "CommonDataServiceForAppsSink",
+								"writeBatchSize": 10,
+								"writeBehavior": "upsert"
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "id",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "name",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_name",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "webUrl",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_weburl",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "addRowsAPIEnabled",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_addrowsapienabled",
+											"type": "Boolean"
+										}
+									},
+									{
+										"source": {
+											"name": "configuredBy",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_configuredby",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "isRefreshable",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_isrefreshable",
+											"type": "Boolean"
+										}
+									},
+									{
+										"source": {
+											"name": "isEffectiveIdentityRequired",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_iseffectiveidentityrequired",
+											"type": "Boolean"
+										}
+									},
+									{
+										"source": {
+											"name": "isEffectiveIdentityRolesRequired",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_iseffectiveidentityrolesrequired",
+											"type": "Boolean"
+										}
+									},
+									{
+										"source": {
+											"name": "targetStorageMode",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_targetstoragemode",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "createdDate",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_createddate",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "createReportEmbedURL",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_createreportembedurl",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "qnaEmbedURL",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_qnaembedurl",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "upstreamDatasets",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_upstreamdatasets",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "users",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_users",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "queryScaleOutSettings",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_queryscaleoutsettings",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "group_id",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_group_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "type",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_type",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "objectId",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_objectid",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "description",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_description",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "reportType",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_reporttype",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "embedUrl",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_embedurl",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "isFromPbix",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_isfrompbix",
+											"type": "Boolean"
+										}
+									},
+									{
+										"source": {
+											"name": "isOwnedByMe",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_isownedbyme",
+											"type": "Boolean"
+										}
+									},
+									{
+										"source": {
+											"name": "datasetId",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_datasetid",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "datasetWorkspaceId",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_datasetworkspaceid",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "subscriptions",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_subscriptions",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "isOnPremGatewayRequired",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_isonpremgatewayrequired",
+											"type": "Boolean"
+										}
+									},
+									{
+										"source": {
+											"name": "id_duplicate",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_resourcesid",
+											"type": "Guid"
+										}
+									},
+									{
+										"source": {
+											"name": "import_name",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_import_name",
+											"type": "String"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "Resources",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "ResourcesDataverse",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "Copy Users",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Delete Records",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "CommonDataServiceForAppsSink",
+								"writeBatchSize": 10,
+								"writeBehavior": "upsert"
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "emailAddress",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_emailaddress",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "groupUserAccessRight",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_groupuseraccessright",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "displayName",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_displayname",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "identifier",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_identifier",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "principalType",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_principaltype",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "group_id",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_group_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "id_duplicate",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_usersid",
+											"type": "Guid"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "Users",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "UsersDataverse",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "Delete Records",
+						"type": "ExecuteDataFlow",
 						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
@@ -2101,23 +4549,34 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"notebook": {
-								"referenceName": "PBIMetadata",
-								"type": "NotebookReference"
+							"dataflow": {
+								"referenceName": "PBIMetadata Test",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"GroupsSource": {},
+									"ActivityEventsSource": {},
+									"DatasourcesSource": {},
+									"RefreshHistorySource": {},
+									"ReportPagesSource": {},
+									"ResourcesSource": {},
+									"UsersSource": {},
+									"GroupsSink": {},
+									"ActivityEventsSink": {},
+									"DatasourcesSink": {},
+									"RefreshHistorySink": {},
+									"ReportPagesSink": {},
+									"ResourcesSink": {},
+									"UsersSink": {}
+								}
 							},
-							"snapshot": true,
-							"sparkPool": {
-								"referenceName": "SparkPool01",
-								"type": "BigDataPoolReference"
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
 							},
-							"executorSize": "Small",
-							"conf": {
-								"spark.dynamicAllocation.enabled": null,
-								"spark.dynamicAllocation.minExecutors": null,
-								"spark.dynamicAllocation.maxExecutors": null
-							},
-							"driverSize": "Small",
-							"numExecutors": null
+							"traceLevel": "Fine",
+							"runConcurrently": true
 						}
 					}
 				],
@@ -2125,11 +4584,145 @@
 					"elapsedTimeMetric": {},
 					"cancelAfter": {}
 				},
+				"variables": {
+					"test": {
+						"type": "String",
+						"defaultValue": "test"
+					}
+				},
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('workspaceId'), '/notebooks/PBIMetadata')]",
-				"[concat(variables('workspaceId'), '/bigDataPools/SparkPool01')]"
+				"[concat(variables('workspaceId'), '/datasets/Groups')]",
+				"[concat(variables('workspaceId'), '/datasets/GroupsDataverse')]",
+				"[concat(variables('workspaceId'), '/datasets/Activity_Events')]",
+				"[concat(variables('workspaceId'), '/datasets/ActivityEventsDataverse')]",
+				"[concat(variables('workspaceId'), '/datasets/Datasources')]",
+				"[concat(variables('workspaceId'), '/datasets/DatasourcesDataverse')]",
+				"[concat(variables('workspaceId'), '/datasets/RefreshHistory')]",
+				"[concat(variables('workspaceId'), '/datasets/RefreshHistoryDataverse')]",
+				"[concat(variables('workspaceId'), '/datasets/ReportPages')]",
+				"[concat(variables('workspaceId'), '/datasets/ReportPagesDataverse')]",
+				"[concat(variables('workspaceId'), '/datasets/Resources')]",
+				"[concat(variables('workspaceId'), '/datasets/ResourcesDataverse')]",
+				"[concat(variables('workspaceId'), '/datasets/Users')]",
+				"[concat(variables('workspaceId'), '/datasets/UsersDataverse')]",
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]",
+				"[concat(variables('workspaceId'), '/dataflows/PBIMetadata Test')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Resume_PowerBI_Embedded')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "GetCapacityDetails",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"url": {
+								"value": "https://management.azure.com/subscriptions/@{pipeline().parameters.SubscriptionId}/resourceGroups/@{pipeline().parameters.resourceGroupName}/providers/Microsoft.PowerBIDedicated/capacities/@{pipeline().parameters.dedicatedCapacityName}?api-version=2021-01-01",
+								"type": "Expression"
+							},
+							"connectVia": {
+								"referenceName": "AutoResolveIntegrationRuntime",
+								"type": "IntegrationRuntimeReference"
+							},
+							"method": "GET",
+							"headers": {},
+							"authentication": {
+								"type": "MSI",
+								"resource": "https://management.azure.com/"
+							}
+						}
+					},
+					{
+						"name": "Check if capacity is Paused",
+						"type": "IfCondition",
+						"dependsOn": [
+							{
+								"activity": "GetCapacityDetails",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"expression": {
+								"value": "@if(\n    equals(\n        activity('GetCapacityDetails').output.Properties.state, \n        'Paused'\n    ), \n    true , \n    false\n)",
+								"type": "Expression"
+							},
+							"ifTrueActivities": [
+								{
+									"name": "Resume Capacity",
+									"type": "WebActivity",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"url": {
+											"value": "https://management.azure.com/subscriptions/@{pipeline().parameters.SubscriptionId}/resourceGroups/@{pipeline().parameters.resourceGroupName}/providers/Microsoft.PowerBIDedicated/capacities/@{pipeline().parameters.dedicatedCapacityName}/resume?api-version=2021-01-01",
+											"type": "Expression"
+										},
+										"connectVia": {
+											"referenceName": "AutoResolveIntegrationRuntime",
+											"type": "IntegrationRuntimeReference"
+										},
+										"method": "POST",
+										"headers": {},
+										"body": {},
+										"authentication": {
+											"type": "MSI",
+											"resource": "https://management.azure.com/"
+										}
+									}
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"SubscriptionId": {
+						"type": "string",
+						"defaultValue": "b2c447f4-0f0b-471d-a130-0c72330f08f2"
+					},
+					"resourceGroupName": {
+						"type": "string",
+						"defaultValue": "DataX-ResGroup"
+					},
+					"dedicatedCapacityName": {
+						"type": "string",
+						"defaultValue": "pbimbeddedpowerpages"
+					}
+				},
+				"folder": {
+					"name": "PowerBI"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
 			]
 		},
 		{
@@ -3490,131 +6083,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/Pause_or_Resume_PowerBI_Embedded')]",
-			"type": "Microsoft.Synapse/workspaces/pipelines",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"activities": [
-					{
-						"name": "GetCurrentTime",
-						"type": "WebActivity",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"url": {
-								"value": "https://www.timeapi.io/api/Time/current/zone?timeZone=@{pipeline().parameters.TimeZone}",
-								"type": "Expression"
-							},
-							"connectVia": {
-								"referenceName": "AutoResolveIntegrationRuntime",
-								"type": "IntegrationRuntimeReference"
-							},
-							"method": "GET",
-							"headers": {}
-						}
-					},
-					{
-						"name": "Check current time",
-						"type": "IfCondition",
-						"dependsOn": [
-							{
-								"activity": "GetCurrentTime",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"expression": {
-								"value": "@if(\n    equals(\n        activity('GetCurrentTime').output.hour, \n        pipeline().parameters.UpTime\n    ),\n    true , \n    false\n)",
-								"type": "Expression"
-							},
-							"ifFalseActivities": [
-								{
-									"name": "Pause Pipeline",
-									"type": "ExecutePipeline",
-									"dependsOn": [],
-									"userProperties": [],
-									"typeProperties": {
-										"pipeline": {
-											"referenceName": "Pause_PowerBI_Embedded",
-											"type": "PipelineReference"
-										},
-										"waitOnCompletion": true,
-										"parameters": {}
-									}
-								}
-							],
-							"ifTrueActivities": [
-								{
-									"name": "Resume Pipeline",
-									"type": "ExecutePipeline",
-									"dependsOn": [],
-									"userProperties": [],
-									"typeProperties": {
-										"pipeline": {
-											"referenceName": "Resume_PowerBI_Embedded",
-											"type": "PipelineReference"
-										},
-										"waitOnCompletion": true,
-										"parameters": {}
-									}
-								}
-							]
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
-				},
-				"parameters": {
-					"SubscriptionId": {
-						"type": "string",
-						"defaultValue": "b2c447f4-0f0b-471d-a130-0c72330f08f2"
-					},
-					"resourceGroupName": {
-						"type": "string",
-						"defaultValue": "DataX-ResGroup"
-					},
-					"dedicatedCapacityName": {
-						"type": "string",
-						"defaultValue": "pbimbeddedpowerpages"
-					},
-					"TimeZone": {
-						"type": "string",
-						"defaultValue": "Etc/UTC"
-					},
-					"UpTime": {
-						"type": "int",
-						"defaultValue": 9
-					}
-				},
-				"variables": {
-					"Time": {
-						"type": "String"
-					}
-				},
-				"folder": {
-					"name": "PowerBI"
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]",
-				"[concat(variables('workspaceId'), '/pipelines/Resume_PowerBI_Embedded')]",
-				"[concat(variables('workspaceId'), '/pipelines/Pause_PowerBI_Embedded')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('workspaceName'), '/pl_anonymize_excel_and_upload_to_DW')]",
 			"type": "Microsoft.Synapse/workspaces/pipelines",
 			"apiVersion": "2019-06-01-preview",
@@ -4008,6 +6476,494 @@
 			},
 			"dependsOn": [
 				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/ActivityEventsDataverse')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_Dataverse",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "CommonDataServiceForAppsEntity",
+				"schema": [],
+				"typeProperties": {
+					"entityName": "cr64d_activityevents"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/ls_Dataverse')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Activity_Events')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "dataxsynapsedev-WorkspaceDefaultStorage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "ActivityEvents.csv",
+						"folderPath": "PBIMetadata",
+						"fileSystem": "dataxsynapsefs"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "Id",
+						"type": "String"
+					},
+					{
+						"name": "RecordType",
+						"type": "String"
+					},
+					{
+						"name": "CreationTime",
+						"type": "String"
+					},
+					{
+						"name": "Operation",
+						"type": "String"
+					},
+					{
+						"name": "OrganizationId",
+						"type": "String"
+					},
+					{
+						"name": "UserType",
+						"type": "String"
+					},
+					{
+						"name": "UserKey",
+						"type": "String"
+					},
+					{
+						"name": "Workload",
+						"type": "String"
+					},
+					{
+						"name": "UserId",
+						"type": "String"
+					},
+					{
+						"name": "ClientIP",
+						"type": "String"
+					},
+					{
+						"name": "UserAgent",
+						"type": "String"
+					},
+					{
+						"name": "Activity",
+						"type": "String"
+					},
+					{
+						"name": "ItemName",
+						"type": "String"
+					},
+					{
+						"name": "WorkSpaceName",
+						"type": "String"
+					},
+					{
+						"name": "CapacityId",
+						"type": "String"
+					},
+					{
+						"name": "CapacityName",
+						"type": "String"
+					},
+					{
+						"name": "WorkspaceId",
+						"type": "String"
+					},
+					{
+						"name": "ObjectId",
+						"type": "String"
+					},
+					{
+						"name": "DataflowId",
+						"type": "String"
+					},
+					{
+						"name": "DataflowName",
+						"type": "String"
+					},
+					{
+						"name": "DataflowAccessTokenRequestParameters",
+						"type": "String"
+					},
+					{
+						"name": "IsSuccess",
+						"type": "String"
+					},
+					{
+						"name": "DataflowType",
+						"type": "String"
+					},
+					{
+						"name": "RequestId",
+						"type": "String"
+					},
+					{
+						"name": "ActivityId",
+						"type": "String"
+					},
+					{
+						"name": "ResourceId",
+						"type": "String"
+					},
+					{
+						"name": "ExportEventStartDateTimeParameter",
+						"type": "String"
+					},
+					{
+						"name": "ExportEventEndDateTimeParameter",
+						"type": "String"
+					},
+					{
+						"name": "DatasetName",
+						"type": "String"
+					},
+					{
+						"name": "ReportName",
+						"type": "String"
+					},
+					{
+						"name": "DatasetId",
+						"type": "String"
+					},
+					{
+						"name": "ReportId",
+						"type": "String"
+					},
+					{
+						"name": "ArtifactId",
+						"type": "String"
+					},
+					{
+						"name": "ArtifactName",
+						"type": "String"
+					},
+					{
+						"name": "ReportType",
+						"type": "String"
+					},
+					{
+						"name": "DistributionMethod",
+						"type": "String"
+					},
+					{
+						"name": "ConsumptionMethod",
+						"type": "String"
+					},
+					{
+						"name": "ArtifactKind",
+						"type": "String"
+					},
+					{
+						"name": "ModelsSnapshots",
+						"type": "String"
+					},
+					{
+						"name": "HasFullReportAttachment",
+						"type": "String"
+					},
+					{
+						"name": "GatewayId",
+						"type": "String"
+					},
+					{
+						"name": "DatasourceId",
+						"type": "String"
+					},
+					{
+						"name": "DataflowRefreshScheduleType",
+						"type": "String"
+					},
+					{
+						"name": "DataConnectivityMode",
+						"type": "String"
+					},
+					{
+						"name": "RefreshType",
+						"type": "String"
+					},
+					{
+						"name": "LastRefreshTime",
+						"type": "String"
+					},
+					{
+						"name": "ExportEventActivityTypeParameter",
+						"type": "String"
+					},
+					{
+						"name": "DashboardName",
+						"type": "String"
+					},
+					{
+						"name": "DashboardId",
+						"type": "String"
+					},
+					{
+						"name": "Datasets",
+						"type": "String"
+					},
+					{
+						"name": "ImportId",
+						"type": "String"
+					},
+					{
+						"name": "ImportSource",
+						"type": "String"
+					},
+					{
+						"name": "ImportType",
+						"type": "String"
+					},
+					{
+						"name": "ImportDisplayName",
+						"type": "String"
+					},
+					{
+						"name": "FolderObjectId",
+						"type": "String"
+					},
+					{
+						"name": "FolderDisplayName",
+						"type": "String"
+					},
+					{
+						"name": "FolderAccessRequests",
+						"type": "String"
+					},
+					{
+						"name": "AppName",
+						"type": "String"
+					},
+					{
+						"name": "AppReportId",
+						"type": "String"
+					},
+					{
+						"name": "AppId",
+						"type": "String"
+					},
+					{
+						"name": "TemplateAppObjectId",
+						"type": "String"
+					},
+					{
+						"name": "TemplatePackageName",
+						"type": "String"
+					},
+					{
+						"name": "TemplateAppVersion",
+						"type": "String"
+					},
+					{
+						"name": "TemplateAppOwnerTenantObjectId",
+						"type": "String"
+					},
+					{
+						"name": "TemplateAppFolderObjectId",
+						"type": "String"
+					},
+					{
+						"name": "IsUpdateAppActivity",
+						"type": "String"
+					},
+					{
+						"name": "IsTemplateAppFromMarketplace",
+						"type": "String"
+					},
+					{
+						"name": "TemplateAppIsInstalledWithAutomation",
+						"type": "String"
+					},
+					{
+						"name": "Schedules",
+						"type": "String"
+					},
+					{
+						"name": "CustomVisualAccessTokenResourceId",
+						"type": "String"
+					},
+					{
+						"name": "CustomVisualAccessTokenSiteUri",
+						"type": "String"
+					},
+					{
+						"name": "EmbedTokenId",
+						"type": "String"
+					},
+					{
+						"name": "ArtifactObjectId",
+						"type": "String"
+					},
+					{
+						"name": "ResultStatus",
+						"type": "String"
+					},
+					{
+						"name": "ObjectType",
+						"type": "String"
+					},
+					{
+						"name": "ObjectDisplayName",
+						"type": "String"
+					},
+					{
+						"name": "Experience",
+						"type": "String"
+					},
+					{
+						"name": "AggregatedWorkspaceInformation",
+						"type": "String"
+					},
+					{
+						"name": "InPlaceSharingEnabled",
+						"type": "String"
+					},
+					{
+						"name": "IsTenantAdminApi",
+						"type": "String"
+					},
+					{
+						"name": "GatewayClusters",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/dataxsynapsedev-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Datasources')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "dataxsynapsedev-WorkspaceDefaultStorage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "Datasources.csv",
+						"folderPath": "PBIMetadata",
+						"fileSystem": "dataxsynapsefs"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "datasourceType",
+						"type": "String"
+					},
+					{
+						"name": "datasourceId",
+						"type": "String"
+					},
+					{
+						"name": "gatewayId",
+						"type": "String"
+					},
+					{
+						"name": "resource_id",
+						"type": "String"
+					},
+					{
+						"name": "group_id",
+						"type": "String"
+					},
+					{
+						"name": "resource_type",
+						"type": "String"
+					},
+					{
+						"name": "id",
+						"type": "String"
+					},
+					{
+						"name": "emailAddress",
+						"type": "String"
+					},
+					{
+						"name": "server",
+						"type": "String"
+					},
+					{
+						"name": "path",
+						"type": "String"
+					},
+					{
+						"name": "sharePointSiteUrl",
+						"type": "String"
+					},
+					{
+						"name": "url",
+						"type": "String"
+					},
+					{
+						"name": "extensionDataSourceKind",
+						"type": "String"
+					},
+					{
+						"name": "extensionDataSourcePath",
+						"type": "String"
+					},
+					{
+						"name": "database",
+						"type": "String"
+					},
+					{
+						"name": "kind",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/dataxsynapsedev-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/DatasourcesDataverse')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_Dataverse",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "CommonDataServiceForAppsEntity",
+				"schema": [],
+				"typeProperties": {
+					"entityName": "cr64d_datasources"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/ls_Dataverse')]"
 			]
 		},
 		{
@@ -5980,6 +8936,88 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/Groups')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "dataxsynapsedev-WorkspaceDefaultStorage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "Groups.csv",
+						"folderPath": "PBIMetadata",
+						"fileSystem": "dataxsynapsefs"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "id",
+						"type": "String"
+					},
+					{
+						"name": "isReadOnly",
+						"type": "String"
+					},
+					{
+						"name": "isOnDedicatedCapacity",
+						"type": "String"
+					},
+					{
+						"name": "type",
+						"type": "String"
+					},
+					{
+						"name": "name",
+						"type": "String"
+					},
+					{
+						"name": "capacityId",
+						"type": "String"
+					},
+					{
+						"name": "defaultDatasetStorageFormat",
+						"type": "String"
+					},
+					{
+						"name": "id_duplicate",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/dataxsynapsedev-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/GroupsDataverse')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_Dataverse",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "CommonDataServiceForAppsEntity",
+				"schema": [],
+				"typeProperties": {
+					"entityName": "cr64d_groups"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/ls_Dataverse')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/Mario_csv')]",
 			"type": "Microsoft.Synapse/workspaces/datasets",
 			"apiVersion": "2019-06-01-preview",
@@ -6023,6 +9061,332 @@
 			},
 			"dependsOn": [
 				"[concat(variables('workspaceId'), '/linkedServices/dataxsynapsedev-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/RefreshHistory')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "dataxsynapsedev-WorkspaceDefaultStorage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "RefreshHistory.csv",
+						"folderPath": "PBIMetadata",
+						"fileSystem": "dataxsynapsefs"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\"",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "requestId",
+						"type": "String"
+					},
+					{
+						"name": "id",
+						"type": "String"
+					},
+					{
+						"name": "refreshType",
+						"type": "String"
+					},
+					{
+						"name": "startTime",
+						"type": "String"
+					},
+					{
+						"name": "endTime",
+						"type": "String"
+					},
+					{
+						"name": "status",
+						"type": "String"
+					},
+					{
+						"name": "resource_id",
+						"type": "String"
+					},
+					{
+						"name": "group_id",
+						"type": "String"
+					},
+					{
+						"name": "resource_type",
+						"type": "String"
+					},
+					{
+						"name": "serviceExceptionJson",
+						"type": "String"
+					},
+					{
+						"name": "id_duplicate",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/dataxsynapsedev-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/RefreshHistoryDataverse')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_Dataverse",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "CommonDataServiceForAppsEntity",
+				"schema": [],
+				"typeProperties": {
+					"entityName": "cr64d_refreshhistory"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/ls_Dataverse')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/ReportPages')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "dataxsynapsedev-WorkspaceDefaultStorage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "ReportPages.csv",
+						"folderPath": "PBIMetadata",
+						"fileSystem": "dataxsynapsefs"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "name",
+						"type": "String"
+					},
+					{
+						"name": "displayName",
+						"type": "String"
+					},
+					{
+						"name": "order",
+						"type": "String"
+					},
+					{
+						"name": "report_id",
+						"type": "String"
+					},
+					{
+						"name": "group_id",
+						"type": "String"
+					},
+					{
+						"name": "Id",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/dataxsynapsedev-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/ReportPagesDataverse')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_Dataverse",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "CommonDataServiceForAppsEntity",
+				"schema": [],
+				"typeProperties": {
+					"entityName": "cr64d_reportpages"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/ls_Dataverse')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Resources')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "dataxsynapsedev-WorkspaceDefaultStorage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "Resources.csv",
+						"folderPath": "PBIMetadata",
+						"fileSystem": "dataxsynapsefs"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "id",
+						"type": "String"
+					},
+					{
+						"name": "name",
+						"type": "String"
+					},
+					{
+						"name": "webUrl",
+						"type": "String"
+					},
+					{
+						"name": "addRowsAPIEnabled",
+						"type": "String"
+					},
+					{
+						"name": "configuredBy",
+						"type": "String"
+					},
+					{
+						"name": "isRefreshable",
+						"type": "String"
+					},
+					{
+						"name": "isEffectiveIdentityRequired",
+						"type": "String"
+					},
+					{
+						"name": "isEffectiveIdentityRolesRequired",
+						"type": "String"
+					},
+					{
+						"name": "targetStorageMode",
+						"type": "String"
+					},
+					{
+						"name": "createdDate",
+						"type": "String"
+					},
+					{
+						"name": "createReportEmbedURL",
+						"type": "String"
+					},
+					{
+						"name": "qnaEmbedURL",
+						"type": "String"
+					},
+					{
+						"name": "upstreamDatasets",
+						"type": "String"
+					},
+					{
+						"name": "users",
+						"type": "String"
+					},
+					{
+						"name": "queryScaleOutSettings",
+						"type": "String"
+					},
+					{
+						"name": "group_id",
+						"type": "String"
+					},
+					{
+						"name": "type",
+						"type": "String"
+					},
+					{
+						"name": "objectId",
+						"type": "String"
+					},
+					{
+						"name": "description",
+						"type": "String"
+					},
+					{
+						"name": "reportType",
+						"type": "String"
+					},
+					{
+						"name": "embedUrl",
+						"type": "String"
+					},
+					{
+						"name": "isFromPbix",
+						"type": "String"
+					},
+					{
+						"name": "isOwnedByMe",
+						"type": "String"
+					},
+					{
+						"name": "datasetId",
+						"type": "String"
+					},
+					{
+						"name": "datasetWorkspaceId",
+						"type": "String"
+					},
+					{
+						"name": "subscriptions",
+						"type": "String"
+					},
+					{
+						"name": "isOnPremGatewayRequired",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/dataxsynapsedev-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/ResourcesDataverse')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_Dataverse",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "CommonDataServiceForAppsEntity",
+				"schema": [],
+				"typeProperties": {
+					"entityName": "cr64d_resources"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/ls_Dataverse')]"
 			]
 		},
 		{
@@ -6492,6 +9856,80 @@
 			},
 			"dependsOn": [
 				"[concat(variables('workspaceId'), '/sqlPools/DataXDW')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Users')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "dataxsynapsedev-WorkspaceDefaultStorage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "Users.csv",
+						"folderPath": "PBIMetadata",
+						"fileSystem": "dataxsynapsefs"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "emailAddress",
+						"type": "String"
+					},
+					{
+						"name": "groupUserAccessRight",
+						"type": "String"
+					},
+					{
+						"name": "displayName",
+						"type": "String"
+					},
+					{
+						"name": "identifier",
+						"type": "String"
+					},
+					{
+						"name": "principalType",
+						"type": "String"
+					},
+					{
+						"name": "group_id",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/dataxsynapsedev-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/UsersDataverse')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_Dataverse",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "CommonDataServiceForAppsEntity",
+				"schema": [],
+				"typeProperties": {
+					"entityName": "cr64d_users"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/ls_Dataverse')]"
 			]
 		},
 		{
@@ -7863,6 +11301,33 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/ls_Dataverse')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "CommonDataServiceForApps",
+				"typeProperties": {
+					"deploymentType": "Online",
+					"serviceUri": "https://org6fc1a113.crm4.dynamics.com",
+					"authenticationType": "AADServicePrincipal",
+					"servicePrincipalCredentialType": "ServicePrincipalKey",
+					"servicePrincipalId": "[parameters('ls_Dataverse_properties_typeProperties_servicePrincipalId')]",
+					"servicePrincipalCredential": {
+						"type": "SecureString",
+						"value": "[parameters('ls_Dataverse_servicePrincipalCredential')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/ls_github')]",
 			"type": "Microsoft.Synapse/workspaces/linkedServices",
 			"apiVersion": "2019-06-01-preview",
@@ -8189,6 +11654,230 @@
 				"typeProperties": {}
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/PBIMetadata Test')]",
+			"type": "Microsoft.Synapse/workspaces/dataflows",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "GroupsDataverse",
+								"type": "DatasetReference"
+							},
+							"name": "GroupsSource"
+						},
+						{
+							"dataset": {
+								"referenceName": "ActivityEventsDataverse",
+								"type": "DatasetReference"
+							},
+							"name": "ActivityEventsSource"
+						},
+						{
+							"dataset": {
+								"referenceName": "DatasourcesDataverse",
+								"type": "DatasetReference"
+							},
+							"name": "DatasourcesSource"
+						},
+						{
+							"dataset": {
+								"referenceName": "RefreshHistoryDataverse",
+								"type": "DatasetReference"
+							},
+							"name": "RefreshHistorySource"
+						},
+						{
+							"dataset": {
+								"referenceName": "ReportPagesDataverse",
+								"type": "DatasetReference"
+							},
+							"name": "ReportPagesSource"
+						},
+						{
+							"dataset": {
+								"referenceName": "ResourcesDataverse",
+								"type": "DatasetReference"
+							},
+							"name": "ResourcesSource"
+						},
+						{
+							"dataset": {
+								"referenceName": "UsersDataverse",
+								"type": "DatasetReference"
+							},
+							"name": "UsersSource"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "GroupsDataverse",
+								"type": "DatasetReference"
+							},
+							"name": "GroupsSink"
+						},
+						{
+							"dataset": {
+								"referenceName": "ActivityEventsDataverse",
+								"type": "DatasetReference"
+							},
+							"name": "ActivityEventsSink"
+						},
+						{
+							"dataset": {
+								"referenceName": "DatasourcesDataverse",
+								"type": "DatasetReference"
+							},
+							"name": "DatasourcesSink"
+						},
+						{
+							"dataset": {
+								"referenceName": "RefreshHistoryDataverse",
+								"type": "DatasetReference"
+							},
+							"name": "RefreshHistorySink"
+						},
+						{
+							"dataset": {
+								"referenceName": "ReportPagesDataverse",
+								"type": "DatasetReference"
+							},
+							"name": "ReportPagesSink"
+						},
+						{
+							"dataset": {
+								"referenceName": "ResourcesDataverse",
+								"type": "DatasetReference"
+							},
+							"name": "ResourcesSink"
+						},
+						{
+							"dataset": {
+								"referenceName": "UsersDataverse",
+								"type": "DatasetReference"
+							},
+							"name": "UsersSink"
+						}
+					],
+					"transformations": [
+						{
+							"name": "AlterRowGroups"
+						},
+						{
+							"name": "AlterRowActivityEvents"
+						},
+						{
+							"name": "AlterRowDatasources"
+						},
+						{
+							"name": "AlterRowRefreshHistory"
+						},
+						{
+							"name": "AlterRowReportPages"
+						},
+						{
+							"name": "AlterRowResources"
+						},
+						{
+							"name": "AlterRowUsers"
+						}
+					],
+					"scriptLines": [
+						"source(allowSchemaDrift: true,",
+						"     validateSchema: false) ~> GroupsSource",
+						"source(allowSchemaDrift: true,",
+						"     validateSchema: false) ~> ActivityEventsSource",
+						"source(allowSchemaDrift: true,",
+						"     validateSchema: false) ~> DatasourcesSource",
+						"source(allowSchemaDrift: true,",
+						"     validateSchema: false) ~> RefreshHistorySource",
+						"source(allowSchemaDrift: true,",
+						"     validateSchema: false) ~> ReportPagesSource",
+						"source(allowSchemaDrift: true,",
+						"     validateSchema: false) ~> ResourcesSource",
+						"source(allowSchemaDrift: true,",
+						"     validateSchema: false) ~> UsersSource",
+						"GroupsSource alterRow(deleteIf(true())) ~> AlterRowGroups",
+						"ActivityEventsSource alterRow(deleteIf(true())) ~> AlterRowActivityEvents",
+						"DatasourcesSource alterRow(deleteIf(true())) ~> AlterRowDatasources",
+						"RefreshHistorySource alterRow(deleteIf(true())) ~> AlterRowRefreshHistory",
+						"ReportPagesSource alterRow(deleteIf(true())) ~> AlterRowReportPages",
+						"ResourcesSource alterRow(deleteIf(true())) ~> AlterRowResources",
+						"UsersSource alterRow(deleteIf(true())) ~> AlterRowUsers",
+						"AlterRowGroups sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     deletable:true,",
+						"     insertable:false,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     saveOrder: 0) ~> GroupsSink",
+						"AlterRowActivityEvents sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     deletable:true,",
+						"     insertable:false,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> ActivityEventsSink",
+						"AlterRowDatasources sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     deletable:true,",
+						"     insertable:false,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> DatasourcesSink",
+						"AlterRowRefreshHistory sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     deletable:true,",
+						"     insertable:false,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> RefreshHistorySink",
+						"AlterRowReportPages sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     deletable:true,",
+						"     insertable:false,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> ReportPagesSink",
+						"AlterRowResources sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     deletable:true,",
+						"     insertable:false,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> ResourcesSink",
+						"AlterRowUsers sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     deletable:true,",
+						"     insertable:false,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> UsersSink"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/datasets/GroupsDataverse')]",
+				"[concat(variables('workspaceId'), '/datasets/ActivityEventsDataverse')]",
+				"[concat(variables('workspaceId'), '/datasets/DatasourcesDataverse')]",
+				"[concat(variables('workspaceId'), '/datasets/RefreshHistoryDataverse')]",
+				"[concat(variables('workspaceId'), '/datasets/ReportPagesDataverse')]",
+				"[concat(variables('workspaceId'), '/datasets/ResourcesDataverse')]",
+				"[concat(variables('workspaceId'), '/datasets/UsersDataverse')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('workspaceName'), '/WorkspaceSystemIdentity')]",
@@ -12057,7 +15746,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "1",
 						"spark.dynamicAllocation.maxExecutors": "1",
-						"spark.autotune.trackingId": "75198b02-1e46-4098-a1fd-47afcf1c5148"
+						"spark.autotune.trackingId": "7565d47c-6b63-4cc8-8b3c-258596d57410"
 					}
 				},
 				"metadata": {
@@ -12080,9 +15769,10 @@
 							"authResource": "https://dev.azuresynapse.net"
 						},
 						"sparkVersion": "3.1",
-						"nodeCount": 10,
+						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28
+						"memory": 28,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -12119,10 +15809,12 @@
 							"from requests.structures import CaseInsensitiveDict\r\n",
 							"import json\r\n",
 							"import pandas as pd\r\n",
+							"import numpy as np\r\n",
+							"import uuid\r\n",
 							"from datetime import datetime, timezone, timedelta"
 						],
 						"outputs": [],
-						"execution_count": 14
+						"execution_count": 104
 					},
 					{
 						"cell_type": "code",
@@ -12143,10 +15835,17 @@
 							"    try:\r\n",
 							"        print(json.dumps(response.json(), indent=4, sort_keys=False))\r\n",
 							"    except:\r\n",
-							"        pass"
+							"        pass\r\n",
+							"\r\n",
+							"def getID(unformatedGUID):\r\n",
+							"    strList = unformatedGUID.split(\"$\")\r\n",
+							"    result = \"\"\r\n",
+							"    if len(strList) > 1 :\r\n",
+							"        result = strList[-2]\r\n",
+							"    return result"
 						],
 						"outputs": [],
-						"execution_count": 15
+						"execution_count": 105
 					},
 					{
 						"cell_type": "markdown",
@@ -12181,7 +15880,7 @@
 							"account_password = mssparkutils.credentials.getSecretWithLS('ls_keyvault', 'PBIMetadataClientUserAndPassword')"
 						],
 						"outputs": [],
-						"execution_count": 16
+						"execution_count": 106
 					},
 					{
 						"cell_type": "code",
@@ -12205,7 +15904,7 @@
 							"headers[\"Authorization\"] = \"Bearer \" + access_token"
 						],
 						"outputs": [],
-						"execution_count": 17
+						"execution_count": 107
 					},
 					{
 						"cell_type": "markdown",
@@ -12241,11 +15940,12 @@
 							"obj = resp.json()\r\n",
 							"\r\n",
 							"groups_df = pd.DataFrame.from_records(obj[\"value\"])\r\n",
+							"groups_df[\"id_duplicate\"] = groups_df[\"id\"]\r\n",
 							"mssparkutils.fs.put(\"/PBIMetadata/Groups.csv\", groups_df.to_csv(index=False), True)\r\n",
 							"#print(groups_df.head())"
 						],
 						"outputs": [],
-						"execution_count": 18
+						"execution_count": 108
 					},
 					{
 						"cell_type": "markdown",
@@ -12292,10 +15992,11 @@
 							"        data_df = pd.concat([data_df,new_df],ignore_index=True)\r\n",
 							"\r\n",
 							"#print(data_df.shape)\r\n",
+							"data_df[\"id_duplicate\"] = data_df[\"id\"]\r\n",
 							"mssparkutils.fs.put(\"/PBIMetadata/Resources.csv\", data_df.to_csv(index=False), True)"
 						],
 						"outputs": [],
-						"execution_count": 19
+						"execution_count": 109
 					},
 					{
 						"cell_type": "markdown",
@@ -12321,7 +16022,8 @@
 								"transient": {
 									"deleting": false
 								}
-							}
+							},
+							"collapsed": false
 						},
 						"source": [
 							"report_df = data_df[data_df[\"type\"] == \"report\"]\r\n",
@@ -12335,12 +16037,14 @@
 							"    new_df = pd.DataFrame.from_records(obj[\"value\"])\r\n",
 							"    new_df[\"report_id\"] = id_\r\n",
 							"    new_df[\"group_id\"] = group\r\n",
+							"    new_df[\"Id\"] = new_df.report_id.map(str) + new_df.name\r\n",
+							"    new_df[\"Id_duplicate\"] = new_df[\"report_id\"]\r\n",
 							"    pages_df = pd.concat([pages_df,new_df],ignore_index=True)\r\n",
 							"mssparkutils.fs.put(\"/PBIMetadata/ReportPages.csv\", pages_df.to_csv(index=False), True)\r\n",
 							"#print(pages_df.shape)"
 						],
 						"outputs": [],
-						"execution_count": 20
+						"execution_count": 110
 					},
 					{
 						"cell_type": "markdown",
@@ -12387,13 +16091,14 @@
 							"            new_df[\"group_id\"] = group\r\n",
 							"            new_df[\"resource_type\"] = resource[:-1]\r\n",
 							"            new_df[\"id\"] = new_df[\"datasourceId\"]\r\n",
+							"            new_df[\"id_duplicate\"] = new_df[\"id\"].apply(lambda x: uuid.uuid4())\r\n",
 							"            new_df = pd.concat([new_df.drop(['connectionDetails'], axis=1), new_df['connectionDetails'].apply(pd.Series)], axis=1)\r\n",
 							"    datasources_df = pd.concat([datasources_df,new_df],ignore_index=True)\r\n",
 							"mssparkutils.fs.put(\"/PBIMetadata/Datasources.csv\", datasources_df.to_csv(index=False), True)\r\n",
 							"#print(datasources_df.shape)"
 						],
 						"outputs": [],
-						"execution_count": 21
+						"execution_count": 111
 					},
 					{
 						"cell_type": "markdown",
@@ -12442,11 +16147,13 @@
 							"        new_df[\"group_id\"] = group\r\n",
 							"        new_df[\"resource_type\"] = type_[:-1]\r\n",
 							"        refresh_df = pd.concat([refresh_df,new_df],ignore_index=True)\r\n",
+							"refresh_df = refresh_df.astype({\"id\": str})\r\n",
+							"refresh_df[\"id_duplicate\"] = np.where(pd.isnull(refresh_df[\"requestId\"]), refresh_df[\"id\"].apply(getID), refresh_df[\"requestId\"])\r\n",
 							"mssparkutils.fs.put(\"/PBIMetadata/RefreshHistory.csv\", refresh_df.to_csv(index=False), True)\r\n",
 							"#print(refresh_df.shape)"
 						],
 						"outputs": [],
-						"execution_count": 22
+						"execution_count": 112
 					},
 					{
 						"cell_type": "markdown",
@@ -12494,7 +16201,7 @@
 							"#mssparkutils.fs.put(\"/PBIMetadata/Imports.csv\", imports_df.to_csv(index=False), True)"
 						],
 						"outputs": [],
-						"execution_count": 23
+						"execution_count": 113
 					},
 					{
 						"cell_type": "code",
@@ -12529,7 +16236,7 @@
 							"mssparkutils.fs.put(\"/PBIMetadata/Resources.csv\", data_df.to_csv(index=False), True)"
 						],
 						"outputs": [],
-						"execution_count": 24
+						"execution_count": 114
 					},
 					{
 						"cell_type": "markdown",
@@ -12568,6 +16275,7 @@
 							"    obj = resp.json()\r\n",
 							"    new_df = pd.DataFrame.from_records(obj[\"value\"])\r\n",
 							"    new_df[\"group_id\"] = group\r\n",
+							"    new_df[\"id_duplicate\"] = new_df[\"identifier\"].apply(lambda x: uuid.uuid4())\r\n",
 							"    users_df = pd.concat([users_df,new_df],ignore_index=True)\r\n",
 							"\r\n",
 							"#print(users_df.shape)\r\n",
@@ -12575,7 +16283,7 @@
 							"mssparkutils.fs.put(\"/PBIMetadata/Users.csv\", users_df.to_csv(index=False), True)"
 						],
 						"outputs": [],
-						"execution_count": 25
+						"execution_count": 115
 					},
 					{
 						"cell_type": "markdown",
@@ -12609,7 +16317,7 @@
 							"tenant_id = '89248974-515e-4d65-9469-ab424abfd2d2'"
 						],
 						"outputs": [],
-						"execution_count": 5
+						"execution_count": 39
 					},
 					{
 						"cell_type": "code",
@@ -12633,7 +16341,7 @@
 							"headers[\"Authorization\"] = \"Bearer \" + access_token"
 						],
 						"outputs": [],
-						"execution_count": 6
+						"execution_count": 40
 					},
 					{
 						"cell_type": "markdown",
@@ -12663,50 +16371,51 @@
 							}
 						},
 						"source": [
-							"resourcesId = [\"DataflowId\", \"DatasourceId\", \"DatasetId\", \"ReportId\", \"DashboardId\"]\r\n",
-							"dates = []\r\n",
-							"dates.append(datetime.now())\r\n",
+							"# resourcesId = [\"DataflowId\", \"DatasourceId\", \"DatasetId\", \"ReportId\", \"DashboardId\"]\r\n",
+							"# dates = []\r\n",
+							"# dates.append(datetime.now())\r\n",
 							"\r\n",
-							"activity_eventsCSV = spark.read.csv('abfss://dataxsynapsefs@adlsdatax01.dfs.core.windows.net/PBIMetadata/ActivityEvents.csv', header=True, inferSchema=True)\r\n",
-							"activity_events_df = activity_eventsCSV.toPandas()\r\n",
-							"#activity_events_df = pd.DataFrame()\r\n",
+							"# activity_eventsCSV = spark.read.csv('abfss://dataxsynapsefs@adlsdatax01.dfs.core.windows.net/PBIMetadata/ActivityEvents.csv', header=True, inferSchema=True)\r\n",
+							"# activity_events_df = activity_eventsCSV.toPandas()\r\n",
+							"# #activity_events_df = pd.DataFrame()\r\n",
 							"\r\n",
-							"for i in range(1,29):\r\n",
-							"    dates.append(datetime.now() - timedelta(i))\r\n",
-							"for date in dates:\r\n",
-							"    # print(date.strftime(f\"%Y-%m-%dT00:00:00Z\"))\r\n",
-							"    # print(date.strftime(f\"%Y-%m-%dT23:59:59Z\"))\r\n",
-							"    startTime = date.strftime(f\"%Y-%m-%dT00:00:00Z\")\r\n",
-							"    endTime = date.strftime(f\"%Y-%m-%dT23:59:59Z\")\r\n",
+							"# for i in range(1,29):\r\n",
+							"#     dates.append(datetime.now() - timedelta(i))\r\n",
+							"# for date in dates:\r\n",
+							"#     # print(date.strftime(f\"%Y-%m-%dT00:00:00Z\"))\r\n",
+							"#     # print(date.strftime(f\"%Y-%m-%dT23:59:59Z\"))\r\n",
+							"#     startTime = date.strftime(f\"%Y-%m-%dT00:00:00Z\")\r\n",
+							"#     endTime = date.strftime(f\"%Y-%m-%dT23:59:59Z\")\r\n",
 							"\r\n",
-							"    url = f\"https://api.powerbi.com/v1.0/myorg/admin/activityevents?startDateTime='{startTime}'&endDateTime='{endTime}'\"\r\n",
+							"#     url = f\"https://api.powerbi.com/v1.0/myorg/admin/activityevents?startDateTime='{startTime}'&endDateTime='{endTime}'\"\r\n",
 							"\r\n",
-							"    resp = requests.get(url, headers=headers)\r\n",
-							"    #safe_print(resp)\r\n",
-							"    obj = resp.json()\r\n",
+							"#     resp = requests.get(url, headers=headers)\r\n",
+							"#     #safe_print(resp)\r\n",
+							"#     obj = resp.json()\r\n",
 							"\r\n",
-							"    new_df = pd.DataFrame.from_records(obj[\"activityEventEntities\"])\r\n",
-							"    for resource in resourcesId:\r\n",
-							"            if resource in new_df.columns:\r\n",
-							"                new_df[\"ResourceId\"] = new_df[resource]\r\n",
+							"#     new_df = pd.DataFrame.from_records(obj[\"activityEventEntities\"])\r\n",
+							"#     for resource in resourcesId:\r\n",
+							"#             if resource in new_df.columns:\r\n",
+							"#                 new_df[\"ResourceId\"] = new_df[resource]\r\n",
 							"\r\n",
-							"    activity_events_df = pd.concat([activity_events_df,new_df],ignore_index=True)\r\n",
+							"#     activity_events_df = pd.concat([activity_events_df,new_df],ignore_index=True)\r\n",
 							"\r\n",
-							"    while(not obj[\"lastResultSet\"]):\r\n",
-							"        url = obj[\"continuationUri\"]\r\n",
-							"        resp = requests.get(url, headers=headers)\r\n",
-							"        obj = resp.json()\r\n",
+							"#     while(not obj[\"lastResultSet\"]):\r\n",
+							"#         url = obj[\"continuationUri\"]\r\n",
+							"#         resp = requests.get(url, headers=headers)\r\n",
+							"#         obj = resp.json()\r\n",
 							"\r\n",
-							"        new_df = pd.DataFrame.from_records(obj[\"activityEventEntities\"])\r\n",
-							"        for resource in resourcesId:\r\n",
-							"            if resource in new_df.columns:\r\n",
-							"                new_df[\"ResourceId\"] = new_df[resource]\r\n",
-							"        activity_events_df = pd.concat([activity_events_df,new_df],ignore_index=True)\r\n",
-							"#print(activity_events_df.shape)\r\n",
-							"mssparkutils.fs.put(\"/PBIMetadata/ActivityEvents.csv\", activity_events_df.to_csv(index=False), True)"
+							"#         new_df = pd.DataFrame.from_records(obj[\"activityEventEntities\"])\r\n",
+							"#         for resource in resourcesId:\r\n",
+							"#             if resource in new_df.columns:\r\n",
+							"#                 new_df[\"ResourceId\"] = new_df[resource]\r\n",
+							"#         new_df[\"id_duplicate\"] = new_df[\"Id\"]\r\n",
+							"#         activity_events_df = pd.concat([activity_events_df,new_df],ignore_index=True)\r\n",
+							"# #print(activity_events_df.shape)\r\n",
+							"# mssparkutils.fs.put(\"/PBIMetadata/ActivityEvents.csv\", activity_events_df.to_csv(index=False), True)"
 						],
 						"outputs": [],
-						"execution_count": 71
+						"execution_count": 41
 					}
 				]
 			},
@@ -14348,14 +18057,14 @@
 			"location": "westeurope"
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/Pause_PowerBI_Embedded')]",
+			"name": "[concat(parameters('workspaceName'), '/Test')]",
 			"type": "Microsoft.Synapse/workspaces/pipelines",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"activities": [
 					{
-						"name": "GetCapacityDetails",
-						"type": "WebActivity",
+						"name": "Delete Records",
+						"type": "ExecuteDataFlow",
 						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
@@ -14366,71 +18075,33 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"url": {
-								"value": "https://management.azure.com/subscriptions/@{pipeline().parameters.SubscriptionId}/resourceGroups/@{pipeline().parameters.resourceGroupName}/providers/Microsoft.PowerBIDedicated/capacities/@{pipeline().parameters.dedicatedCapacityName}?api-version=2021-01-01",
-								"type": "Expression"
-							},
-							"connectVia": {
-								"referenceName": "AutoResolveIntegrationRuntime",
-								"type": "IntegrationRuntimeReference"
-							},
-							"method": "GET",
-							"headers": {},
-							"authentication": {
-								"type": "MSI",
-								"resource": "https://management.azure.com/"
-							}
-						}
-					},
-					{
-						"name": "Check if capacity is Active",
-						"type": "IfCondition",
-						"dependsOn": [
-							{
-								"activity": "GetCapacityDetails",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"expression": {
-								"value": "@if(\n    equals(\n        activity('GetCapacityDetails').output.Properties.state, \n        'Succeeded'\n    ), \n    true , \n    false\n)",
-								"type": "Expression"
-							},
-							"ifTrueActivities": [
-								{
-									"name": "Pause Capacity",
-									"type": "WebActivity",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"url": {
-											"value": "https://management.azure.com/subscriptions/@{pipeline().parameters.SubscriptionId}/resourceGroups/@{pipeline().parameters.resourceGroupName}/providers/Microsoft.PowerBIDedicated/capacities/@{pipeline().parameters.dedicatedCapacityName}/suspend?api-version=2021-01-01",
-											"type": "Expression"
-										},
-										"connectVia": {
-											"referenceName": "AutoResolveIntegrationRuntime",
-											"type": "IntegrationRuntimeReference"
-										},
-										"method": "POST",
-										"headers": {},
-										"body": {},
-										"authentication": {
-											"type": "MSI",
-											"resource": "https://management.azure.com/"
-										}
-									}
+							"dataflow": {
+								"referenceName": "PBIMetadata Test",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"GroupsSource": {},
+									"ActivityEventsSource": {},
+									"DatasourcesSource": {},
+									"RefreshHistorySource": {},
+									"ReportPagesSource": {},
+									"ResourcesSource": {},
+									"UsersSource": {},
+									"GroupsSink": {},
+									"ActivityEventsSink": {},
+									"DatasourcesSink": {},
+									"RefreshHistorySink": {},
+									"ReportPagesSink": {},
+									"ResourcesSink": {},
+									"UsersSink": {}
 								}
-							]
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
 						}
 					}
 				],
@@ -14438,141 +18109,11 @@
 					"elapsedTimeMetric": {},
 					"cancelAfter": {}
 				},
-				"parameters": {
-					"SubscriptionId": {
-						"type": "string",
-						"defaultValue": "b2c447f4-0f0b-471d-a130-0c72330f08f2"
-					},
-					"resourceGroupName": {
-						"type": "string",
-						"defaultValue": "DataX-ResGroup"
-					},
-					"dedicatedCapacityName": {
-						"type": "string",
-						"defaultValue": "pbimbeddedpowerpages"
-					}
-				},
-				"folder": {
-					"name": "PowerBI"
-				},
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/Resume_PowerBI_Embedded')]",
-			"type": "Microsoft.Synapse/workspaces/pipelines",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"activities": [
-					{
-						"name": "GetCapacityDetails",
-						"type": "WebActivity",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"url": {
-								"value": "https://management.azure.com/subscriptions/@{pipeline().parameters.SubscriptionId}/resourceGroups/@{pipeline().parameters.resourceGroupName}/providers/Microsoft.PowerBIDedicated/capacities/@{pipeline().parameters.dedicatedCapacityName}?api-version=2021-01-01",
-								"type": "Expression"
-							},
-							"connectVia": {
-								"referenceName": "AutoResolveIntegrationRuntime",
-								"type": "IntegrationRuntimeReference"
-							},
-							"method": "GET",
-							"headers": {},
-							"authentication": {
-								"type": "MSI",
-								"resource": "https://management.azure.com/"
-							}
-						}
-					},
-					{
-						"name": "Check if capacity is Paused",
-						"type": "IfCondition",
-						"dependsOn": [
-							{
-								"activity": "GetCapacityDetails",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"expression": {
-								"value": "@if(\n    equals(\n        activity('GetCapacityDetails').output.Properties.state, \n        'Paused'\n    ), \n    true , \n    false\n)",
-								"type": "Expression"
-							},
-							"ifTrueActivities": [
-								{
-									"name": "Resume Capacity",
-									"type": "WebActivity",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"url": {
-											"value": "https://management.azure.com/subscriptions/@{pipeline().parameters.SubscriptionId}/resourceGroups/@{pipeline().parameters.resourceGroupName}/providers/Microsoft.PowerBIDedicated/capacities/@{pipeline().parameters.dedicatedCapacityName}/resume?api-version=2021-01-01",
-											"type": "Expression"
-										},
-										"connectVia": {
-											"referenceName": "AutoResolveIntegrationRuntime",
-											"type": "IntegrationRuntimeReference"
-										},
-										"method": "POST",
-										"headers": {},
-										"body": {},
-										"authentication": {
-											"type": "MSI",
-											"resource": "https://management.azure.com/"
-										}
-									}
-								}
-							]
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
-				},
-				"parameters": {
-					"SubscriptionId": {
-						"type": "string",
-						"defaultValue": "b2c447f4-0f0b-471d-a130-0c72330f08f2"
-					},
-					"resourceGroupName": {
-						"type": "string",
-						"defaultValue": "DataX-ResGroup"
-					},
-					"dedicatedCapacityName": {
-						"type": "string",
-						"defaultValue": "pbimbeddedpowerpages"
-					}
-				},
-				"folder": {
-					"name": "PowerBI"
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]",
+				"[concat(variables('workspaceId'), '/dataflows/PBIMetadata Test')]"
 			]
 		}
 	]

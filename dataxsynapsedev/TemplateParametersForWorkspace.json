@@ -23,6 +23,9 @@
 		"dataxsynapsedev-WorkspaceDefaultSqlServer_connectionString": {
 			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:dataxsynapsedev.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
 		},
+		"ls_Dataverse_servicePrincipalCredential": {
+			"value": ""
+		},
 		"ls_github_credential": {
 			"value": ""
 		},
@@ -40,6 +43,9 @@
 		},
 		"dataxsynapsedev-WorkspaceDefaultStorage_properties_typeProperties_url": {
 			"value": "https://adlsdatax01.dfs.core.windows.net"
+		},
+		"ls_Dataverse_properties_typeProperties_servicePrincipalId": {
+			"value": "b47b7e20-2e2e-48d3-916e-7ffe88a71407"
 		},
 		"ls_github_properties_typeProperties_username": {
 			"value": "alejandroperezdatax"
