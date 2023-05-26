@@ -4537,9 +4537,43 @@
 						]
 					},
 					{
+						"name": "Update Data",
+						"type": "SynapseNotebook",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebook": {
+								"referenceName": "PBIMetadata",
+								"type": "NotebookReference"
+							},
+							"snapshot": true,
+							"sparkPool": {
+								"referenceName": "SparkPool01",
+								"type": "BigDataPoolReference"
+							},
+							"executorSize": "Small",
+							"conf": {},
+							"driverSize": "Small"
+						}
+					},
+					{
 						"name": "Delete Records",
 						"type": "ExecuteDataFlow",
-						"dependsOn": [],
+						"dependsOn": [
+							{
+								"activity": "Update Data",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -4575,8 +4609,7 @@
 								"coreCount": 8,
 								"computeType": "General"
 							},
-							"traceLevel": "Fine",
-							"runConcurrently": true
+							"traceLevel": "Fine"
 						}
 					}
 				],
@@ -4607,6 +4640,8 @@
 				"[concat(variables('workspaceId'), '/datasets/ResourcesDataverse')]",
 				"[concat(variables('workspaceId'), '/datasets/Users')]",
 				"[concat(variables('workspaceId'), '/datasets/UsersDataverse')]",
+				"[concat(variables('workspaceId'), '/notebooks/PBIMetadata')]",
+				"[concat(variables('workspaceId'), '/bigDataPools/SparkPool01')]",
 				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]",
 				"[concat(variables('workspaceId'), '/dataflows/PBIMetadata Test')]"
 			]
@@ -4771,6 +4806,157 @@
 			},
 			"dependsOn": [
 				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Test')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy ReportPages",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "CommonDataServiceForAppsSink",
+								"writeBatchSize": 10,
+								"writeBehavior": "upsert"
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "name",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_name",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "displayName",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_displayname",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "order",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_order",
+											"type": "Int32"
+										}
+									},
+									{
+										"source": {
+											"name": "report_id",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_report_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "group_id",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_group_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "Id",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "Id_duplicate",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "cr64d_reportpagesid",
+											"type": "Guid"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "ReportPages",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "ReportPagesDataverse",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/datasets/ReportPages')]",
+				"[concat(variables('workspaceId'), '/datasets/ReportPagesDataverse')]"
 			]
 		},
 		{
@@ -15746,7 +15932,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "1",
 						"spark.dynamicAllocation.maxExecutors": "1",
-						"spark.autotune.trackingId": "7565d47c-6b63-4cc8-8b3c-258596d57410"
+						"spark.autotune.trackingId": "8b0946a7-6191-4ba1-9a3f-e5e47ef847a0"
 					}
 				},
 				"metadata": {
@@ -15771,8 +15957,7 @@
 						"sparkVersion": "3.1",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28,
-						"automaticScaleJobs": false
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -18055,66 +18240,6 @@
 			},
 			"dependsOn": [],
 			"location": "westeurope"
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/Test')]",
-			"type": "Microsoft.Synapse/workspaces/pipelines",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"activities": [
-					{
-						"name": "Delete Records",
-						"type": "ExecuteDataFlow",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"dataflow": {
-								"referenceName": "PBIMetadata Test",
-								"type": "DataFlowReference",
-								"parameters": {},
-								"datasetParameters": {
-									"GroupsSource": {},
-									"ActivityEventsSource": {},
-									"DatasourcesSource": {},
-									"RefreshHistorySource": {},
-									"ReportPagesSource": {},
-									"ResourcesSource": {},
-									"UsersSource": {},
-									"GroupsSink": {},
-									"ActivityEventsSink": {},
-									"DatasourcesSink": {},
-									"RefreshHistorySink": {},
-									"ReportPagesSink": {},
-									"ResourcesSink": {},
-									"UsersSink": {}
-								}
-							},
-							"staging": {},
-							"compute": {
-								"coreCount": 8,
-								"computeType": "General"
-							},
-							"traceLevel": "Fine"
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]",
-				"[concat(variables('workspaceId'), '/dataflows/PBIMetadata Test')]"
-			]
 		}
 	]
 }
