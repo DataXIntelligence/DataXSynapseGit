@@ -1641,7 +1641,7 @@
 							},
 							{
 								"source": {
-									"name": "Id_duplicate",
+									"name": "id_duplicate",
 									"type": "String",
 									"physicalType": "String"
 								},

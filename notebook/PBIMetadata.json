@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "1",
 				"spark.dynamicAllocation.maxExecutors": "1",
-				"spark.autotune.trackingId": "c2ddad00-8faf-4b2a-96a4-be19cf108b00"
+				"spark.autotune.trackingId": "5f57ab33-a2ad-4231-99c4-8b6100110158"
 			}
 		},
 		"metadata": {
@@ -85,7 +85,7 @@
 					"import uuid\r\n",
 					"from datetime import datetime, timezone, timedelta"
 				],
-				"execution_count": 2
+				"execution_count": 14
 			},
 			{
 				"cell_type": "code",
@@ -115,7 +115,7 @@
 					"        result = strList[-2]\r\n",
 					"    return result"
 				],
-				"execution_count": 3
+				"execution_count": 15
 			},
 			{
 				"cell_type": "markdown",
@@ -149,7 +149,7 @@
 					"client_secret = mssparkutils.credentials.getSecretWithLS('ls_keyvault', 'PBIMetadataClientSecret')\r\n",
 					"account_password = mssparkutils.credentials.getSecretWithLS('ls_keyvault', 'PBIMetadataClientUserAndPassword')"
 				],
-				"execution_count": 4
+				"execution_count": 16
 			},
 			{
 				"cell_type": "code",
@@ -172,7 +172,7 @@
 					"headers = CaseInsensitiveDict()\r\n",
 					"headers[\"Authorization\"] = \"Bearer \" + access_token"
 				],
-				"execution_count": 5
+				"execution_count": 17
 			},
 			{
 				"cell_type": "markdown",
@@ -212,7 +212,7 @@
 					"mssparkutils.fs.put(\"/PBIMetadata/Groups.csv\", groups_df.to_csv(index=False), True)\r\n",
 					"#print(groups_df.head())"
 				],
-				"execution_count": 6
+				"execution_count": 18
 			},
 			{
 				"cell_type": "markdown",
@@ -262,7 +262,7 @@
 					"data_df[\"id_duplicate\"] = data_df[\"id\"]\r\n",
 					"mssparkutils.fs.put(\"/PBIMetadata/Resources.csv\", data_df.to_csv(index=False), True)"
 				],
-				"execution_count": 7
+				"execution_count": 19
 			},
 			{
 				"cell_type": "markdown",
@@ -304,12 +304,12 @@
 					"    new_df[\"report_id\"] = id_\r\n",
 					"    new_df[\"group_id\"] = group\r\n",
 					"    new_df[\"Id\"] = new_df.report_id.map(str) + new_df.name\r\n",
-					"    new_df[\"Id_duplicate\"] = new_df[\"report_id\"].apply(lambda x: uuid.uuid4())\r\n",
+					"    new_df[\"id_duplicate\"] = new_df[\"report_id\"].apply(lambda x: uuid.uuid4())\r\n",
 					"    pages_df = pd.concat([pages_df,new_df],ignore_index=True)\r\n",
 					"mssparkutils.fs.put(\"/PBIMetadata/ReportPages.csv\", pages_df.to_csv(index=False), True)\r\n",
 					"#print(pages_df.shape)"
 				],
-				"execution_count": 8
+				"execution_count": 21
 			},
 			{
 				"cell_type": "markdown",
