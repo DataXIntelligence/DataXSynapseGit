@@ -3,8 +3,8 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Delete Records",
-				"type": "ExecuteDataFlow",
+				"name": "Copy ReportPages",
+				"type": "Copy",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
@@ -15,16 +15,123 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"dataflow": {
-						"referenceName": "PBIMetadata Test",
-						"type": "DataFlowReference"
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
 					},
-					"compute": {
-						"coreCount": 8,
-						"computeType": "General"
+					"sink": {
+						"type": "CommonDataServiceForAppsSink",
+						"writeBatchSize": 10,
+						"writeBehavior": "upsert"
 					},
-					"traceLevel": "Fine"
-				}
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "name",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_name",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "displayName",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_displayname",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "order",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_order",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"name": "report_id",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_report_id",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "group_id",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_group_id",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Id",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_id",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Id_duplicate",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cr64d_reportpagesid",
+									"type": "Guid"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ReportPages",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ReportPagesDataverse",
+						"type": "DatasetReference"
+					}
+				]
 			}
 		],
 		"annotations": []
