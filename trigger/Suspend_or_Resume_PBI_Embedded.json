@@ -3,7 +3,14 @@
 	"properties": {
 		"annotations": [],
 		"runtimeState": "Started",
-		"pipelines": [],
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "Pause_or_Resume_Fabric_Capacity",
+					"type": "PipelineReference"
+				}
+			}
+		],
 		"type": "ScheduleTrigger",
 		"typeProperties": {
 			"recurrence": {
@@ -16,8 +23,8 @@
 						0
 					],
 					"hours": [
-						9,
-						17
+						7,
+						16
 					]
 				}
 			}
