@@ -1,5 +1,5 @@
 {
-	"name": "Pause_PowerBI_Embedded",
+	"name": "Pause_Fabric_Capacity",
 	"properties": {
 		"activities": [
 			{
@@ -91,7 +91,7 @@
 			},
 			"dedicatedCapacityName": {
 				"type": "string",
-				"defaultValue": "pbimbeddedpowerpages"
+				"defaultValue": "dataxfabriccapacity"
 			}
 		},
 		"folder": {

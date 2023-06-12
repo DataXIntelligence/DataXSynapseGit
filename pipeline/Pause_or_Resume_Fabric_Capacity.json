@@ -1,5 +1,5 @@
 {
-	"name": "Pause_or_Resume_PowerBI_Embedded",
+	"name": "Pause_or_Resume_Fabric_Capacity",
 	"properties": {
 		"activities": [
 			{
@@ -51,7 +51,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"pipeline": {
-									"referenceName": "Pause_PowerBI_Embedded",
+									"referenceName": "Pause_Fabric_Capacity",
 									"type": "PipelineReference"
 								},
 								"waitOnCompletion": true
@@ -66,7 +66,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"pipeline": {
-									"referenceName": "Resume_PowerBI_Embedded",
+									"referenceName": "Resume_Fabric_Capacity",
 									"type": "PipelineReference"
 								},
 								"waitOnCompletion": true
@@ -87,7 +87,7 @@
 			},
 			"dedicatedCapacityName": {
 				"type": "string",
-				"defaultValue": "pbimbeddedpowerpages"
+				"defaultValue": "dataxfabriccapacity"
 			},
 			"TimeZone": {
 				"type": "string",
@@ -95,7 +95,7 @@
 			},
 			"UpTime": {
 				"type": "int",
-				"defaultValue": 9
+				"defaultValue": 7
 			}
 		},
 		"variables": {

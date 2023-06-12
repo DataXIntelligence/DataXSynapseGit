@@ -1,5 +1,5 @@
 {
-	"name": "Resume_PowerBI_Embedded",
+	"name": "Resume_Fabric_Capacity",
 	"properties": {
 		"activities": [
 			{
@@ -91,7 +91,7 @@
 			},
 			"dedicatedCapacityName": {
 				"type": "string",
-				"defaultValue": "pbimbeddedpowerpages"
+				"defaultValue": "dataxfabriccapacity"
 			}
 		},
 		"folder": {
